@@ -28,6 +28,7 @@ CLAUDE.md
 /storage/*.key
 /storage/pail
 /vendor
+/packages
 Homestead.json
 Homestead.yaml
 Thumbs.db
