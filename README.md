@@ -9,6 +9,65 @@ Este proyecto sirve como **entorno de prueba** para validar la compatibilidad y 
 - **`aichadigital/larabill`** - Sistema de facturación y billing agnóstico
 - **`aichadigital/lara-verifactu`** - Integración con AEAT Verifactu para España
 
+---
+
+## 🌳 BRANCH: `model/uuid-binary`
+
+### ⚙️ Configuración de esta Branch
+
+Esta branch prueba el paquete larabill con **UUID v7 ordenado almacenado como binary(16)**.
+
+#### User Model Configuration:
+- **Tipo de ID**: UUID v7 (ordered)
+- **Storage**: `binary(16)` en base de datos
+- **Paquete**: `dyrynda/laravel-model-uuid` v8.2.0
+- **Eficiencia**: 55% menos espacio que UUID string (16 bytes vs 36 bytes)
+
+#### Implementación:
+
+```php
+// app/Models/User.php
+use Dyrynda\Database\Support\{BindsOnUuid, GeneratesUuid};
+use Dyrynda\Database\Support\Casts\EfficientUuid;
+use Filament\Models\Contracts\FilamentUser;
+
+class User extends Authenticatable implements FilamentUser
+{
+    use BindsOnUuid, GeneratesUuid, HasFactory, Notifiable;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    public function uuidVersion(): string { return 'uuid7'; }
+    public function uuidColumn(): string { return 'id'; }
+
+    protected function casts(): array
+    {
+        return [
+            'id' => EfficientUuid::class,
+            // ...
+        ];
+    }
+
+    // CLAVE: Retorna valor RAW binary para Laravel Auth
+    public function getAuthIdentifier(): mixed
+    {
+        return $this->getRawOriginal($this->getAuthIdentifierName());
+    }
+}
+```
+
+#### Migración:
+
+```php
+Schema::create('users', function (Blueprint $table) {
+    $table->binary('id', 16)->primary();
+    // ...
+});
+```
+
+---
+
 ## 🌳 Estrategia de Branches
 
 Este proyecto utiliza una **estrategia de branches por configuración de modelo** para probar la compatibilidad del paquete con diferentes tipos de ID de usuario:
@@ -18,7 +77,7 @@ Este proyecto utiliza una **estrategia de branches por configuración de modelo*
 | Branch | Descripción | User ID Type | Estado |
 |--------|-------------|--------------|--------|
 | `main` | Base limpia con Filament | N/A | ✅ Ready |
-| `model/uuid-binary` | UUID v7 ordenado como binary(16) | UUID v7 (16 bytes) | 🚧 En desarrollo |
+| `model/uuid-binary` | **← ESTÁS AQUÍ** | UUID v7 (16 bytes) | 🚧 En desarrollo |
 | `model/autoincrement` | Auto-increment tradicional | bigIncrements | 📋 Pendiente |
 | `model/uuid-string` | UUID v7 como string | UUID v7 (36 chars) | 📋 Pendiente |
 | `model/ulid-binary` | ULID como binary(16) | ULID (16 bytes) | 📋 Pendiente |
@@ -29,6 +88,7 @@ Este proyecto utiliza una **estrategia de branches por configuración de modelo*
 2. **Comparación Fácil**: `git diff model/uuid-binary model/autoincrement`
 3. **Un Solo Repositorio**: Todo el historial centralizado
 4. **Documentación por Branch**: Cada configuración documentada en su contexto
+5. **Evita Duplicación**: Los paquetes (symlinks) se comparten entre branches
 
 ### Workflow de Testing:
 
@@ -69,9 +129,9 @@ git checkout main
 ✅ Recursos de Filament para testing:
    - UserResource
    - InvoiceResource
-   - UserTaxProfileResource
-   - FiscalSettingsResource
-✅ Seeders con datos de prueba
+   - UserTaxProfileResource (opcional)
+   - FiscalSettingsResource (opcional)
+✅ Seeders con datos de prueba específicos
 ```
 
 ## 📦 Paquetes Bajo Prueba
@@ -81,7 +141,7 @@ git checkout main
 **Características clave:**
 - ✅ Agnóstico al tipo de user_id (UUID, ULID, Int)
 - ✅ UUID binary para facturas (eficiencia del 55%)
-- ✅ Base-100 para montos (lara100): €12.34 → 1234
+- ✅ **Base-100 para montos (lara100)**: €12.34 → 1234
 - ✅ Verificación de CIF/VAT
 - ✅ Cálculo de impuestos (IVA, IGIC, IPSI, EU)
 - ✅ Inmutabilidad de facturas
@@ -102,6 +162,18 @@ git checkout main
     }
 }
 ```
+
+**⚠️ IMPORTANTE - Lara100 (Base-100):**
+
+El paquete usa `aichadigital/lara100` para manejar montos en **base 100** (sin decimales):
+- €12.34 se almacena como `1234` (integer)
+- €0.99 se almacena como `99` (integer)
+- €100.00 se almacena como `10000` (integer)
+
+**Beneficios:**
+- ✅ Sin errores de redondeo de punto flotante
+- ✅ Cálculos precisos de impuestos
+- ✅ Performance mejorada (integer vs decimal/float)
 
 ### Lara-Verifactu (Development)
 
@@ -127,12 +199,13 @@ git checkout main
 }
 ```
 
-## 🚀 Stack Tecnológico
+## 🚀 Stack Tecnológico (Branch: model/uuid-binary)
 
 - **Laravel**: 12.33.0
 - **PHP**: 8.4.13
 - **Filament**: 4.1.7
 - **MySQL**: Latest
+- **User ID**: UUID v7 binary(16) con `dyrynda/laravel-model-uuid`
 - **Entorno Local**: Laravel Herd
 - **URL**: https://larafactu.test/ (HTTPS activo)
 
@@ -157,18 +230,21 @@ vendor/bin/pint                   # Formatear código
 php artisan test                  # Ejecutar tests
 ```
 
-### Verifactu (cuando esté en branch específica)
+### Verifactu
 ```bash
 php artisan verifactu:test-connection    # Probar conexión AEAT
 php artisan verifactu:register {id}      # Registrar factura
 php artisan verifactu:status             # Ver estado del sistema
 php artisan verifactu:verify-blockchain  # Verificar integridad
+php artisan verifactu:retry-failed       # Reintentar envíos fallidos
 ```
 
 ## 📚 Documentación Adicional
 
-- **`STAGING_SETUP.md`** - Configuración detallada del entorno staging
+- **`STAGING_SETUP.md`** - Configuración detallada del entorno staging y UUID binary
 - **`.cursor/rules/larafactu.mdc`** - Reglas específicas del proyecto para Cursor AI
+- **Paquete Larabill**: `./packages/aichadigital/larabill/README.md`
+- **Paquete Lara-Verifactu**: `./packages/aichadigital/lara-verifactu/README.md`
 
 ## 🐛 Troubleshooting
 
@@ -182,7 +258,7 @@ php artisan migrate:fresh --seed   # Recrear DB para la nueva configuración
 php artisan optimize:clear          # Limpiar cachés
 ```
 
-### Problemas con Herd
+### Problemas con Herd (Testing Simultáneo)
 
 Si necesitas múltiples entornos simultáneos, puedes crear symlinks:
 
