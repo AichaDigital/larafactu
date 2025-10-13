@@ -1,61 +1,209 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Larafactu - Staging Project for Package Testing
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> **Proyecto de staging para probar los paquetes larabill y lara-verifactu en diferentes configuraciones de modelos**
 
-## About Laravel
+## 🎯 Propósito
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Este proyecto sirve como **entorno de prueba** para validar la compatibilidad y funcionalidad de los paquetes:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **`aichadigital/larabill`** - Sistema de facturación y billing agnóstico
+- **`aichadigital/lara-verifactu`** - Integración con AEAT Verifactu para España
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🌳 Estrategia de Branches
 
-## Learning Laravel
+Este proyecto utiliza una **estrategia de branches por configuración de modelo** para probar la compatibilidad del paquete con diferentes tipos de ID de usuario:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Branches Disponibles:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+| Branch | Descripción | User ID Type | Estado |
+|--------|-------------|--------------|--------|
+| `main` | Base limpia con Filament | N/A | ✅ Ready |
+| `model/uuid-binary` | UUID v7 ordenado como binary(16) | UUID v7 (16 bytes) | 🚧 En desarrollo |
+| `model/autoincrement` | Auto-increment tradicional | bigIncrements | 📋 Pendiente |
+| `model/uuid-string` | UUID v7 como string | UUID v7 (36 chars) | 📋 Pendiente |
+| `model/ulid-binary` | ULID como binary(16) | ULID (16 bytes) | 📋 Pendiente |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### ¿Por qué esta estrategia?
 
-## Laravel Sponsors
+1. **Testing Completo**: Verificar que larabill funciona con cualquier tipo de user_id
+2. **Comparación Fácil**: `git diff model/uuid-binary model/autoincrement`
+3. **Un Solo Repositorio**: Todo el historial centralizado
+4. **Documentación por Branch**: Cada configuración documentada en su contexto
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Workflow de Testing:
 
-### Premium Partners
+```bash
+# Probar configuración UUID Binary
+git checkout model/uuid-binary
+composer install
+php artisan migrate:fresh --seed
+# → Acceder a https://larafactu.test/admin
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Probar configuración Auto-increment
+git checkout model/autoincrement
+php artisan migrate:fresh --seed
+# → Acceder a https://larafactu.test/admin
 
-## Contributing
+# Volver a la base limpia
+git checkout main
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🏗️ Estructura del Proyecto
 
-## Code of Conduct
+### Branch `main` (Base Limpia):
+```
+✅ Laravel 12
+✅ Filament 4.1 (Admin Panel básico)
+✅ User model con FilamentUser (login funcional)
+✅ Paquetes instalados (symlinks):
+   - aichadigital/larabill
+   - aichadigital/lara-verifactu
+✅ Migraciones de paquetes publicadas
+❌ SIN recursos de Filament (vacío)
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Branches `model/*` (Configuraciones Específicas):
+```
+✅ Todo lo de main
+✅ User model configurado para tipo específico de ID
+✅ Recursos de Filament para testing:
+   - UserResource
+   - InvoiceResource
+   - UserTaxProfileResource
+   - FiscalSettingsResource
+✅ Seeders con datos de prueba
+```
 
-## Security Vulnerabilities
+## 📦 Paquetes Bajo Prueba
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Larabill v0.1.0 (Development)
 
-## License
+**Características clave:**
+- ✅ Agnóstico al tipo de user_id (UUID, ULID, Int)
+- ✅ UUID binary para facturas (eficiencia del 55%)
+- ✅ Base-100 para montos (lara100): €12.34 → 1234
+- ✅ Verificación de CIF/VAT
+- ✅ Cálculo de impuestos (IVA, IGIC, IPSI, EU)
+- ✅ Inmutabilidad de facturas
+- ✅ Generación de PDF
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Instalación:**
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./packages/aichadigital/larabill",
+            "options": { "symlink": true }
+        }
+    ],
+    "require": {
+        "aichadigital/larabill": "@dev"
+    }
+}
+```
+
+### Lara-Verifactu (Development)
+
+**Características clave:**
+- ✅ Integración con AEAT Verifactu
+- ✅ Firma electrónica de facturas
+- ✅ Blockchain de facturas
+- ✅ Envío a la AEAT
+
+**Instalación:**
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./packages/aichadigital/lara-verifactu",
+            "options": { "symlink": true }
+        }
+    ],
+    "require": {
+        "aichadigital/lara-verifactu": "@dev"
+    }
+}
+```
+
+## 🚀 Stack Tecnológico
+
+- **Laravel**: 12.33.0
+- **PHP**: 8.4.13
+- **Filament**: 4.1.7
+- **MySQL**: Latest
+- **Entorno Local**: Laravel Herd
+- **URL**: https://larafactu.test/ (HTTPS activo)
+
+## 👤 Usuarios de Prueba
+
+Disponibles en todas las branches:
+
+```
+Email: test@example.com
+Password: password
+```
+
+Este usuario se crea automáticamente con el seeder usando `firstOrCreate()` para persistir entre migraciones.
+
+## 🛠️ Comandos Útiles
+
+### General
+```bash
+php artisan migrate:fresh --seed  # Recrear DB con datos
+php artisan optimize:clear        # Limpiar cachés
+vendor/bin/pint                   # Formatear código
+php artisan test                  # Ejecutar tests
+```
+
+### Verifactu (cuando esté en branch específica)
+```bash
+php artisan verifactu:test-connection    # Probar conexión AEAT
+php artisan verifactu:register {id}      # Registrar factura
+php artisan verifactu:status             # Ver estado del sistema
+php artisan verifactu:verify-blockchain  # Verificar integridad
+```
+
+## 📚 Documentación Adicional
+
+- **`STAGING_SETUP.md`** - Configuración detallada del entorno staging
+- **`.cursor/rules/larafactu.mdc`** - Reglas específicas del proyecto para Cursor AI
+
+## 🐛 Troubleshooting
+
+### Cambiar entre branches
+
+```bash
+# Al cambiar de branch, siempre ejecutar:
+git checkout model/nombre-branch
+composer install                    # Por si hay dependencias diferentes
+php artisan migrate:fresh --seed   # Recrear DB para la nueva configuración
+php artisan optimize:clear          # Limpiar cachés
+```
+
+### Problemas con Herd
+
+Si necesitas múltiples entornos simultáneos, puedes crear symlinks:
+
+```bash
+# Crear copia para testing paralelo
+ln -s ~/SitesLR12/larafactu ~/SitesLR12/larafactu-int
+cd ~/SitesLR12/larafactu-int
+git checkout model/autoincrement
+
+# Herd creará automáticamente:
+# - larafactu.test → model/uuid-binary
+# - larafactu-int.test → model/autoincrement
+```
+
+## 🌍 Normativa de Lenguaje
+
+- **Código**: Todo en inglés (variables, clases, comentarios, docblocks)
+- **Chat/Docs**: En español (documentación de usuario, comunicación)
+
+Ver `.cursor/rules/larafactu.mdc` para más detalles.
+
+## 📝 License
+
+The MIT License (MIT). Ver [License File](LICENSE.md).
