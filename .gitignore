@@ -31,6 +31,7 @@ CLAUDE.md
 /storage/pail
 /vendor
 /packages
+/docs
 Homestead.json
 Homestead.yaml
 Thumbs.db

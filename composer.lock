@@ -247,7 +247,7 @@
             "dist": {
                 "type": "path",
                 "url": "./packages/aichadigital/larabill",
-                "reference": "22ba781beca8fbadaf11862dcfba72899eb806f8"
+                "reference": "759477c5b6c7b7aa13253aa4eb134991b79fe01b"
             },
             "require": {
                 "aichadigital/lara100": "^1.0",
