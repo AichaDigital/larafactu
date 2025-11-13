@@ -33,6 +33,50 @@ class UserFactory extends Factory
     }
 
     /**
+     * Spanish company (ES - Spain)
+     */
+    public function spanish(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => fake()->company() . ' S.L.',
+            'email' => fake()->unique()->companyEmail(),
+        ]);
+    }
+
+    /**
+     * EU Intra-community company (ROI - Reverse Charge Operator)
+     */
+    public function euRoi(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => fake()->company() . ' GmbH',
+            'email' => fake()->unique()->companyEmail(),
+        ]);
+    }
+
+    /**
+     * EU Intra-community company (Non-ROI)
+     */
+    public function euNonRoi(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => fake()->company() . ' SAS',
+            'email' => fake()->unique()->companyEmail(),
+        ]);
+    }
+
+    /**
+     * Non-EU company (outside EU)
+     */
+    public function nonEu(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => fake()->company() . ' Inc.',
+            'email' => fake()->unique()->companyEmail(),
+        ]);
+    }
+
+    /**
      * Indicate that the model's email address should be unverified.
      */
     public function unverified(): static
