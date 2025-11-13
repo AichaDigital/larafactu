@@ -35,3 +35,28 @@ CLAUDE.md
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+## Public builds
+public/css/
+public/js/
+public/mix-manifest.json
+public/hot/
+public/storage/
+public/build/
+public/assets/
+public/fonts/
+public/images/
+public/videos/
+public/sounds/
+public/downloads/
+
+## locks
+composer.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+bun.lock
+bun.lock.json
+bun.lock.yaml
+bun.lock.json
