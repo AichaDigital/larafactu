@@ -7,24 +7,18 @@
     "license": "MIT",
     "repositories": [
         {
-            "type": "path",
-            "url": "./packages/aichadigital/larabill",
-            "options": {
-                "symlink": true
-            }
+            "type": "vcs",
+            "url": "https://github.com/aichadigital/larabill.git"
         },
         {
-            "type": "path",
-            "url": "./packages/aichadigital/lara-verifactu",
-            "options": {
-                "symlink": true
-            }
+            "type": "vcs",
+            "url": "https://github.com/aichadigital/lara-verifactu.git"
         }
     ],
     "require": {
-        "php": "^8.2",
-        "aichadigital/larabill": "@dev",
-        "aichadigital/lara-verifactu": "@dev",
+        "php": "^8.3",
+        "aichadigital/larabill": "dev-main",
+        "aichadigital/lara-verifactu": "dev-main",
         "filament/filament": "^4.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1"
@@ -65,9 +59,36 @@
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
         ],
-        "test": [
-            "@php artisan config:clear --ansi",
-            "@php artisan test"
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "test-parallel": "vendor/bin/pest --parallel",
+        "test-profile": "vendor/bin/pest --profile",
+        "test-mutate": "vendor/bin/pest --mutate",
+        "format": "vendor/bin/pint",
+        "phpstan": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "phpstan-baseline": "vendor/bin/phpstan analyse --generate-baseline --memory-limit=1G",
+        "phpinsights": "vendor/bin/phpinsights",
+        "phpinsights-fix": "vendor/bin/phpinsights fix",
+        "phpinsights-baseline": "vendor/bin/phpinsights analyse --generate-baseline",
+        "pint": [
+            "./vendor/bin/pint"
+        ],
+        "quality": [
+            "@format",
+            "@phpstan",
+            "@test-coverage"
+        ],
+        "quality-full": [
+            "@format",
+            "@phpstan",
+            "@test-coverage",
+            "@test-mutate"
+        ],
+        "precommit": [
+            "@format",
+            "@phpstan",
+            "@test-parallel"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

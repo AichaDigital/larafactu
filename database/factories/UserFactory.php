@@ -38,7 +38,7 @@ class UserFactory extends Factory
     public function spanish(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => fake()->company() . ' S.L.',
+            'name' => fake()->company().' S.L.',
             'email' => fake()->unique()->companyEmail(),
         ]);
     }
@@ -49,7 +49,7 @@ class UserFactory extends Factory
     public function euRoi(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => fake()->company() . ' GmbH',
+            'name' => fake()->company().' GmbH',
             'email' => fake()->unique()->companyEmail(),
         ]);
     }
@@ -60,7 +60,7 @@ class UserFactory extends Factory
     public function euNonRoi(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => fake()->company() . ' SAS',
+            'name' => fake()->company().' SAS',
             'email' => fake()->unique()->companyEmail(),
         ]);
     }
@@ -71,7 +71,7 @@ class UserFactory extends Factory
     public function nonEu(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => fake()->company() . ' Inc.',
+            'name' => fake()->company().' Inc.',
             'email' => fake()->unique()->companyEmail(),
         ]);
     }

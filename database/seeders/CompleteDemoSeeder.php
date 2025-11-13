@@ -2,15 +2,13 @@
 
 namespace Database\Seeders;
 
+use AichaDigital\Larabill\Models\FiscalSettings;
+use AichaDigital\Larabill\Models\Invoice;
+use AichaDigital\Larabill\Models\InvoiceItem;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use AichaDigital\Larabill\Models\{
-    Invoice,
-    InvoiceItem,
-    FiscalSettings
-};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class CompleteDemoSeeder extends Seeder
 {
@@ -54,9 +52,9 @@ class CompleteDemoSeeder extends Seeder
         });
 
         $this->command->info('Demo seeding completed successfully!');
-        $this->command->info('Created: ' . $allUsers->count() . ' users');
-        $this->command->info('Created: ' . Invoice::count() . ' invoices');
-        $this->command->info('Created: ' . InvoiceItem::count() . ' invoice items');
+        $this->command->info('Created: '.$allUsers->count().' users');
+        $this->command->info('Created: '.Invoice::count().' invoices');
+        $this->command->info('Created: '.InvoiceItem::count().' invoice items');
     }
 
     /**
@@ -69,7 +67,7 @@ class CompleteDemoSeeder extends Seeder
 
         for ($i = 0; $i < $count; $i++) {
             $user = User::create([
-                'name' => fake()->company() . ' S.L.',
+                'name' => fake()->company().' S.L.',
                 'email' => fake()->unique()->companyEmail(),
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
@@ -79,7 +77,7 @@ class CompleteDemoSeeder extends Seeder
             DB::table('user_tax_infos')->insert([
                 'user_id' => $user->getRawOriginal('id'), // Get raw binary UUID
                 'is_current' => true,
-                'tax_id' => 'ES' . fake()->numerify('B########'),
+                'tax_id' => 'ES'.fake()->numerify('B########'),
                 'company_name' => $user->name,
                 'address' => fake()->streetAddress(),
                 'city' => fake()->randomElement($spanishCities),
@@ -125,7 +123,7 @@ class CompleteDemoSeeder extends Seeder
             $countryData = $euCountries[$countryCode];
 
             $user = User::create([
-                'name' => fake()->company() . ' ' . $countryData['suffix'],
+                'name' => fake()->company().' '.$countryData['suffix'],
                 'email' => fake()->unique()->companyEmail(),
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
@@ -135,7 +133,7 @@ class CompleteDemoSeeder extends Seeder
             DB::table('user_tax_infos')->insert([
                 'user_id' => $user->getRawOriginal('id'), // Get raw binary UUID
                 'is_current' => true,
-                'tax_id' => $countryData['prefix'] . fake()->numerify('###########'),
+                'tax_id' => $countryData['prefix'].fake()->numerify('###########'),
                 'company_name' => $user->name,
                 'address' => fake()->streetAddress(),
                 'city' => fake()->randomElement($countryData['cities']),
@@ -181,7 +179,7 @@ class CompleteDemoSeeder extends Seeder
             $countryData = $euCountries[$countryCode];
 
             $user = User::create([
-                'name' => fake()->company() . ' ' . $countryData['suffix'],
+                'name' => fake()->company().' '.$countryData['suffix'],
                 'email' => fake()->unique()->companyEmail(),
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
@@ -191,7 +189,7 @@ class CompleteDemoSeeder extends Seeder
             DB::table('user_tax_infos')->insert([
                 'user_id' => $user->getRawOriginal('id'), // Get raw binary UUID
                 'is_current' => true,
-                'tax_id' => $countryData['prefix'] . fake()->numerify('###########'),
+                'tax_id' => $countryData['prefix'].fake()->numerify('###########'),
                 'company_name' => $user->name,
                 'address' => fake()->streetAddress(),
                 'city' => fake()->randomElement($countryData['cities']),
@@ -237,7 +235,7 @@ class CompleteDemoSeeder extends Seeder
             $countryData = $nonEuCountries[$countryCode];
 
             $user = User::create([
-                'name' => fake()->company() . ' ' . $countryData['suffix'],
+                'name' => fake()->company().' '.$countryData['suffix'],
                 'email' => fake()->unique()->companyEmail(),
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
@@ -285,7 +283,7 @@ class CompleteDemoSeeder extends Seeder
             $isImmutable = fake()->boolean(70);
 
             $invoice = Invoice::create([
-                'number' => 'FAC-' . now()->year . '-' . str_pad(Invoice::count() + 1, 6, '0', STR_PAD_LEFT),
+                'number' => 'FAC-'.now()->year.'-'.str_pad(Invoice::count() + 1, 6, '0', STR_PAD_LEFT),
                 'type' => fake()->randomElement(['invoice', 'proforma']),
                 'status' => fake()->randomElement(['draft', 'sent', 'paid', 'overdue']),
                 'user_id' => $user->getRawOriginal('id'), // Get raw binary UUID
