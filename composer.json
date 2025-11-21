@@ -7,18 +7,32 @@
     "license": "MIT",
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/aichadigital/larabill.git"
+            "type": "path",
+            "url": "./packages/aichadigital/larabill",
+            "options": {
+                "symlink": true
+            }
         },
         {
-            "type": "vcs",
-            "url": "https://github.com/aichadigital/lara-verifactu.git"
+            "type": "path",
+            "url": "./packages/aichadigital/lara-verifactu",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "./packages/aichadigital/laratickets",
+            "options": {
+                "symlink": true
+            }
         }
     ],
     "require": {
         "php": "^8.3",
         "aichadigital/larabill": "dev-main",
         "aichadigital/lara-verifactu": "dev-main",
+        "aichadigital/laratickets": "dev-main",
         "filament/filament": "^4.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1"
@@ -124,6 +138,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
