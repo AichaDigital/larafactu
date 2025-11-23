@@ -1,0 +1,382 @@
+---
+description: "Larafactu Project - Staging for Billing Packages Development"
+globs: ["**/*.php", "**/*.blade.php", "**/*.md"]
+alwaysApply: true
+---
+
+# Larafactu - Staging Project Rules
+
+## 🎯 Project Identity
+
+### Core Purpose
+- **Staging environment** for testing billing packages in real-world scenarios
+- **Target v1.0**: Hosting companies, Spain/EU, Intracom Operator
+- **Critical deadline**: December 15, 2025 - stable version for WHMCS migration
+- **Philosophy**: Pragmatic, Laravel-aligned, avoid over-engineering
+
+### Main Packages Under Development
+Located at: `/Users/abkrim/development/packages/aichadigital/`
+
+1. **larabill** (core billing) - dev-main
+2. **lararoi** (EU VAT/ROI logic) - dev-main
+3. **lara-verifactu** (Spain AEAT integration) - dev-main
+4. **laratickets** (support tickets) - dev-main
+5. **lara100** (base-100 monetary) - v1.0 stable
+
+## 🏗️ Technical Stack
+
+### Framework & Versions
+- **PHP**: 8.4.13
+- **Laravel**: 12.x
+- **Filament**: 4.x
+- **Pest**: 4.x (browser testing enabled)
+- **Tailwind CSS**: 4.x
+- **Database**: MySQL (local: Laravel Herd)
+
+### UUID Strategy (Security-Driven)
+**Purpose**: Avoid discovery attacks on public-facing resources
+
+#### ✅ UUID v7 Binary (16 bytes) - Public Exposure
+- `users` table → User model
+- `invoices` table → Invoice model (Larabill)
+- `tickets` table → Ticket model (Laratickets)
+
+**Rationale**: Models exposed in URLs, API endpoints, or external references
+
+#### ❌ Integer IDs - Internal Configuration
+- `tax_rates`, `fiscal_settings`, `invoice_templates`
+- `tax_categories`, `unit_measures`, `legal_entity_types`
+- Any internal/configuration tables
+
+**Rationale**: No public exposure, better JOIN performance, simpler relationships
+
+### UUID Implementation
+
+```php
+// Example: User model (UUID v7 binary)
+use Dyrynda\Database\Support\{BindsOnUuid, GeneratesUuid};
+use Dyrynda\Database\Support\Casts\EfficientUuid;
+
+class User extends Authenticatable
+{
+    use BindsOnUuid, GeneratesUuid;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    public function uuidVersion(): string { return 'uuid7'; }
+    public function uuidColumn(): string { return 'id'; }
+
+    protected function casts(): array {
+        return [
+            'id' => EfficientUuid::class,
+            // ...
+        ];
+    }
+
+    // CRITICAL: Return raw binary for Laravel Auth
+    public function getAuthIdentifier(): mixed {
+        return $this->getRawOriginal($this->getAuthIdentifierName());
+    }
+}
+```
+
+**Package**: `dyrynda/laravel-model-uuid` (established, don't reinvent)
+
+## 💰 Monetary Values - Base 100 (Lara100)
+
+### CRITICAL RULE
+**NEVER use float/decimal for monetary values, prices, amounts, tax rates**
+
+### Always Use Integers (Base 100)
+- €12.34 → `1234` (integer)
+- 21.5% IVA → `2150` (integer)
+- €0.99 → `99` (integer)
+
+### Package
+- `aichadigital/lara100` (v1.0 - stable)
+- Prevents floating-point errors
+- Ensures exact fiscal calculations
+- Used throughout: Invoice, TaxRate, prices, amounts
+
+## 📦 Package Development Mode
+
+### Local Development Setup
+
+**CRITICAL**: Larafactu usa **path repositories con symlinks** para desarrollo local.
+
+**Estructura de directorios:**
+```
+/Users/abkrim/
+├── development/packages/aichadigital/  # Paquetes source
+│   ├── larabill/
+│   ├── lararoi/
+│   ├── lara-verifactu/
+│   └── laratickets/
+└── SitesLR12/larafactu/                # App staging
+    └── packages/aichadigital/          # Symlinks locales
+        ├── larabill -> /Users/abkrim/development/packages/aichadigital/larabill
+        ├── lararoi -> /Users/abkrim/development/packages/aichadigital/lararoi
+        ├── lara-verifactu -> /Users/abkrim/development/packages/aichadigital/lara-verifactu
+        └── laratickets -> /Users/abkrim/development/packages/aichadigital/laratickets
+```
+
+**composer.json (Modo Desarrollo):**
+```json
+"repositories": [
+    {
+        "type": "path",
+        "url": "./packages/aichadigital/larabill",
+        "options": { "symlink": true }
+    },
+    {
+        "type": "path",
+        "url": "./packages/aichadigital/lararoi",
+        "options": { "symlink": true }
+    },
+    {
+        "type": "path",
+        "url": "./packages/aichadigital/lara-verifactu",
+        "options": { "symlink": true }
+    },
+    {
+        "type": "path",
+        "url": "./packages/aichadigital/laratickets",
+        "options": { "symlink": true }
+    }
+],
+"require": {
+    "aichadigital/larabill": "dev-main",
+    "aichadigital/lararoi": "dev-main",
+    "aichadigital/lara-verifactu": "dev-main",
+    "aichadigital/laratickets": "dev-main",
+    "aichadigital/lara100": "^1.0"
+}
+```
+
+**⚠️ IMPORTANTE**: NO usar `"type": "vcs"` en modo desarrollo - Composer hará copias en lugar de symlinks y los cambios NO se reflejarán automáticamente.
+
+### Development Workflow
+1. **Changes in packages** → automatically reflected via symlink
+2. **Breaking changes** → document in package CHANGELOG
+3. **Test in staging** → validate before committing to packages
+4. **Pragmatic approach** → speed over perfection (deadline-driven)
+
+## 🧪 Testing Standards
+
+### Coverage Goals (Pragmatic)
+- **Packages**: 80-95% coverage (critical business logic)
+- **Staging app**: 60-70% coverage (integration tests primarily)
+- **Priority**: Feature tests > Unit tests
+
+### Quality Tools
+
+```bash
+# Run before committing
+composer test-coverage     # Pest with coverage
+composer phpstan          # Level 6 (pragmatic balance)
+composer pint             # Code formatting
+```
+
+### Database for Testing
+- **SQLite in-memory** for fast unit/feature tests
+- **MySQL** for integration tests when needed (staging environment)
+- Configuration in `phpunit.xml`: `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`
+
+### PHPStan Strategy
+- **Level 6** in packages (pragmatic, AI-friendly)
+- **Avoid baseline abuse** - fix real issues
+- **Level 8 refactor** → postponed to v2.0
+
+### Test Types
+- **Feature tests**: Integration, happy paths, edge cases
+- **Unit tests**: Critical calculations (taxes, base100)
+- **Browser tests**: Filament resources (Pest 4)
+
+## 🌿 Branch Strategy
+
+### Naming Convention
+- `issues/` - Bug fixes, GitHub issues
+- `improvement/` - Feature enhancements
+- `i18n/` - Internationalization
+- `dev/` - Development experiments
+- `testing/` - Staging configurations
+
+### Current Focus
+**Single main branch** for v1.0 delivery (no multi-branch testing complexity)
+
+**Postponed to v2.0**:
+- Multi-branch agnostic testing (UUID vs Int vs ULID)
+- Different hosting scenarios
+- Multiple tax jurisdictions
+
+## 🎯 v1.0 Scope (Before Dec 15, 2025)
+
+### Target Market
+- **Industry**: Hosting companies (domains, VPS, dedicated servers)
+- **Region**: Spain (Verifactu compliance)
+- **Tax Status**: Intra-community Operator (OSS/ROI)
+- **Migration**: WHMCS → Larafactu
+
+### Features Priority
+1. ✅ Invoice generation with Verifactu
+2. ✅ Intra-community operations (B2B reverse charge)
+3. ✅ Tax calculation (IVA 21%, IGIC, IPSI)
+4. ✅ Customer tax profiles (NIF/VAT validation)
+5. ✅ Ticket system for support
+6. ⏳ WHMCS data migration tools
+
+### Out of Scope (v2.0)
+- Multiple user ID types testing (UUID/ULID/Int variants)
+- Complex multi-jurisdiction scenarios
+- Advanced reporting/analytics
+- SaaS multi-tenancy
+
+## 🚫 Anti-Patterns (Critical)
+
+### DON'T Do This
+❌ Over-engineer for hypothetical scenarios (v1.0 focus)
+❌ Create custom UUID solutions (use dyrynda package)
+❌ Use float/decimal for money (always base100)
+❌ Bypass Laravel conventions (stay aligned)
+❌ Obsess over PHPStan level 8 (pragmatic level 6)
+❌ Create complex abstractions "just in case"
+
+### DO This Instead
+✅ Use established packages (dyrynda, lara100)
+✅ Follow Laravel 12 conventions strictly
+✅ Test in staging before package commits
+✅ Document breaking changes clearly
+✅ Prioritize delivery over perfection
+✅ Keep packages agnostic (no assumptions)
+
+## 📐 Code Conventions
+
+### UUID Models
+
+```php
+// Migration
+$table->binary('id', 16)->primary();
+
+// Model
+use BindsOnUuid, GeneratesUuid;
+public $incrementing = false;
+protected $keyType = 'string';
+public function uuidVersion(): string { return 'uuid7'; }
+```
+
+### Monetary Values
+
+```php
+// Migration
+$table->integer('amount'); // base 100, NOT decimal
+
+// Model
+use AichaDigital\Lara100\Casts\MoneyCast;
+protected $casts = [
+    'amount' => MoneyCast::class,
+];
+```
+
+### Relationships (with UUID)
+
+```php
+// When User has UUID binary, Invoice has UUID binary
+public function user(): BelongsTo
+{
+    return $this->belongsTo(User::class);
+}
+
+// Larabill handles binary UUID conversions automatically
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+```env
+# Larabill
+LARABILL_USER_ID_TYPE=uuid_binary
+LARABILL_COMPANY_VAT=ESB12345678
+LARABILL_COMPANY_IS_ROI=true
+
+# Verifactu
+VERIFACTU_MODE=native
+VERIFACTU_ENVIRONMENT=sandbox
+
+# Testing (phpunit.xml)
+DB_CONNECTION=sqlite  # In-memory for fast tests
+DB_DATABASE=:memory:
+```
+
+## 📚 Documentation
+
+### When Creating Code
+- **English**: Code, comments, docblocks, tests
+- **Spanish**: User-facing docs, README, guides
+- **Pragmatic**: Document decisions, not obvious code
+
+### Package Changes
+- Update CHANGELOG.md for breaking changes
+- Document in `/docs` if affects staging setup
+- Create issues for complex refactors
+
+## 🚀 Development Commands
+
+### Daily Workflow
+
+```bash
+# Test changes
+composer test-coverage
+
+# Check quality
+composer phpstan
+composer pint
+
+# Run specific tests
+php artisan test --filter=InvoiceTest
+
+# Database refresh (staging)
+php artisan migrate:fresh --seed
+```
+
+### Package Updates
+
+```bash
+# Update all dev packages
+composer update aichadigital/larabill
+composer update aichadigital/lararoi
+composer update aichadigital/lara-verifactu
+composer update aichadigital/laratickets
+```
+
+## 🎓 Learning from Experience
+
+### Key Lessons Integrated
+1. **Avoid over-engineering** in staging (learned from memory)
+2. **Use established packages** (dyrynda > custom solutions)
+3. **Align with Laravel conventions** (demonstrate package efficacy)
+4. **Pragmatic testing** (80% coverage, not 100%)
+5. **Speed matters** (deadline-driven, v1.0 focused)
+
+### Migration from WHMCS
+- **Complex task** → Priority for v1.0
+- **Data mapping** → WHMCS schema → Larabill schema
+- **Preserve integrity** → Invoices, customers, products
+- **Verifactu compliance** → Retroactive signatures if needed
+
+---
+
+## 📌 Quick Reference
+
+**UUID Models**: User, Invoice, Ticket
+**Integer Models**: TaxRate, FiscalSettings, InvoiceTemplate
+**Money Format**: Always base 100 integers (lara100)
+**Package Mode**: All in `dev-main` with symlinks
+**Testing**: 80-95% packages, 60-70% staging
+**Deadline**: December 15, 2025 (v1.0 stable)
+**Target**: Hosting + Spain + Intracom + WHMCS migration
+
+---
+
+**Remember**: This is a staging project to validate packages in real scenarios. Pragmatism and delivery speed are priorities. Over-engineering is the enemy. Laravel conventions are the guide.

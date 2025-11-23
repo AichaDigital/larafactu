@@ -31,7 +31,6 @@ CLAUDE.md
 /storage/pail
 /vendor
 /packages
-/docs
 Homestead.json
 Homestead.yaml
 Thumbs.db
@@ -60,3 +59,43 @@ bun.lock
 bun.lock.json
 bun.lock.yaml
 bun.lock.json
+
+## Docker/Sail (responsabilidad del usuario)
+docker/
+sail
+sail/
+docker-compose.override.yml
+
+## Configs publicados por paquetes (generados en instalación)
+config/larabill.php
+config/lararoi.php
+config/laratickets.php
+config/lara100.php
+config/lara-verifactu.php
+config/model-uuid.php
+config/blade-*.php
+config/filament*.php
+config/livewire.php
+config/boost.php
+config/mcp.php
+config/tinker.php
+
+## Assets publicados por paquetes (vendor assets)
+resources/views/vendor/
+resources/views/mcp/
+resources/views/errors/
+public/vendor/
+stubs/
+
+## Language files publicados
+lang/
+
+## Routes publicados por paquetes
+routes/ai.php
+
+## Database dumps (internos del desarrollo)
+database/dumps/
+database/*.sql
+database/*.dump
+
+docs/
