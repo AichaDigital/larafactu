@@ -97,3 +97,5 @@ routes/ai.php
 database/dumps/
 database/*.sql
 database/*.dump
+
+docs/
