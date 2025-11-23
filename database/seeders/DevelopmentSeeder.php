@@ -28,7 +28,7 @@ class DevelopmentSeeder extends Seeder
         // - Invoices (with items)
         // - Tickets (with departments)
         // - Tax rates (Spanish: 21%, 10%, 4%)
-        
+
         $this->command->info('✓ Development data seeded successfully');
     }
 }
