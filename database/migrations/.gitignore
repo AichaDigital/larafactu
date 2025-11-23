@@ -1,0 +1,14 @@
+# Ignorar TODAS las migraciones publicadas por paquetes
+# Solo mantener las 3 migraciones CORE de Laravel en git:
+# - 0001_01_01_000000_create_users_table.php
+# - 0001_01_01_000001_create_cache_table.php
+# - 0001_01_01_000002_create_jobs_table.php
+
+# Ignorar migraciones de paquetes (timestamps 2024_*, 2025_*, etc.)
+[0-9][0-9][0-9][0-9]_[0-9][0-9]_[0-9][0-9]_*.php
+
+# Alternativa más segura: NO ignorar las CORE explícitamente
+!0001_01_01_000000_create_users_table.php
+!0001_01_01_000001_create_cache_table.php
+!0001_01_01_000002_create_jobs_table.php
+
