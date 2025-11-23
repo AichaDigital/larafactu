@@ -18,7 +18,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: mbstring, dom, curl, libxml, mysql, zip, pcntl, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
@@ -60,7 +60,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: mbstring, dom, curl, libxml, mysql, zip, pcntl, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
@@ -70,18 +70,18 @@ jobs:
           cat > modify-composer.php << 'EOFPHP'
           <?php
           $composer = json_decode(file_get_contents('composer.json'), true);
-          
+
           $composer['repositories'] = [
               ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/larabill'],
               ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lara-verifactu'],
               ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/laratickets'],
               ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lararoi'],
           ];
-          
+
           file_put_contents('composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
           echo "✓ Converted path repositories to vcs for CI\n";
           EOFPHP
-          
+
           # Execute the script
           php modify-composer.php
 
