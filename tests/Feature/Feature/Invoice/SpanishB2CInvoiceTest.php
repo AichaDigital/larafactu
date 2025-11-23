@@ -56,18 +56,19 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
         'status' => InvoiceStatus::DRAFT, // Enum value, not string
     ]);
 
-    // Act: Add item to invoice (invoice_items is agnostic, no article_id)
+    // Act: Add item to invoice (correct column names from migration)
     $invoice->items()->create([
         'description' => $article->name,
-        'quantity' => 1,
+        'quantity' => 100, // Base100: 1 unit = 100
         'unit_price' => $article->base_price,
-        'line_subtotal' => $article->base_price,
-        'line_tax_amount' => 210, // 21% of €9.99 = €2.10 (base100)
-        'line_total' => 1209, // €9.99 + €2.10 = €12.09 (base100)
+        'taxable_amount' => 999, // €9.99 base100
+        'tax_rate' => 2100, // 21% base100
+        'tax_amount' => 210, // 21% of €9.99 = €2.10 base100
+        'total_amount' => 1209, // €9.99 + €2.10 = €12.09 base100
     ]);
 
-    // TODO: Implement calculateTotals() method in Invoice model
-    // $invoice->calculateTotals();
+    // Act: Calculate invoice totals
+    $invoice->calculateTotals();
 
     // Refresh invoice to get latest data
     $invoice->refresh();
@@ -76,19 +77,19 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
     expect($invoice->customer_id)->toBe($customer->id);
     expect($invoice->items()->count())->toBe(1);
 
-    // TODO: Assert totals when calculateTotals() is implemented
-    // expect($invoice->taxable_amount)->toBe(999); // €9.99
-    // expect($invoice->tax_amount)->toBe(210); // €2.10 (21% of €9.99)
-    // expect($invoice->total_amount)->toBe(1209); // €12.09
+    // Assert: Totals calculated correctly (use toEqual for Base100 cast float values)
+    expect((int) $invoice->taxable_amount)->toBe(999); // €9.99
+    expect((int) $invoice->tax_amount)->toBe(210); // €2.10 (21% of €9.99)
+    expect((int) $invoice->total_amount)->toBe(1209); // €12.09
 
     // Assert: Customer tax profile exists
     expect($customer->currentTaxProfile)->not->toBeNull();
     expect($customer->currentTaxProfile->tax_code)->toBe('12345678Z');
     expect($customer->currentTaxProfile->country_code)->toBe('ES');
 
-    // TODO: Assert tax methods when implemented
-    // expect($invoice->requiresVAT())->toBeTrue();
-    // expect($invoice->isReverseCharge())->toBeFalse();
+    // Assert: Tax methods work correctly
+    expect($invoice->requiresVAT())->toBeTrue();
+    expect($invoice->isReverseCharge())->toBeFalse();
 });
 
 it('calculates correct VAT for multiple items', function () {
@@ -112,38 +113,42 @@ it('calculates correct VAT for multiple items', function () {
     // Item 1: Hosting €9.99
     $invoice->items()->create([
         'description' => 'Hosting Mensual',
-        'quantity' => 1,
+        'quantity' => 100,
         'unit_price' => 999,
-        'line_subtotal' => 999,
-        'line_tax_amount' => 210,
-        'line_total' => 1209,
+        'taxable_amount' => 999,
+        'tax_rate' => 2100,
+        'tax_amount' => 210,
+        'total_amount' => 1209,
     ]);
 
     // Item 2: Domain €12.99
     $invoice->items()->create([
         'description' => 'Dominio .com',
-        'quantity' => 1,
+        'quantity' => 100,
         'unit_price' => 1299,
-        'line_subtotal' => 1299,
-        'line_tax_amount' => 273, // 21% of €12.99 = €2.73
-        'line_total' => 1572,
+        'taxable_amount' => 1299,
+        'tax_rate' => 2100,
+        'tax_amount' => 273, // 21% of €12.99 = €2.73
+        'total_amount' => 1572,
     ]);
 
-    // TODO: Implement calculateTotals()
-    // $invoice->calculateTotals();
+    // Act: Calculate totals
+    $invoice->calculateTotals();
 
     $invoice->refresh();
 
     // Assert items were created
     expect($invoice->items()->count())->toBe(2);
     
-    // TODO: Assert totals when calculateTotals() is implemented
+    // Assert: Totals calculated correctly
     // Subtotal: €9.99 + €12.99 = €22.98
-    // expect($invoice->taxable_amount)->toBe(2298);
+    expect((int) $invoice->taxable_amount)->toBe(2298);
+    
     // Tax: €2.10 + €2.73 = €4.83
-    // expect($invoice->tax_amount)->toBe(483);
+    expect((int) $invoice->tax_amount)->toBe(483);
+    
     // Total: €22.98 + €4.83 = €27.81
-    // expect($invoice->total_amount)->toBe(2781);
+    expect((int) $invoice->total_amount)->toBe(2781);
 });
 
 it('validates Spanish DNI format', function () {
