@@ -22,6 +22,30 @@ jobs:
           extensions: mbstring, dom, curl, libxml, mysql, zip, pcntl, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
+      - name: Switch to VCS repositories for CI
+        run: |
+          # Replace path repositories with vcs (GitHub)
+          cat composer.json | jq '
+            .repositories = [
+              {
+                "type": "vcs",
+                "url": "https://github.com/AichaDigital/larabill"
+              },
+              {
+                "type": "vcs",
+                "url": "https://github.com/AichaDigital/lara-verifactu"
+              },
+              {
+                "type": "vcs",
+                "url": "https://github.com/AichaDigital/laratickets"
+              },
+              {
+                "type": "vcs",
+                "url": "https://github.com/AichaDigital/lararoi"
+              }
+            ]
+          ' > composer.json.tmp && mv composer.json.tmp composer.json
+
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -42,6 +66,30 @@ jobs:
           php-version: '8.3'
           extensions: mbstring, dom, curl, libxml, mysql, zip, pcntl, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
+
+      - name: Switch to VCS repositories for CI
+        run: |
+          # Replace path repositories with vcs (GitHub)
+          cat composer.json | jq '
+            .repositories = [
+              {
+                "type": "vcs",
+                "url": "https://github.com/AichaDigital/larabill"
+              },
+              {
+                "type": "vcs",
+                "url": "https://github.com/AichaDigital/lara-verifactu"
+              },
+              {
+                "type": "vcs",
+                "url": "https://github.com/AichaDigital/laratickets"
+              },
+              {
+                "type": "vcs",
+                "url": "https://github.com/AichaDigital/lararoi"
+              }
+            ]
+          ' > composer.json.tmp && mv composer.json.tmp composer.json
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
