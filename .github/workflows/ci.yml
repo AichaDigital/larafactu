@@ -43,6 +43,9 @@ jobs:
           # Execute the script
           php modify-composer.php
 
+          # Remove temporary script to avoid Pint checking it
+          rm modify-composer.php
+
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -84,6 +87,9 @@ jobs:
 
           # Execute the script
           php modify-composer.php
+
+          # Remove temporary script
+          rm modify-composer.php
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
