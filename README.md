@@ -134,9 +134,43 @@ git checkout main
 ✅ Seeders con datos de prueba específicos
 ```
 
+## ⚠️ IMPORTANTE: Factories en Paquetes (Testing)
+
+### Decisión Arquitectónica: Factories NO Publicables
+
+**En este proyecto de staging, las factories de los paquetes NO son publicables.**
+
+#### Razón:
+Este es un **proyecto de testing/staging**, no un proyecto de producción. Las factories de `Larabill`, `LaraROI`, etc. **viven en los paquetes** y se usan directamente desde allí mediante `newFactory()` en los modelos.
+
+```php
+// Ejemplo: AichaDigital\Larabill\Models\Customer
+protected static function newFactory(): \AichaDigital\Larabill\Database\Factories\CustomerFactory
+{
+    return \AichaDigital\Larabill\Database\Factories\CustomerFactory::new();
+}
+```
+
+#### ¿Por qué esta decisión?
+- ✅ **Enfoque estándar de Laravel** para paquetes (usado por Sanctum, Passport, etc.)
+- ✅ **Simplicidad**: No requiere publicación manual de factories
+- ✅ **Coherencia**: Factories evolucionan con el paquete automáticamente
+- ✅ **Testing rápido**: Los tests usan factories directamente del paquete
+
+#### ⚠️ Limitación Conocida:
+- ❌ **No es agnostic**: Factories están acopladas al namespace del paquete
+- ❌ **Usuario no puede customizar**: Las factories no se publican en `database/factories/`
+
+#### 📋 TODO v2.0:
+- [ ] Implementar factories publicables (opcional) para proyectos de producción
+- [ ] Permitir que usuario customice factories en su aplicación
+- [ ] Documentar en paquetes cómo publicar factories
+
+---
+
 ## 📦 Paquetes Bajo Prueba
 
-### Larabill v0.1.0 (Development)
+### Larabill v0.4.2
 
 **Características clave:**
 - ✅ Agnóstico al tipo de user_id (UUID, ULID, Int)
@@ -145,7 +179,7 @@ git checkout main
 - ✅ Verificación de CIF/VAT
 - ✅ Cálculo de impuestos (IVA, IGIC, IPSI, EU)
 - ✅ Inmutabilidad de facturas
-- ✅ Generación de PDF
+- ✅ **Factories incluidas** (Customer, Invoice, Article, etc.)
 
 **Instalación:**
 ```json
