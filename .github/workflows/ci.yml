@@ -24,27 +24,24 @@ jobs:
 
       - name: Switch to VCS repositories for CI
         run: |
-          # Replace path repositories with vcs (GitHub)
-          cat composer.json | jq '
-            .repositories = [
-              {
-                "type": "vcs",
-                "url": "https://github.com/AichaDigital/larabill"
-              },
-              {
-                "type": "vcs",
-                "url": "https://github.com/AichaDigital/lara-verifactu"
-              },
-              {
-                "type": "vcs",
-                "url": "https://github.com/AichaDigital/laratickets"
-              },
-              {
-                "type": "vcs",
-                "url": "https://github.com/AichaDigital/lararoi"
-              }
-            ]
-          ' > composer.json.tmp && mv composer.json.tmp composer.json
+          # Create temporary PHP script to modify composer.json
+          cat > modify-composer.php << 'EOFPHP'
+          <?php
+          $composer = json_decode(file_get_contents('composer.json'), true);
+
+          $composer['repositories'] = [
+              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/larabill'],
+              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lara-verifactu'],
+              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/laratickets'],
+              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lararoi'],
+          ];
+
+          file_put_contents('composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+          echo "✓ Converted path repositories to vcs for CI\n";
+          EOFPHP
+
+          # Execute the script
+          php modify-composer.php
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -69,27 +66,24 @@ jobs:
 
       - name: Switch to VCS repositories for CI
         run: |
-          # Replace path repositories with vcs (GitHub)
-          cat composer.json | jq '
-            .repositories = [
-              {
-                "type": "vcs",
-                "url": "https://github.com/AichaDigital/larabill"
-              },
-              {
-                "type": "vcs",
-                "url": "https://github.com/AichaDigital/lara-verifactu"
-              },
-              {
-                "type": "vcs",
-                "url": "https://github.com/AichaDigital/laratickets"
-              },
-              {
-                "type": "vcs",
-                "url": "https://github.com/AichaDigital/lararoi"
-              }
-            ]
-          ' > composer.json.tmp && mv composer.json.tmp composer.json
+          # Create temporary PHP script to modify composer.json
+          cat > modify-composer.php << 'EOFPHP'
+          <?php
+          $composer = json_decode(file_get_contents('composer.json'), true);
+          
+          $composer['repositories'] = [
+              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/larabill'],
+              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lara-verifactu'],
+              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/laratickets'],
+              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lararoi'],
+          ];
+          
+          file_put_contents('composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+          echo "✓ Converted path repositories to vcs for CI\n";
+          EOFPHP
+          
+          # Execute the script
+          php modify-composer.php
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
