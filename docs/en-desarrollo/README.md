@@ -26,12 +26,18 @@
    - Estado actual del proyecto
    - Próximos pasos
 
-### 📝 **Cambios Pendientes**
+### 📝 **Historial de Sesiones**
 
-4. **[CAMBIOS_PENDIENTES_PAQUETES.md](./CAMBIOS_PENDIENTES_PAQUETES.md)**
-   - Cambios aplicados en Larafactu que deben propagarse a paquetes
-   - Lista de mejoras críticas en Larabill
-   - Issues de Lara-Verifactu
+4. **[SESION_2025_11_23_LIMPIEZA.md](./SESION_2025_11_23_LIMPIEZA.md)** ⭐ NUEVO
+   - Consolidación de fixes en paquetes (v0.4.2, v0.2.1-alpha)
+   - Limpieza de .gitignore (vendor-published files)
+   - GitHub CI/CD pasando al 100%
+   - Lecciones sobre separación de responsabilidades
+
+5. **[CAMBIOS_PENDIENTES_PAQUETES.md](./CAMBIOS_PENDIENTES_PAQUETES.md)** ✅ RESUELTO
+   - ~~Cambios aplicados en Larafactu~~ → Ya aplicados en paquetes
+   - ~~Lista de mejoras críticas en Larabill~~ → Incluidas en v0.4.2
+   - ~~Issues de Lara-Verifactu~~ → Resueltas en v0.2.1-alpha
 
 ---
 

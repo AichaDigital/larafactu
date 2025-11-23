@@ -145,21 +145,25 @@ mysql larafactu -e "SELECT COUNT(*) FROM invoices"
 
 ## 📝 **Git Workflow**
 
-### **Commits en Paquetes**
+### **Commits en Paquetes (Push Directo a Main)**
 
 ```bash
 # Larabill
 cd /Users/abkrim/development/packages/aichadigital/larabill
 git add -A
 git commit -m "fix(migrations): descripción del cambio"
-git push origin improvements/larafactu-join
+git push origin main  # Push directo (configurado solo para ti)
 
 # Lara-Verifactu
 cd /Users/abkrim/development/packages/aichadigital/lara-verifactu
 git add -A
 git commit -m "feat(install): descripción del cambio"
-git push origin improvements/larafactu-join
+git push origin main  # Push directo (configurado solo para ti)
+
+# CI se ejecutará automáticamente después del push
 ```
+
+**Nota**: En fase alfa, puedes hacer push directo a `main` (solo tú). El CI valida después.
 
 ---
 
@@ -240,8 +244,8 @@ composer update aichadigital/larabill --no-scripts --quiet
 ### **Ver Versiones Instaladas**
 
 ```bash
-composer show aichadigital/larabill
-composer show aichadigital/lara-verifactu
+composer show aichadigital/larabill      # Debe mostrar: dev-main o v0.4.2
+composer show aichadigital/lara-verifactu  # Debe mostrar: dev-main o v0.2.1-alpha
 composer show aichadigital/laratickets
 ```
 
@@ -301,6 +305,7 @@ alias cda='composer dump-autoload'
 
 ---
 
-**Última actualización**: 2025-11-21  
+**Última actualización**: 2025-11-23  
+**Versiones actuales**: Larabill v0.4.2 | Lara-Verifactu v0.2.1-alpha  
 **Tip**: Guarda este archivo en favoritos para consulta rápida
 
