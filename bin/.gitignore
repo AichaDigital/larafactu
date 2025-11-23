@@ -1,0 +1,12 @@
+# Ignorar scripts temporales/locales
+*.local.sh
+*.backup
+
+# Permitir scripts oficiales
+!check-packages-sync.sh
+!composer-update-vcs.sh
+!reset-for-testing.sh
+!test-install.sh
+!README.md
+!WORKFLOW.md
+!.gitignore
