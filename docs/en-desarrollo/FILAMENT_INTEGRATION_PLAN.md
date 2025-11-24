@@ -7,6 +7,95 @@
 
 ---
 
+## 📋 **Reglas de Codificación (CRÍTICO)**
+
+### **Idiomas en el Proyecto**
+
+#### ✅ **INGLÉS - Código, Clases, Variables, Funciones**
+```php
+// ✅ CORRECTO: Todo en inglés
+class InvoiceResource extends Resource
+{
+    protected static ?string $model = Invoice::class;
+    
+    public function calculateTotals(): self
+    {
+        $this->taxableAmount = ...;
+        return $this;
+    }
+}
+```
+
+#### ✅ **ESPAÑOL - UI, Traducciones, Mensajes de Usuario**
+```php
+// ✅ CORRECTO: Traducciones en español
+Forms\Components\TextInput::make('fiscal_number')
+    ->label(__('larabill::filament.invoice.fiscal_number'))  // "Número Fiscal"
+    ->helperText(__('larabill::filament.invoice.fiscal_number_help'));  // Explicación en español
+
+// resources/lang/es/filament.php
+return [
+    'invoice' => [
+        'fiscal_number' => 'Número Fiscal',
+        'fiscal_number_help' => 'Número fiscal único para esta factura (FAC-2025-001)',
+    ],
+];
+```
+
+#### ❌ **NUNCA - Mezclar Idiomas en Código**
+```php
+// ❌ INCORRECTO: Código en español
+class RecursoFactura extends Resource  // ❌ NO
+{
+    protected static ?string $modelo = Factura::class;  // ❌ NO
+    
+    public function calcularTotales(): self  // ❌ NO
+    {
+        $this->baseImponible = ...;  // ❌ NO
+        return $this;
+    }
+}
+```
+
+### **Resumen de Reglas**
+
+| Elemento | Idioma | Ejemplos |
+|----------|--------|----------|
+| **Clases** | 🇬🇧 Inglés | `InvoiceResource`, `CustomerService`, `TaxCalculator` |
+| **Métodos** | 🇬🇧 Inglés | `calculateTotals()`, `requiresVAT()`, `isReverseCharge()` |
+| **Variables** | 🇬🇧 Inglés | `$taxableAmount`, `$totalTaxAmount`, `$fiscalNumber` |
+| **Propiedades** | 🇬🇧 Inglés | `protected static ?string $model`, `public int $quantity` |
+| **Namespaces** | 🇬🇧 Inglés | `AichaDigital\Larabill\Filament\Resources` |
+| **Archivos** | 🇬🇧 Inglés | `InvoiceResource.php`, `CustomerService.php` |
+| **DB Columnas** | 🇬🇧 Inglés | `fiscal_number`, `taxable_amount`, `is_roi_taxed` |
+| **Config Keys** | 🇬🇧 Inglés | `larabill.filament.enabled`, `verifactu.mode` |
+| **Labels UI** | 🇪🇸 Español | `__('larabill::filament.invoice.total')` → "Total" |
+| **Help Text** | 🇪🇸 Español | `->helperText('Formato: FAC-2025-001')` |
+| **Notifications** | 🇪🇸 Español | `->title('Factura registrada correctamente')` |
+| **Validation Messages** | 🇪🇸 Español | `'required' => 'El campo :attribute es obligatorio'` |
+| **Comments** | 🇬🇧 Inglés | `// Calculate base100 totals from items` |
+| **Docblocks** | 🇬🇧 Inglés | `@param int $amount Base100 amount` |
+| **Git Commits** | 🇬🇧 Inglés | `feat: Add invoice finalize action` |
+| **README** | 🇪🇸 Español | Documentación de usuario |
+| **Docs Técnicos** | 🇪🇸 Español | Guías de desarrollo, arquitectura |
+
+### **Idioma por Defecto de la Aplicación**
+
+```php
+// config/app.php
+'locale' => 'es',  // ✅ Español por defecto
+'fallback_locale' => 'en',
+
+// Pero soporta múltiples idiomas
+'available_locales' => [
+    'es' => 'Español',
+    'en' => 'English',
+    'ca' => 'Català',  // Futuro
+],
+```
+
+---
+
 ## 🎯 **Objetivos**
 
 ### **Corto Plazo (v1.0 - Dic 15, 2025)**
