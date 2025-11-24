@@ -54,21 +54,24 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
         'invoice_date' => now(),
         'due_date' => now()->addDays(15),
         'status' => InvoiceStatus::DRAFT, // Enum value, not string
+        'taxable_amount' => 0, // Reset to 0, will be calculated
+        'total_tax_amount' => 0, // Reset to 0, will be calculated
+        'total_amount' => 0, // Reset to 0, will be calculated
     ]);
 
     // Act: Add item to invoice (correct column names from migration)
     $invoice->items()->create([
         'description' => $article->name,
         'quantity' => 100, // Base100: 1 unit = 100
-        'unit_price' => $article->base_price,
+        'unit_price' => 999, // €9.99 base100 (explicit value, not $article->base_price)
         'taxable_amount' => 999, // €9.99 base100
         'tax_rate' => 2100, // 21% base100
-        'tax_amount' => 210, // 21% of €9.99 = €2.10 base100
+        'total_tax_amount' => 210, // 21% of €9.99 = €2.10 base100
         'total_amount' => 1209, // €9.99 + €2.10 = €12.09 base100
     ]);
 
     // Act: Calculate invoice totals
-    $invoice->calculateTotals();
+    $invoice->calculateTotals()->save();
 
     // Refresh invoice to get latest data
     $invoice->refresh();
@@ -79,7 +82,7 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
 
     // Assert: Totals calculated correctly (use toEqual for Base100 cast float values)
     expect((int) $invoice->taxable_amount)->toBe(999); // €9.99
-    expect((int) $invoice->tax_amount)->toBe(210); // €2.10 (21% of €9.99)
+    expect((int) $invoice->total_tax_amount)->toBe(210); // €2.10 (21% of €9.99)
     expect((int) $invoice->total_amount)->toBe(1209); // €12.09
 
     // Assert: Customer tax profile exists
@@ -108,6 +111,9 @@ it('calculates correct VAT for multiple items', function () {
         'user_id' => $issuer->id,
         'customer_id' => $customer->id,
         'status' => InvoiceStatus::DRAFT,
+        'taxable_amount' => 0, // Reset to 0, will be calculated
+        'total_tax_amount' => 0, // Reset to 0, will be calculated
+        'total_amount' => 0, // Reset to 0, will be calculated
     ]);
 
     // Item 1: Hosting €9.99
@@ -117,7 +123,7 @@ it('calculates correct VAT for multiple items', function () {
         'unit_price' => 999,
         'taxable_amount' => 999,
         'tax_rate' => 2100,
-        'tax_amount' => 210,
+        'total_tax_amount' => 210,
         'total_amount' => 1209,
     ]);
 
@@ -128,25 +134,25 @@ it('calculates correct VAT for multiple items', function () {
         'unit_price' => 1299,
         'taxable_amount' => 1299,
         'tax_rate' => 2100,
-        'tax_amount' => 273, // 21% of €12.99 = €2.73
+        'total_tax_amount' => 273, // 21% of €12.99 = €2.73
         'total_amount' => 1572,
     ]);
 
     // Act: Calculate totals
-    $invoice->calculateTotals();
+    $invoice->calculateTotals()->save();
 
     $invoice->refresh();
 
     // Assert items were created
     expect($invoice->items()->count())->toBe(2);
-    
+
     // Assert: Totals calculated correctly
     // Subtotal: €9.99 + €12.99 = €22.98
     expect((int) $invoice->taxable_amount)->toBe(2298);
-    
+
     // Tax: €2.10 + €2.73 = €4.83
-    expect((int) $invoice->tax_amount)->toBe(483);
-    
+    expect((int) $invoice->total_tax_amount)->toBe(483);
+
     // Total: €22.98 + €4.83 = €27.81
     expect((int) $invoice->total_amount)->toBe(2781);
 });
