@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="es" class="dark">
-<head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Larafactu - Modern Billing Platform for Hosting Companies</title>
     <meta name="description" content="Complete billing and invoicing platform for hosting companies with Spanish tax compliance (Verifactu AEAT).">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
+            <style>
         [x-cloak] { display: none !important; }
-    </style>
-</head>
+            </style>
+    </head>
 <body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 min-h-screen">
     <div id="app" x-data="larafactuApp()" x-cloak>
         <!-- Header -->
@@ -33,9 +33,20 @@
         <!-- Hero Section -->
         <section class="container mx-auto px-4 py-20 text-center">
             <div class="max-w-4xl mx-auto">
-                <span class="inline-block px-4 py-2 bg-blue-500/10 text-blue-400 rounded-full text-sm font-medium mb-6">
+                <!-- Pre-Production Warning -->
+                <div class="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl max-w-2xl mx-auto">
+                    <div class="flex items-center justify-center gap-3 mb-2">
+                        <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                        <span class="text-yellow-400 font-bold text-lg" x-text="t('preproduction.title')"></span>
+                    </div>
+                    <p class="text-yellow-100/80 text-sm" x-html="t('preproduction.message')"></p>
+                </div>
+
+                <span class="inline-block px-4 py-2 bg-orange-500/10 text-orange-400 rounded-full text-sm font-medium mb-6 border border-orange-500/30">
                     <span x-text="t('badge')"></span>
-                </span>
+                            </span>
 
                 <h2 class="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                     <span x-text="t('hero.title')"></span>
@@ -102,7 +113,7 @@
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                 <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                            </svg>
+                    </svg>
                             <span x-text="currentLang === 'es' ? 'Ver en GitHub' : 'View on GitHub'"></span>
                         </div>
                     </a>
@@ -115,19 +126,20 @@
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="text-gray-400 text-sm text-center md:text-left">
                     <p x-text="t('footer.built_with')"></p>
-                    <p class="mt-1" x-text="t('footer.version')"></p>
+                    <p class="mt-1 text-orange-400 font-semibold" x-text="t('footer.version')"></p>
+                    <p class="mt-2 text-xs text-gray-500" x-text="t('footer.environment')"></p>
                 </div>
 
                 <div class="flex gap-6">
                     <a href="https://github.com/AichaDigital" target="_blank" class="text-gray-400 hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                        </svg>
+                    </svg>
                     </a>
                 </div>
             </div>
         </footer>
-    </div>
+        </div>
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -139,7 +151,11 @@
 
                 translations: {
                     es: {
-                        badge: 'v1.0 - Staging',
+                        badge: '⚠️ Pre-Producción / Staging',
+                        preproduction: {
+                            title: '🚧 Instalación Pre-Producción',
+                            message: 'Esta es una <strong>versión de pruebas</strong> en entorno staging.<br>📅 <strong>Lanzamiento v1.0.0 estable: 15 de Diciembre 2025</strong>'
+                        },
                         hero: {
                             title: 'Facturación Moderna para Empresas de Hosting',
                             subtitle: 'Plataforma completa de billing con cumplimiento fiscal español (Verifactu AEAT). Construida con Laravel, diseñada para hosting.',
@@ -223,11 +239,16 @@
                         },
                         footer: {
                             built_with: '❤️ Desarrollado por Aicha Digital',
-                            version: 'v1.0.0-staging • Target: 15 dic 2025'
+                            version: 'v1.0.0-staging • Lanzamiento estable: 15 dic 2025',
+                            environment: 'Entorno de staging para pruebas y desarrollo'
                         }
                     },
                     en: {
-                        badge: 'v1.0 - Staging',
+                        badge: '⚠️ Pre-Production / Staging',
+                        preproduction: {
+                            title: '🚧 Pre-Production Installation',
+                            message: 'This is a <strong>testing version</strong> in staging environment.<br>📅 <strong>Stable v1.0.0 Release: December 15, 2025</strong>'
+                        },
                         hero: {
                             title: 'Modern Billing for Hosting Companies',
                             subtitle: 'Complete billing platform with Spanish tax compliance (Verifactu AEAT). Built with Laravel, designed for hosting.',
@@ -311,7 +332,8 @@
                         },
                         footer: {
                             built_with: '❤️ Built by Aicha Digital',
-                            version: 'v1.0.0-staging • Target: Dec 15, 2025'
+                            version: 'v1.0.0-staging • Stable Release: Dec 15, 2025',
+                            environment: 'Staging environment for testing and development'
                         }
                     }
                 },
@@ -334,5 +356,5 @@
             };
         }
     </script>
-</body>
+    </body>
 </html>
