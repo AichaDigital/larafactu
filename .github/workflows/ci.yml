@@ -110,13 +110,7 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate --ansi
 
-      - name: Create Users Table First
-        run: php artisan migrate --path=database/migrations/0001_01_01_000000_create_users_table.php --force --no-interaction
-
-      - name: Publish Larabill Migrations
-        run: php artisan larabill:install --no-interaction --no-migrate
-
-      - name: Run All Migrations
+      - name: Run Migrations
         run: php artisan migrate --force --no-interaction
 
       - name: Run Tests
