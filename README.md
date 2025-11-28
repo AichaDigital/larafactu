@@ -167,7 +167,21 @@ REDIS_PORT=0
 php artisan key:generate --force
 ```
 
-#### Paso 5: Instalar Larabill (CRÍTICO)
+#### Paso 5: Migrar Tablas Base de Laravel
+
+```bash
+# IMPORTANTE: Migrar PRIMERO las tablas base de Laravel
+# (users, password_resets, sessions, etc.)
+php artisan migrate --force
+```
+
+**Tablas creadas en este paso:**
+- `users` (requerida por larabill:install)
+- `password_reset_tokens`
+- `sessions`
+- `cache`, `jobs` (si usas queue/cache en DB)
+
+#### Paso 6: Instalar Larabill (CRÍTICO)
 
 ```bash
 # Publica migraciones y configuraciones del paquete
@@ -175,24 +189,24 @@ php artisan larabill:install --no-interaction
 ```
 
 **Qué hace `larabill:install`:**
-- ✅ Publica 30+ migraciones de todas las tablas
+- ✅ Publica 30+ migraciones adicionales de facturación
 - ✅ Publica configuraciones del paquete
-- ✅ Prepara el sistema para facturación
+- ✅ Verifica que la tabla `users` exista (paso anterior)
 
-#### Paso 6: Migrar Base de Datos
+#### Paso 7: Migrar Tablas de Larabill
 
 ```bash
-# Crear todas las tablas
+# Crear todas las tablas de facturación
 php artisan migrate --force
 ```
 
-**Tablas creadas:**
-- `users`, `invoices`, `invoice_items`
-- `fiscal_settings`, `customers`, `tax_rates`
+**Tablas creadas en este paso:**
+- `invoices`, `invoice_items`, `fiscal_settings`
+- `customers`, `tax_rates`, `tax_categories`
 - `articles`, `commissions`, `vat_verifications`
 - Y 20+ tablas más para el sistema completo
 
-#### Paso 7: Optimizar
+#### Paso 8: Optimizar
 
 ```bash
 # Limpiar cache
@@ -205,7 +219,7 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-#### Paso 8 (Opcional): Compilar Assets Frontend
+#### Paso 9 (Opcional): Compilar Assets Frontend
 
 ```bash
 npm install
