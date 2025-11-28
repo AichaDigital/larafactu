@@ -63,6 +63,19 @@ APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://tudominio.com
 
+```env
+APP_NAME=Larafactu
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://tudominio.com
+
+# Admin Panel Access Control (IMPORTANTE - Seguridad)
+# Emails específicos permitidos (separados por comas)
+ADMIN_EMAILS=admin@tuempresa.com,manager@tuempresa.com
+# O dominios completos permitidos (con @)
+ADMIN_DOMAINS=@tuempresa.com,@tudominio.com
+# Nota: En local development, todos los usuarios tienen acceso
+
 # Database
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1

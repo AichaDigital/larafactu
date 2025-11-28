@@ -70,7 +70,45 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         // In local development, allow access to all users
-        // TODO: In production, implement role/permission verification
-        return App::environment('local');
+        if (App::environment('local')) {
+            return true;
+        }
+
+        // Production: Check against allowed emails and domains
+        return $this->isAllowedAdminUser();
+    }
+
+    /**
+     * Check if user is allowed to access admin panel.
+     */
+    protected function isAllowedAdminUser(): bool
+    {
+        // Get allowed emails (comma-separated)
+        $allowedEmails = config('app.admin_emails', '');
+        if (! empty($allowedEmails)) {
+            $emailList = array_map('trim', explode(',', $allowedEmails));
+            if (in_array($this->email, $emailList, true)) {
+                return true;
+            }
+        }
+
+        // Get allowed domains (comma-separated)
+        $allowedDomains = config('app.admin_domains', '');
+        if (! empty($allowedDomains)) {
+            // Normalize domains: remove @ prefix if present
+            $domainList = array_map(function ($domain) {
+                $domain = trim($domain);
+
+                return ltrim($domain, '@');
+            }, explode(',', $allowedDomains));
+
+            $userDomain = substr(strrchr($this->email, '@'), 1);
+
+            if (in_array($userDomain, $domainList, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

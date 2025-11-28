@@ -43,6 +43,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin Panel Access Control
+    |--------------------------------------------------------------------------
+    |
+    | Configure who can access the Filament admin panel in production.
+    | In local environment, all users have access by default.
+    |
+    | - admin_emails: Comma-separated list of exact email addresses
+    |   Example: admin@example.com,manager@company.com
+    |
+    | - admin_domains: Comma-separated list of allowed email domains
+    |   Example: @example.com,@company.com
+    |
+    */
+
+    'admin_emails' => env('ADMIN_EMAILS', ''),
+    'admin_domains' => env('ADMIN_DOMAINS', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |
