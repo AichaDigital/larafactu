@@ -63,11 +63,11 @@ aichadigital/lara100         → Valores monetarios base 100
 - Composer 2.x
 - Node.js 20+
 
-### Pasos
+### 🏠 Desarrollo Local
 
 ```bash
 # 1. Clonar repositorio
-git clone https://github.com/tuorg/larafactu.git
+git clone https://github.com/AichaDigital/larafactu.git
 cd larafactu
 
 # 2. Instalar dependencias
@@ -78,8 +78,10 @@ npm install && npm run build
 cp .env.example .env
 php artisan key:generate
 
-# 4. Configurar base de datos
-# Editar .env con tus credenciales DB
+# 4. Configurar base de datos en .env
+# DB_DATABASE=larafactu
+# DB_USERNAME=root
+# DB_PASSWORD=
 
 # 5. Migrar y seedear
 php artisan migrate:fresh --seed
@@ -93,6 +95,144 @@ php artisan serve
 - **Frontend**: http://localhost:8000
 - **Admin**: http://localhost:8000/admin
 - **Credenciales**: `admin@example.com` / `password`
+
+---
+
+### 🌐 Producción / Pre-producción
+
+**Pasos detallados para instalación en servidor:**
+
+#### Paso 1: Clonar y Preparar
+
+```bash
+# Clonar repositorio
+git clone https://github.com/AichaDigital/larafactu.git
+cd larafactu
+
+# Convertir repositorios de paquetes (path → GitHub)
+php scripts/post-deploy.php
+```
+
+#### Paso 2: Instalar Dependencias
+
+```bash
+# Composer (sin dev dependencies)
+composer install --no-dev --optimize-autoloader --no-interaction
+
+# Si pide GitHub token (rate limit), crearlo en:
+# https://github.com/settings/tokens (read:packages)
+```
+
+#### Paso 3: Configurar Entorno
+
+```bash
+# Crear .env desde example
+cp .env.example .env
+
+# Editar con tus datos reales
+nano .env  # o vim, vi, etc.
+```
+
+**Variables CRÍTICAS en `.env`:**
+
+```env
+APP_NAME=Larafactu
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://tudominio.com
+
+# Admin Panel Access Control (IMPORTANTE)
+ADMIN_EMAILS=admin@tuempresa.com,manager@tuempresa.com
+ADMIN_DOMAINS=@tuempresa.com
+
+# Database
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=larafactu_db
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_password
+
+# Redis (si usas socket Unix)
+REDIS_CLIENT=phpredis
+REDIS_HOST=/path/to/redis.sock
+REDIS_PORT=0
+
+# Mail, Queue, Cache según tu setup...
+```
+
+#### Paso 4: Generate Key
+
+```bash
+php artisan key:generate --force
+```
+
+#### Paso 5: Instalar Larabill (CRÍTICO)
+
+```bash
+# Publica migraciones y configuraciones del paquete
+php artisan larabill:install --no-interaction
+```
+
+**Qué hace `larabill:install`:**
+- ✅ Publica 30+ migraciones de todas las tablas
+- ✅ Publica configuraciones del paquete
+- ✅ Prepara el sistema para facturación
+
+#### Paso 6: Migrar Base de Datos
+
+```bash
+# Crear todas las tablas
+php artisan migrate --force
+```
+
+**Tablas creadas:**
+- `users`, `invoices`, `invoice_items`
+- `fiscal_settings`, `customers`, `tax_rates`
+- `articles`, `commissions`, `vat_verifications`
+- Y 20+ tablas más para el sistema completo
+
+#### Paso 7: Optimizar
+
+```bash
+# Limpiar cache
+php artisan config:clear
+php artisan cache:clear
+
+# Cachear para producción
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+#### Paso 8 (Opcional): Compilar Assets Frontend
+
+```bash
+npm install
+npm run build
+```
+
+---
+
+### 🔄 Script de Deploy Automático
+
+Para **actualizaciones futuras**, usa el script:
+
+```bash
+./scripts/deploy.sh
+```
+
+**El script automáticamente:**
+1. 💾 Hace backup (.env, composer.json, BD)
+2. 🔒 Entra en modo mantenimiento
+3. 📥 Pull del último código (git reset hard)
+4. 🔧 Convierte repositories (post-deploy.php)
+5. 📦 Actualiza dependencias (composer install)
+6. 🗄️ Corre migraciones (con confirmación)
+7. 🧹 Limpia y cachea
+8. 🔓 Sale de modo mantenimiento
+
+Más detalles: [docs/UPDATE_MANAGEMENT.md](docs/UPDATE_MANAGEMENT.md)
 
 ## 📚 Documentación
 
