@@ -1,9 +1,10 @@
 # ADR 001: Refactorización de FiscalSettings - Separación Empresa vs Usuario
 
-**Estado**: 🟡 Propuesta  
+**Estado**: ✅ **APROBADO**  
 **Fecha**: 2025-11-28  
 **Contexto**: Staging Pre-Producción (antes del 15 dic 2025)  
-**Impacto**: 🔴 **CRÍTICO** - Cambio arquitectónico fundamental
+**Impacto**: 🔴 **CRÍTICO** - Cambio arquitectónico fundamental  
+**Aprobado por**: @abkrim
 
 ---
 
@@ -87,8 +88,8 @@ Schema::create('company_fiscal_configs', function (Blueprint $table) {
 
 1. **Solo UNA config activa** con `valid_until = null` en cualquier momento
 2. **Al crear nueva config**: La anterior debe tener `valid_until = hoy`
-3. **Facturas emitidas**: Toman config vigente en `invoice_date`
-4. **Proformas**: Se actualizan automáticamente a nueva config al convertirse en factura
+3. **Facturas emitidas**: Toman config vigente en `invoice_date`. Siguen siendoo INTOCABLES y asociadas a sus datos.
+4. **Proformas**: Se actualizan automáticamente a nueva config al cambiarse la fiscalidad de la empresa. Trabajo via Job y con vigalancia de que se umpla el 100% de los objetivos.
 
 ---
 
@@ -152,19 +153,7 @@ Schema::create('customer_fiscal_data', function (Blueprint $table) {
 
 **¿Qué hacer con la tabla actual?**
 
-Opción A: **Renombrar y Migrar**
-```bash
-# Renombrar fiscal_settings → company_fiscal_configs
-# Migrar datos existentes
-# Mantener retrocompatibilidad temporal
-```
-
-Opción B: **Coexistencia Temporal**
-```bash
-# Mantener fiscal_settings para clientes legacy
-# Nuevos clientes usan customer_fiscal_data
-# Deprecar progresivamente
-```
+- Eliminacion de la tabla, modelos, observers, y cualque tema realacionao con ella.
 
 ---
 
@@ -186,6 +175,7 @@ CompanyFiscalConfig::createNew([
 // 2. Config nueva es la activa
 // 3. Facturas nuevas usan nueva identidad
 // 4. Facturas antiguas mantienen identidad original
+// 5. Factura proforma (no pagadas cambian a la nueva identidad)
 ```
 
 ### Cambio de Datos Fiscales del Cliente
@@ -203,7 +193,7 @@ $user->updateFiscalData([
 // Automáticamente:
 // 1. Config anterior recibe valid_until = '2025-01-31'
 // 2. Config nueva es la activa
-// 3. Proformas pendientes se actualizan al convertirse en factura
+// 3. Proformas pendientes se actualizan antes de convertirse en factura.
 // 4. Facturas emitidas antes de la fecha NO cambian
 ```
 
@@ -233,7 +223,7 @@ $invoice = Invoice::create([
    - Añadir relaciones: `companyFiscalConfig()`, `customerFiscalData()`
    - Snapshot fiscal al crear factura
    
-2. **`FiscalSettings`** (deprecar):
+2. **`FiscalSettings`** (deprecar y eliminar):
    - Mover lógica de empresa → `CompanyFiscalConfig`
    - Mover lógica de cliente → `CustomerFiscalData`
    
@@ -264,8 +254,8 @@ $invoice = Invoice::create([
 ### ⚠️ Desventajas
 
 1. **Complejidad inicial**: Más tablas, más lógica
-2. **Migración de datos**: Requiere script cuidadoso
-3. **Retrocompatibilidad**: Apps existentes necesitan adaptación
+2. **Migración de datos**: No requiere
+3. **Retrocompatibilidad**: No hay apps
 4. **Testing extensivo**: Escenarios temporales complejos
 
 ---
@@ -336,35 +326,36 @@ $table->json('customer_fiscal_data');
 ## 📝 Preguntas Abiertas
 
 1. **¿Multi-empresa?**: ¿Soportar múltiples empresas emisoras en v1.0?
-   - **Respuesta propuesta**: NO, una sola empresa en v1.0, preparar estructura para v2.0
+   - **Respuesta propuesta**: NO, una sola empresa en v1.0 sin idea de cambio.
 
 2. **¿Proformas?**: ¿Cómo actualizar proformas a nueva config?
-   - **Respuesta propuesta**: Trigger automático al convertir proforma → factura
+   - **Respuesta propuesta**: Trigger automático para modificar la proforma.
 
 3. **¿Facturas rectificativas?**: ¿Usan config de factura original o config actual?
-   - **Respuesta propuesta**: Config de la factura original (inmutabilidad)
-
-4. **¿PDFs históricos?**: ¿Regenerar PDFs con identidad histórica?
+   - **Respuesta propuesta**: Config de la factura original (inmutabilidad). As facturas rectifciativas, no hemos llegaod a ellas. PEro en la configruacion europea es especifico. Es un todo aruiqtectural que ya llegara.
+4. **¿PDFs históricos?**: ¿Regenerar PDFs con identidad histórica? Los PDF de las proforma son pdf que se generan al vuelo cuando se solicitan. Las facturas, son guardadas en disco, y con se repite una y otra vez, ya quedan INMUTABLES.
    - **Respuesta propuesta**: SÍ, PDFs deben reflejar identidad fiscal vigente en fecha de emisión
 
 ---
 
 ## 🎯 Decisión Final
 
-**Estado**: 🟡 **Pendiente de Aprobación**
+**Estado**: ✅ **APROBADO Y VALIDADO**
 
 **Recomendación**: ✅ **Implementar refactorización completa**
 
 **Justificación**:
 - Arquitectura limpia y escalable
 - Compliance fiscal garantizado
+- Inmutabilidad de facturas GARANTIZADA desde creación
+- Proformas actualizables ANTES de convertirse en facturas
 - Preparado para v2.0 (multi-empresa)
 - Costo de implementación asumible (5 semanas < deadline 15 dic)
 
 **Próximo paso**: 
-1. Validar con @abkrim
-2. Crear issues en GitHub
-3. Comenzar Fase 1
+1. ✅ Validar con @abkrim: **VALIDADO**
+2. ✅ Ajustes al ADR: **COMPLETADO**
+3. 🚀 Comenzar Fase 1: **READY TO START**
 
 ---
 
