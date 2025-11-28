@@ -259,7 +259,12 @@ class InvoiceResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('status', InvoiceStatus::DRAFT)->count();
+        try {
+            return static::getModel()::where('status', InvoiceStatus::DRAFT)->count();
+        } catch (\Exception $e) {
+            // Graceful degradation if table doesn't exist yet (e.g., before migrations)
+            return null;
+        }
     }
 
     public static function getNavigationBadgeColor(): ?string
