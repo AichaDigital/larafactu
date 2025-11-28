@@ -110,6 +110,12 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate --ansi
 
+      - name: Publish Larabill Migrations
+        run: php artisan larabill:install --no-interaction --no-migrate
+
+      - name: Run Migrations
+        run: php artisan migrate --force --no-interaction
+
       - name: Run Tests
         run: php artisan test
 
