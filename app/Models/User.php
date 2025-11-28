@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Dyrynda\Database\Support\BindsOnUuid;
-use Dyrynda\Database\Support\Casts\EfficientUuid;
-use Dyrynda\Database\Support\GeneratesUuid;
+use AichaDigital\Larabill\Concerns\HasUuid;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,37 +13,7 @@ use Illuminate\Support\Facades\App;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use BindsOnUuid, GeneratesUuid, HasFactory, Notifiable;
-
-    /**
-     * Indicates if the model's ID is auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
-     * The data type of the auto-incrementing ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'string';
-
-    /**
-     * The UUID version to use (ordered UUID v7).
-     */
-    public function uuidVersion(): string
-    {
-        return 'uuid7';
-    }
-
-    /**
-     * The column name for the UUID.
-     */
-    public function uuidColumn(): string
-    {
-        return 'id';
-    }
+    use HasFactory, HasUuid, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -76,19 +44,9 @@ class User extends Authenticatable implements FilamentUser
     protected function casts(): array
     {
         return [
-            'id' => EfficientUuid::class,
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    /**
-     * Get the authentication identifier (raw binary value for UUID).
-     * This is crucial for Laravel Auth to work with binary UUID.
-     */
-    public function getAuthIdentifier(): mixed
-    {
-        return $this->getRawOriginal($this->getAuthIdentifierName());
     }
 
     /**

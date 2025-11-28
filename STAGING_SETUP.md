@@ -1,259 +1,421 @@
-# Larafactu - Proyecto Staging
+# 🚀 Larafactu - Proyecto Staging/Pre-Producción
 
-> Proyecto staging para probar los paquetes **larabill** y **lara-verifactu** en desarrollo local
+> **Plataforma de Facturación y Billing para Hosting + Cumplimiento Fiscal España (Verifactu)**
 
-## 🌍 Normativa de Lenguaje (IMPORTANTE)
+[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=flat&logo=php)](https://php.net)
+[![Filament](https://img.shields.io/badge/Filament-4.x-FFAA00?style=flat)](https://filamentphp.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-### Código en Inglés
-**TODO el código debe estar en inglés**:
-- ✅ Nombres de variables, funciones, clases
-- ✅ Comentarios de código (inline y docblocks)
-- ✅ Bloques PHPDoc y anotaciones
-- ✅ Mensajes de error y excepciones
-- ✅ Nombres de tests
+---
 
-### Chat en Español
-**Solo la comunicación con el usuario**:
-- ✅ Respuestas en chat
-- ✅ Documentación de usuario (archivos .md)
+## 📋 Sobre el Proyecto
 
-## 📋 Resumen
+**Larafactu** es un proyecto de **staging/pre-producción** que sirve como:
 
-Este proyecto sirve como entorno de staging para validar la integración de los paquetes:
-- `aichadigital/larabill` - Sistema de facturación y billing
-- `aichadigital/lara-verifactu` - Integración con AEAT Verifactu
+1. **Entorno de pruebas** para los paquetes en desarrollo:
+   - `aichadigital/larabill` - Sistema completo de facturación y billing
+   - `aichadigital/lararoi` - Lógica fiscal ROI/OSS para operadores intracomunitarios
+   - `aichadigital/lara-verifactu` - Integración con AEAT Verifactu (España)
+   - `aichadigital/laratickets` - Sistema de tickets de soporte
+   - `aichadigital/lara100` - Gestión monetaria sin float (base 100)
 
-## 🎯 Configuración Actual
+2. **Demostración funcional** del ecosistema completo de paquetes trabajando juntos
 
-### UUID Binary (varbinary(16)) con UUID v7
+3. **Base para migración WHMCS** → Larafactu (objetivo v1.0 - 15 dic 2025)
 
-El proyecto usa **UUID v7 ordered** almacenado como **binary(16)** para máxima eficiencia:
+### 🎯 Mercado Objetivo (v1.0)
 
-- **Formato**: `varbinary(16)` (16 bytes)
-- **Ventajas**:
-  - 55% menos espacio vs UUID string (36 bytes)
-  - Índices más pequeños y rápidos
-  - UUID v7 ordenado temporalmente (mejor para B-tree indexes)
-  - Compatible con los paquetes larabill y lara-verifactu
+- **Industria**: Empresas de hosting (dominios, VPS, servidores dedicados)
+- **Región**: España + Operadores Intracomunitarios (OSS/ROI)
+- **Fiscal**: Cumplimiento Verifactu AEAT
+- **Migración**: Desde WHMCS
 
-### Modelo User - Solución con `dyrynda/laravel-model-uuid`
+---
 
-**Paquete usado**: `dyrynda/laravel-model-uuid` v8.2.0
+## 🏗️ Arquitectura Técnica
 
+### UUID Strategy
+
+**Decisión técnica (Nov 2025)**: Migración de UUID Binary → **UUID String Nativo**
+
+| Aspecto | UUID Binary (v0.x) | UUID String (v1.0+) |
+|---------|-------------------|---------------------|
+| **Storage** | `varbinary(16)` | `char(36)` |
+| **Paquete** | dyrynda/laravel-model-uuid | Laravel nativo |
+| **Filament** | ❌ Problemas serialización | ✅ Compatible |
+| **Debugging** | ❌ Difícil (hex) | ✅ Legible |
+| **Tech Debt** | ❌ Dependencia externa | ✅ Cero |
+
+**Implementación**:
 ```php
-use Dyrynda\Database\Support\BindsOnUuid;
-use Dyrynda\Database\Support\Casts\EfficientUuid;
-use Dyrynda\Database\Support\GeneratesUuid;
-use Filament\Models\Contracts\FilamentUser;
+use AichaDigital\Larabill\Concerns\HasUuid;
 
-class User extends Authenticatable implements FilamentUser
+class Invoice extends Model
 {
-    use BindsOnUuid, GeneratesUuid, HasFactory, Notifiable;
-    
-    public $incrementing = false;
-    protected $keyType = 'string';
-    
-    // UUID v7 (ordered) para mejor performance
-    public function uuidVersion(): string { return 'uuid7'; }
-    public function uuidColumn(): string { return 'id'; }
-    
-    protected function casts(): array
-    {
-        return [
-            'id' => EfficientUuid::class, // Conversión binary <-> string
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-    
-    // CLAVE: Retorna valor RAW binary para Laravel Auth
-    public function getAuthIdentifier(): mixed
-    {
-        return $this->getRawOriginal($this->getAuthIdentifierName());
-    }
-    
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return App::environment('local');
-    }
+    use HasUuid;  // UUID v7 nativo de Laravel
 }
 ```
 
-⚠️ **IMPORTANTE**: El método `getAuthIdentifier()` es **crucial**. Sin él, Laravel Auth no puede recuperar usuarios desde la sesión porque el valor del ID se convierte a string, pero la base de datos espera binary.
+### Stack Tecnológico
 
-### Estructura de Base de Datos
-
-Todas las tablas están creadas y funcionando:
-
-#### Core Laravel
-- ✅ `users` (id binary(16))
-- ✅ `cache`, `jobs`, `sessions`
-
-#### Larabill (Facturación)
-- ✅ `invoices` - Facturas con UUID binary
-- ✅ `invoice_items` - Items de facturas
-- ✅ `user_tax_infos` - Perfiles fiscales de usuarios
-- ✅ `tax_rates` - Tasas de impuestos
-- ✅ `vat_verifications` - Verificaciones de CIF/VAT
-- ✅ `company_fiscal_configs` - Configuración fiscal
-- ✅ `invoice_templates` - Plantillas de facturas
-- ✅ `company_template_settings` - Configuración de plantillas
-
-#### Lara-Verifactu (AEAT)
-- ✅ `verifactu_invoices` - Facturas Verifactu
-- ✅ `verifactu_registries` - Registros de envíos AEAT
-- ✅ `verifactu_invoice_breakdowns` - Desglose de facturas
-
-## 👤 Usuarios de Prueba
-
-### Usuario Principal (Persistente)
-Credenciales de acceso local:
 ```
-Email: test@example.com
-Password: password
-UUID: 52C0442D179E42E89C8A150495C0FC28
-```
-Este usuario se crea automáticamente con el seeder usando `firstOrCreate()`.
-
-### Usuario Admin (Adicional)
-```
-Email: admin@larafactu.test
-Password: password
-UUID: 4BD914F14E9741B0B0AE3BD8102AE7DA
+Laravel 12.39 (PHP 8.4.15)
+├── Filament 4.1     → Admin Panel
+├── Livewire 3.6     → Reactivity
+├── Tailwind 4.1     → CSS
+├── Pest 4.1         → Testing (Browser + Unit)
+└── MySQL 8.0        → Database
 ```
 
-### Acceso a Filament Admin
+### Paquetes en Desarrollo (Symlinks)
 
-**URL**: https://larafactu.test/admin/login
-
-Puedes usar cualquiera de los dos usuarios. El modelo User tiene configurado `canAccessPanel()` para permitir acceso a **todos los usuarios** en modo local. 
-
-⚠️ **Importante**: En producción, deberás implementar la lógica de roles/permisos (Spatie Permission, políticas, etc.).
-
-## 📦 Instalación de Paquetes
-
-Los paquetes están instalados como **symlinks locales** desde `./packages/`:
-
-```json
-{
-  "repositories": [
-    {
-      "type": "path",
-      "url": "./packages/aichadigital/larabill",
-      "options": { "symlink": true }
-    },
-    {
-      "type": "path",
-      "url": "./packages/aichadigital/lara-verifactu",
-      "options": { "symlink": true }
-    }
-  ]
-}
+```bash
+/Users/abkrim/
+├── development/packages/aichadigital/  # Source
+│   ├── larabill/
+│   ├── lararoi/
+│   ├── lara-verifactu/
+│   └── laratickets/
+└── SitesLR12/larafactu/                # Staging
+    └── packages/aichadigital/          # Symlinks
+        ├── larabill -> /Users/.../larabill
+        ├── lararoi -> /Users/.../lararoi
+        ├── lara-verifactu -> /Users/.../lara-verifactu
+        └── laratickets -> /Users/.../laratickets
 ```
 
-**Ventajas del symlink**:
-- Cambios en los paquetes se reflejan inmediatamente
-- No necesitas `composer update` constantemente
-- Perfecto para desarrollo iterativo
+**Ventaja**: Cambios en paquetes se reflejan **inmediatamente** sin `composer update`
 
-## 🚀 Comandos Artisan Disponibles
+---
+
+## 🚀 Instalación Pre-Producción
+
+### Requisitos
+
+- PHP 8.4+
+- MySQL 8.0+
+- Composer 2.x
+- Node.js 20+
+
+### 1. Clonar y Configurar
+
+```bash
+git clone https://github.com/tuorg/larafactu.git
+cd larafactu
+composer install
+npm install && npm run build
+cp .env.example .env
+php artisan key:generate
+```
+
+### 2. Configurar Base de Datos
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=larafactu
+DB_USERNAME=root
+DB_PASSWORD=
+
+# Larabill UUID Type (IMPORTANTE)
+LARABILL_USER_ID_TYPE=uuid
+```
+
+### 3. Migrar y Seedear
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+**Resultado**: Se crean automáticamente:
+- ✅ Admin: `admin@example.com` / `password`
+- ✅ Test: `test@example.com` / `password`
+- ✅ Configuración fiscal básica
+
+### 4. Acceder
+
+- **Frontend**: http://localhost (landing page bilingüe)
+- **Admin Panel**: http://localhost/admin
+- **Credenciales**: `admin@example.com` / `password`
+
+---
+
+## 👥 Usuarios de Desarrollo
+
+### Sistema de Seeding Automático
+
+El proyecto incluye `DevelopmentSeeder` que se ejecuta automáticamente en local/testing:
+
+```bash
+# Opción 1: Con migrate:fresh
+php artisan migrate:fresh --seed
+
+# Opción 2: Solo seed
+php artisan dev:seed
+
+# Opción 3: Fresh + seed en un comando
+php artisan dev:seed --fresh
+```
+
+### Usuarios Creados
+
+| Email | Password | Rol | Uso |
+|-------|----------|-----|-----|
+| `admin@example.com` | `password` | Admin | Panel Filament |
+| `test@example.com` | `password` | Cliente | Testing API/Frontend |
+
+**Protección**: Los seeders solo funcionan en entornos `local` y `testing`
+
+---
+
+## 📦 Configuración de Paquetes
 
 ### Larabill
-```bash
-# Ver todos los comandos de larabill
-php artisan list
+
+```env
+LARABILL_USER_ID_TYPE=uuid
+LARABILL_COMPANY_VAT=ESB12345678
+LARABILL_COMPANY_IS_ROI=true
 ```
 
 ### Verifactu
-```bash
-# Probar conexión con AEAT
-php artisan verifactu:test-connection
 
-# Registrar factura en AEAT
-php artisan verifactu:register
-
-# Ver estado del sistema
-php artisan verifactu:status
-
-# Verificar blockchain
-php artisan verifactu:verify-blockchain
-
-# Reintentar envíos fallidos
-php artisan verifactu:retry-failed
+```env
+VERIFACTU_MODE=native
+VERIFACTU_ENVIRONMENT=sandbox
+VERIFACTU_NIF=ESB12345678
 ```
 
-## 🛠️ Comandos de Desarrollo
+### Lararoi
 
-```bash
-# Refrescar migraciones y seed
-php artisan migrate:fresh --seed
-
-# Formatear código
-vendor/bin/pint
-
-# Ejecutar tests
-php artisan test
-
-# Ver schema de base de datos
-php artisan db:show
-php artisan db:table users
-```
-
-## 📚 Backend Filament
-
-El proyecto tiene **Filament 4.1** instalado para pruebas de backend.
-
-Acceso: https://larafactu.test/admin (con Laravel Herd)
-
-## 🔧 Stack Tecnológico
-
-- **Laravel**: 12.33.0
-- **PHP**: 8.4.13
-- **Filament**: 4.1.7
-- **Livewire**: 3.6.4
-- **Tailwind**: 4.1.14
-- **Pest**: 4.1.2
-
-## 📝 Notas Importantes
-
-1. **UUID Binary**: El campo `id` de users es `binary(16)`. El modelo se encarga automáticamente de convertir entre string UUID y binary.
-
-2. **Paquetes en Desarrollo**: Los paquetes están en `./packages/` y se cargan mediante symlinks. Cualquier cambio en los paquetes se refleja automáticamente.
-
-3. **Laravel Herd**: El proyecto está configurado para usar Laravel Herd con HTTPS activado.
-
-4. **Usuario Persistente**: El usuario de prueba `test@example.com` se preserva entre migraciones usando `firstOrCreate()`.
-
-## 🎯 Próximos Pasos
-
-1. Probar la creación de facturas con larabill
-2. Integrar facturas con verifactu
-3. Validar el flujo completo de facturación → envío AEAT
-4. Crear recursos de Filament para gestión visual
-5. Probar con diferentes esquemas de ID en otros modelos
-
-## 🐛 Troubleshooting
-
-### Re-ejecutar migraciones
-```bash
-php artisan migrate:fresh --seed
-```
-
-### Limpiar caches
-```bash
-php artisan optimize:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-```
-
-### Reinstalar paquetes
-```bash
-composer update aichadigital/larabill aichadigital/lara-verifactu --no-interaction
+```env
+LARAROI_OSS_ENABLED=true
+LARAROI_OPERATOR_VAT=ESB12345678
 ```
 
 ---
 
-**Fecha de creación**: 12 de octubre de 2025  
-**Versión**: 1.0.0
+## 🛠️ Comandos Útiles
 
+### Desarrollo
+
+```bash
+# Seed de desarrollo (solo usuarios y fiscal)
+php artisan dev:seed
+
+# Formatear código
+composer pint
+
+# Tests
+php artisan test
+composer test-coverage
+
+# Limpiar caché
+php artisan config:clear && php artisan cache:clear
+```
+
+### Larabill
+
+```bash
+php artisan larabill:install    # Setup inicial
+php artisan larabill:status     # Estado del sistema
+```
+
+### Verifactu
+
+```bash
+php artisan verifactu:test-connection
+php artisan verifactu:register
+php artisan verifactu:status
+php artisan verifactu:verify-blockchain
+```
+
+---
+
+## 🧪 Testing
+
+### Cobertura Pragmática
+
+- **Paquetes**: 80-95% (crítico)
+- **Staging**: 60-70% (integración)
+
+### Ejecutar Tests
+
+```bash
+# Todos los tests
+php artisan test
+
+# Con cobertura
+composer test-coverage
+
+# Filtrar
+php artisan test --filter=Invoice
+```
+
+### Tests de Navegador (Pest 4)
+
+```php
+it('puede crear una factura', function () {
+    $page = visit('/admin/invoices/create');
+    
+    $page->fill('prefix', 'FAC')
+         ->select('serie', 'INVOICE')
+         ->click('Crear')
+         ->assertSee('Factura creada');
+});
+```
+
+---
+
+## 📊 Base de Datos
+
+### Tablas Principales
+
+**Core**:
+- `users` (UUID string, char(36))
+- `sessions` (user_id string para UUID)
+
+**Larabill**:
+- `invoices` (UUID primary key)
+- `invoice_items` (integer PK, UUID FK)
+- `customers`, `tax_rates`, `tax_groups`
+- `company_fiscal_configs`
+
+**Verifactu**:
+- `verifactu_invoices`
+- `verifactu_registries`
+- `verifactu_invoice_breakdowns`
+
+**Laratickets**:
+- `tickets` (UUID primary key)
+- `ticket_assignments`, `escalation_requests`
+
+---
+
+## 🎨 Frontend
+
+### Landing Page Bilingüe (ES/EN)
+
+- **URL**: `/` (index)
+- **Diseño**: Oscuro, moderno, responsive
+- **Contenido**: Descripción del proyecto, stack, enlaces útiles
+- **i18n**: Español e Inglés con toggle
+
+### Admin Panel (Filament 4)
+
+- **URL**: `/admin`
+- **Recursos**:
+  - ✅ Invoices (CRUD completo + Items)
+  - ✅ Fiscal Settings
+  - 🚧 Customers (próximamente)
+  - 🚧 Products (próximamente)
+
+---
+
+## 🔒 Seguridad Pre-Producción
+
+### Checklist
+
+- [ ] Cambiar `APP_ENV=production`
+- [ ] `APP_DEBUG=false`
+- [ ] Contraseñas seguras (no `password`)
+- [ ] Configurar `SANCTUM_STATEFUL_DOMAINS`
+- [ ] SSL/HTTPS obligatorio
+- [ ] Rate limiting configurado
+- [ ] Backups automáticos de DB
+
+### Protecciones Activas
+
+```php
+// DevelopmentSeeder solo en local/testing
+if (! app()->environment(['local', 'testing'])) {
+    $this->command->error('❌ DevelopmentSeeder can only run in local/testing.');
+    return;
+}
+```
+
+---
+
+## 📝 Notas de Versión
+
+### v1.0.0-staging (Actual)
+
+**✅ Completado**:
+- Migración UUID Binary → UUID String
+- InvoiceResource completo con RelationManager
+- DevelopmentSeeder automático
+- Tests pasando (3/3 Invoice tests)
+- Paquetes actualizados en GitHub
+
+**🚧 En Progreso**:
+- Landing page bilingüe
+- CustomerResource
+- Widgets/Stats para dashboard
+
+**📅 Roadmap v1.0 (15 dic 2025)**:
+- [ ] WHMCS migration tool
+- [ ] Customer portal
+- [ ] Email templates
+- [ ] PDF generation
+- [ ] Payment gateways
+
+---
+
+## 🐛 Troubleshooting
+
+### Error: "Data too long for column 'user_id'"
+
+**Solución**: La columna user_id debe ser `char(36)` no `bigint`:
+
+```sql
+ALTER TABLE invoices MODIFY COLUMN user_id CHAR(36) NULL;
+```
+
+### Error: "Malformed UTF-8 characters"
+
+**Causa**: Sesiones con binary UUID cuando User usa string UUID
+
+**Solución**:
+```bash
+php artisan tinker --execute="DB::table('sessions')->truncate();"
+```
+
+### Paquetes no se actualizan
+
+**Verificar symlinks**:
+```bash
+ls -la packages/aichadigital/
+# Deben mostrar -> /Users/abkrim/development/...
+```
+
+---
+
+## 📚 Documentación Adicional
+
+- [README.md](README.md) - Documentación general
+- [DEVELOPMENT_COMMANDS.md](docs/DEVELOPMENT_COMMANDS.md) - Comandos útiles
+- [Paquetes en GitHub](https://github.com/AichaDigital)
+
+---
+
+## 🤝 Contribución
+
+Este es un proyecto privado de staging. Para contribuir a los paquetes públicos:
+
+- [larabill](https://github.com/AichaDigital/larabill)
+- [lararoi](https://github.com/AichaDigital/lararoi)
+- [lara-verifactu](https://github.com/AichaDigital/lara-verifactu)
+
+---
+
+## 📄 Licencia
+
+MIT License - Ver [LICENSE](LICENSE) para más detalles.
+
+---
+
+**Última actualización**: 28 de noviembre de 2025  
+**Versión**: 1.0.0-staging  
+**Objetivo v1.0 estable**: 15 de diciembre de 2025

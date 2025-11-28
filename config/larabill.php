@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    // User ID Type
+    'user_id_type' => env('LARABILL_USER_ID_TYPE', 'uuid'),
+
     // VAT verification API settings
     'vat_apis' => [
         'abstractapi' => [
@@ -44,7 +47,7 @@ return [
 
     // Model mappings for extensibility
     'models' => [
-        'user' => \AichaDigital\Larabill\Tests\Models\User::class, // Your application's User model
+        'user' => \App\Models\User::class, // Your application's User model
         'user_tax_profile' => \AichaDigital\Larabill\Models\UserTaxProfile::class,
         'invoice' => \AichaDigital\Larabill\Models\Invoice::class,
         'invoice_item' => \AichaDigital\Larabill\Models\InvoiceItem::class,

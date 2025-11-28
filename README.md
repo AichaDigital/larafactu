@@ -1,319 +1,334 @@
-# Larafactu - Staging Project for Package Testing
+# 🚀 Larafactu
 
-> **Proyecto de staging para probar los paquetes larabill y lara-verifactu en diferentes configuraciones de modelos**
+**Modern Billing & Invoicing Platform for Hosting Companies with Spanish Tax Compliance (Verifactu)**
 
-## 🎯 Propósito
-
-Este proyecto sirve como **entorno de prueba** para validar la compatibilidad y funcionalidad de los paquetes:
-
-- **`aichadigital/larabill`** - Sistema de facturación y billing agnóstico
-- **`aichadigital/lara-verifactu`** - Integración con AEAT Verifactu para España
-
----
-
-## 🌳 BRANCH: `model/uuid-binary`
-
-### ⚙️ Configuración de esta Branch
-
-Esta branch prueba el paquete larabill con **UUID v7 ordenado almacenado como binary(16)**.
-
-#### User Model Configuration:
-- **Tipo de ID**: UUID v7 (ordered)
-- **Storage**: `binary(16)` en base de datos
-- **Paquete**: `dyrynda/laravel-model-uuid` v8.2.0
-- **Eficiencia**: 55% menos espacio que UUID string (16 bytes vs 36 bytes)
-
-#### Implementación:
-
-```php
-// app/Models/User.php
-use Dyrynda\Database\Support\{BindsOnUuid, GeneratesUuid};
-use Dyrynda\Database\Support\Casts\EfficientUuid;
-use Filament\Models\Contracts\FilamentUser;
-
-class User extends Authenticatable implements FilamentUser
-{
-    use BindsOnUuid, GeneratesUuid, HasFactory, Notifiable;
-
-    public $incrementing = false;
-    protected $keyType = 'string';
-
-    public function uuidVersion(): string { return 'uuid7'; }
-    public function uuidColumn(): string { return 'id'; }
-
-    protected function casts(): array
-    {
-        return [
-            'id' => EfficientUuid::class,
-            // ...
-        ];
-    }
-
-    // CLAVE: Retorna valor RAW binary para Laravel Auth
-    public function getAuthIdentifier(): mixed
-    {
-        return $this->getRawOriginal($this->getAuthIdentifierName());
-    }
-}
-```
-
-#### Migración:
-
-```php
-Schema::create('users', function (Blueprint $table) {
-    $table->binary('id', 16)->primary();
-    // ...
-});
-```
+[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=flat&logo=php)](https://php.net)
+[![Filament](https://img.shields.io/badge/Filament-4.x-FFAA00?style=flat)](https://filamentphp.com)
+[![Pest](https://img.shields.io/badge/Tested-Pest-22C55E?style=flat)](https://pestphp.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## 🌳 Estrategia de Branches
+## 🌍 Multi-Language
 
-Este proyecto utiliza una **estrategia de branches por configuración de modelo** para probar la compatibilidad del paquete con diferentes tipos de ID de usuario:
+- [🇪🇸 Español](#español)
+- [🇬🇧 English](#english)
 
-### Branches Disponibles:
+---
 
-| Branch | Descripción | User ID Type | Estado |
-|--------|-------------|--------------|--------|
-| `main` | Base limpia con Filament | N/A | ✅ Ready |
-| `model/uuid-binary` | **← ESTÁS AQUÍ** | UUID v7 (16 bytes) | 🚧 En desarrollo |
-| `model/autoincrement` | Auto-increment tradicional | bigIncrements | 📋 Pendiente |
-| `model/uuid-string` | UUID v7 como string | UUID v7 (36 chars) | 📋 Pendiente |
-| `model/ulid-binary` | ULID como binary(16) | ULID (16 bytes) | 📋 Pendiente |
+# Español
 
-### ¿Por qué esta estrategia?
+## 📋 Sobre Larafactu
 
-1. **Testing Completo**: Verificar que larabill funciona con cualquier tipo de user_id
-2. **Comparación Fácil**: `git diff model/uuid-binary model/autoincrement`
-3. **Un Solo Repositorio**: Todo el historial centralizado
-4. **Documentación por Branch**: Cada configuración documentada en su contexto
-5. **Evita Duplicación**: Los paquetes (symlinks) se comparten entre branches
+**Larafactu** es una plataforma completa de facturación y billing diseñada específicamente para **empresas de hosting en España** con cumplimiento fiscal automático (Verifactu AEAT).
 
-### Workflow de Testing:
+### ✨ Características Principales
+
+- 🧾 **Facturación Completa** - Facturas, presupuestos, notas de crédito
+- 🇪🇺 **ROI/OSS** - Operador intracomunitario (B2B reverse charge)
+- 🏛️ **Verifactu AEAT** - Integración nativa con el sistema español
+- 💰 **Base 100** - Cálculos monetarios precisos sin errores de float
+- 🎫 **Soporte Integrado** - Sistema de tickets incorporado
+- 📊 **Panel Admin** - Filament 4 para gestión completa
+- 🔐 **UUID v7** - Seguridad contra ataques de descubrimiento
+
+### 🎯 Mercado Objetivo
+
+| Aspecto | Descripción |
+|---------|-------------|
+| **Industria** | Hosting (dominios, VPS, servidores dedicados) |
+| **Región** | España + UE (operadores intracomunitarios) |
+| **Fiscal** | Verifactu, IVA 21%, IGIC, IPSI, ROI |
+| **Migración** | Compatible con WHMCS |
+
+### 📦 Arquitectura Modular
+
+Larafactu está construido sobre paquetes Laravel independientes y reutilizables:
+
+```
+aichadigital/larabill        → Core de facturación y billing
+aichadigital/lararoi         → Lógica fiscal ROI/OSS
+aichadigital/lara-verifactu  → Integración AEAT Verifactu
+aichadigital/laratickets     → Sistema de tickets
+aichadigital/lara100         → Valores monetarios base 100
+```
+
+## 🚀 Instalación Rápida
+
+### Requisitos
+
+- PHP 8.4+
+- MySQL 8.0+ / PostgreSQL 15+
+- Composer 2.x
+- Node.js 20+
+
+### Pasos
 
 ```bash
-# Probar configuración UUID Binary
-git checkout model/uuid-binary
+# 1. Clonar repositorio
+git clone https://github.com/tuorg/larafactu.git
+cd larafactu
+
+# 2. Instalar dependencias
 composer install
+npm install && npm run build
+
+# 3. Configurar entorno
+cp .env.example .env
+php artisan key:generate
+
+# 4. Configurar base de datos
+# Editar .env con tus credenciales DB
+
+# 5. Migrar y seedear
 php artisan migrate:fresh --seed
-# → Acceder a https://larafactu.test/admin
 
-# Probar configuración Auto-increment
-git checkout model/autoincrement
-php artisan migrate:fresh --seed
-# → Acceder a https://larafactu.test/admin
-
-# Volver a la base limpia
-git checkout main
+# 6. Servir (desarrollo)
+php artisan serve
 ```
 
-## 🏗️ Estructura del Proyecto
+### 🎉 ¡Listo!
 
-### Branch `main` (Base Limpia):
-```
-✅ Laravel 12
-✅ Filament 4.1 (Admin Panel básico)
-✅ User model con FilamentUser (login funcional)
-✅ Paquetes instalados (symlinks):
-   - aichadigital/larabill
-   - aichadigital/lara-verifactu
-✅ Migraciones de paquetes publicadas
-❌ SIN recursos de Filament (vacío)
-```
+- **Frontend**: http://localhost:8000
+- **Admin**: http://localhost:8000/admin
+- **Credenciales**: `admin@example.com` / `password`
 
-### Branches `model/*` (Configuraciones Específicas):
-```
-✅ Todo lo de main
-✅ User model configurado para tipo específico de ID
-✅ Recursos de Filament para testing:
-   - UserResource
-   - InvoiceResource
-   - UserTaxProfileResource (opcional)
-   - FiscalSettingsResource (opcional)
-✅ Seeders con datos de prueba específicos
+## 📚 Documentación
+
+- [STAGING_SETUP.md](STAGING_SETUP.md) - Configuración completa de staging/pre-producción
+- [docs/DEVELOPMENT_COMMANDS.md](docs/DEVELOPMENT_COMMANDS.md) - Comandos útiles de desarrollo
+
+## 🧪 Testing
+
+```bash
+# Tests completos
+php artisan test
+
+# Con cobertura
+composer test-coverage
+
+# Solo Invoice tests
+php artisan test --filter=Invoice
 ```
 
-## ⚠️ IMPORTANTE: Factories en Paquetes (Testing)
+**Cobertura objetivo**:
+- Paquetes: 80-95%
+- App staging: 60-70%
 
-### Decisión Arquitectónica: Factories NO Publicables
+## 🛠️ Stack Tecnológico
 
-**En este proyecto de staging, las factories de los paquetes NO son publicables.**
+| Componente | Tecnología | Versión |
+|------------|-----------|---------|
+| **Framework** | Laravel | 12.x |
+| **PHP** | PHP | 8.4+ |
+| **Admin Panel** | Filament | 4.x |
+| **Testing** | Pest | 4.x |
+| **Frontend** | Livewire + Tailwind | 3.x + 4.x |
+| **Database** | MySQL / PostgreSQL | 8.0+ / 15+ |
 
-#### Razón:
-Este es un **proyecto de testing/staging**, no un proyecto de producción. Las factories de `Larabill`, `LaraROI`, etc. **viven en los paquetes** y se usan directamente desde allí mediante `newFactory()` en los modelos.
+## 📋 Roadmap
 
-```php
-// Ejemplo: AichaDigital\Larabill\Models\Customer
-protected static function newFactory(): \AichaDigital\Larabill\Database\Factories\CustomerFactory
-{
-    return \AichaDigital\Larabill\Database\Factories\CustomerFactory::new();
-}
-```
+### ✅ v1.0 (15 dic 2025)
 
-#### ¿Por qué esta decisión?
-- ✅ **Enfoque estándar de Laravel** para paquetes (usado por Sanctum, Passport, etc.)
-- ✅ **Simplicidad**: No requiere publicación manual de factories
-- ✅ **Coherencia**: Factories evolucionan con el paquete automáticamente
-- ✅ **Testing rápido**: Los tests usan factories directamente del paquete
+- [x] Sistema de facturación completo
+- [x] Integración Verifactu AEAT
+- [x] ROI/OSS para intracomunitario
+- [x] Panel admin Filament
+- [x] UUID v7 nativo
+- [ ] Portal de clientes
+- [ ] Herramienta migración WHMCS
+- [ ] Pasarelas de pago
 
-#### ⚠️ Limitación Conocida:
-- ❌ **No es agnostic**: Factories están acopladas al namespace del paquete
-- ❌ **Usuario no puede customizar**: Las factories no se publican en `database/factories/`
+### 🚧 v2.0 (Q1 2026)
 
-#### 📋 TODO v2.0:
-- [ ] Implementar factories publicables (opcional) para proyectos de producción
-- [ ] Permitir que usuario customice factories en su aplicación
-- [ ] Documentar en paquetes cómo publicar factories
+- [ ] Multi-tenant SaaS
+- [ ] Más jurisdicciones fiscales
+- [ ] API pública
+- [ ] Integraciones (Stripe, PayPal, etc.)
+
+## 🤝 Contribuir
+
+Este proyecto es **staging/pre-producción** para validar paquetes. Para contribuir:
+
+1. **Reporta issues** en los paquetes individuales
+2. **Pull requests** en [GitHub](https://github.com/AichaDigital)
+3. **Documentación** siempre bienvenida
+
+### Paquetes Principales
+
+- [larabill](https://github.com/AichaDigital/larabill) - Sistema de facturación
+- [lararoi](https://github.com/AichaDigital/lararoi) - Lógica fiscal ROI
+- [lara-verifactu](https://github.com/AichaDigital/lara-verifactu) - AEAT Verifactu
+
+## 📄 Licencia
+
+MIT License - Consulta [LICENSE](LICENSE) para más detalles.
 
 ---
 
-## 📦 Paquetes Bajo Prueba
+## 🙏 Créditos
 
-### Larabill v0.4.2
+Desarrollado con ❤️ por [Aicha Digital](https://aichadigital.com)
 
-**Características clave:**
-- ✅ Agnóstico al tipo de user_id (UUID, ULID, Int)
-- ✅ UUID binary para facturas (eficiencia del 55%)
-- ✅ **Base-100 para montos (lara100)**: €12.34 → 1234
-- ✅ Verificación de CIF/VAT
-- ✅ Cálculo de impuestos (IVA, IGIC, IPSI, EU)
-- ✅ Inmutabilidad de facturas
-- ✅ **Factories incluidas** (Customer, Invoice, Article, etc.)
+---
 
-**Instalación:**
-```json
-{
-    "repositories": [
-        {
-            "type": "path",
-            "url": "./packages/aichadigital/larabill",
-            "options": { "symlink": true }
-        }
-    ],
-    "require": {
-        "aichadigital/larabill": "@dev"
-    }
-}
-```
+# English
 
-**⚠️ IMPORTANTE - Lara100 (Base-100):**
+## 📋 About Larafactu
 
-El paquete usa `aichadigital/lara100` para manejar montos en **base 100** (sin decimales):
-- €12.34 se almacena como `1234` (integer)
-- €0.99 se almacena como `99` (integer)
-- €100.00 se almacena como `10000` (integer)
+**Larafactu** is a complete billing and invoicing platform designed specifically for **hosting companies in Spain** with automatic tax compliance (Verifactu AEAT).
 
-**Beneficios:**
-- ✅ Sin errores de redondeo de punto flotante
-- ✅ Cálculos precisos de impuestos
-- ✅ Performance mejorada (integer vs decimal/float)
+### ✨ Key Features
 
-### Lara-Verifactu (Development)
+- 🧾 **Complete Invoicing** - Invoices, quotes, credit notes
+- 🇪🇺 **ROI/OSS** - Intra-community operator (B2B reverse charge)
+- 🏛️ **Verifactu AEAT** - Native integration with Spanish tax system
+- 💰 **Base 100** - Precise monetary calculations without float errors
+- 🎫 **Integrated Support** - Built-in ticket system
+- 📊 **Admin Panel** - Filament 4 for complete management
+- 🔐 **UUID v7** - Security against discovery attacks
 
-**Características clave:**
-- ✅ Integración con AEAT Verifactu
-- ✅ Firma electrónica de facturas
-- ✅ Blockchain de facturas
-- ✅ Envío a la AEAT
+### 🎯 Target Market
 
-**Instalación:**
-```json
-{
-    "repositories": [
-        {
-            "type": "path",
-            "url": "./packages/aichadigital/lara-verifactu",
-            "options": { "symlink": true }
-        }
-    ],
-    "require": {
-        "aichadigital/lara-verifactu": "@dev"
-    }
-}
-```
+| Aspect | Description |
+|--------|-------------|
+| **Industry** | Hosting (domains, VPS, dedicated servers) |
+| **Region** | Spain + EU (intra-community operators) |
+| **Tax** | Verifactu, VAT 21%, IGIC, IPSI, ROI |
+| **Migration** | WHMCS compatible |
 
-## 🚀 Stack Tecnológico (Branch: model/uuid-binary)
+### 📦 Modular Architecture
 
-- **Laravel**: 12.33.0
-- **PHP**: 8.4.13
-- **Filament**: 4.1.7
-- **MySQL**: Latest
-- **User ID**: UUID v7 binary(16) con `dyrynda/laravel-model-uuid`
-- **Entorno Local**: Laravel Herd
-- **URL**: https://larafactu.test/ (HTTPS activo)
-
-## 👤 Usuarios de Prueba
-
-Disponibles en todas las branches:
+Larafactu is built on independent and reusable Laravel packages:
 
 ```
-Email: test@example.com
-Password: password
+aichadigital/larabill        → Billing & invoicing core
+aichadigital/lararoi         → ROI/OSS tax logic
+aichadigital/lara-verifactu  → AEAT Verifactu integration
+aichadigital/laratickets     → Ticket system
+aichadigital/lara100         → Base-100 monetary values
 ```
 
-Este usuario se crea automáticamente con el seeder usando `firstOrCreate()` para persistir entre migraciones.
+## 🚀 Quick Installation
 
-## 🛠️ Comandos Útiles
+### Requirements
 
-### General
-```bash
-php artisan migrate:fresh --seed  # Recrear DB con datos
-php artisan optimize:clear        # Limpiar cachés
-vendor/bin/pint                   # Formatear código
-php artisan test                  # Ejecutar tests
-```
+- PHP 8.4+
+- MySQL 8.0+ / PostgreSQL 15+
+- Composer 2.x
+- Node.js 20+
 
-### Verifactu
-```bash
-php artisan verifactu:test-connection    # Probar conexión AEAT
-php artisan verifactu:register {id}      # Registrar factura
-php artisan verifactu:status             # Ver estado del sistema
-php artisan verifactu:verify-blockchain  # Verificar integridad
-php artisan verifactu:retry-failed       # Reintentar envíos fallidos
-```
-
-## 📚 Documentación Adicional
-
-- **`STAGING_SETUP.md`** - Configuración detallada del entorno staging y UUID binary
-- **`.cursor/rules/larafactu.mdc`** - Reglas específicas del proyecto para Cursor AI
-- **Paquete Larabill**: `./packages/aichadigital/larabill/README.md`
-- **Paquete Lara-Verifactu**: `./packages/aichadigital/lara-verifactu/README.md`
-
-## 🐛 Troubleshooting
-
-### Cambiar entre branches
+### Steps
 
 ```bash
-# Al cambiar de branch, siempre ejecutar:
-git checkout model/nombre-branch
-composer install                    # Por si hay dependencias diferentes
-php artisan migrate:fresh --seed   # Recrear DB para la nueva configuración
-php artisan optimize:clear          # Limpiar cachés
+# 1. Clone repository
+git clone https://github.com/yourorg/larafactu.git
+cd larafactu
+
+# 2. Install dependencies
+composer install
+npm install && npm run build
+
+# 3. Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# 4. Configure database
+# Edit .env with your DB credentials
+
+# 5. Migrate and seed
+php artisan migrate:fresh --seed
+
+# 6. Serve (development)
+php artisan serve
 ```
 
-### Problemas con Herd (Testing Simultáneo)
+### 🎉 Done!
 
-Si necesitas múltiples entornos simultáneos, puedes crear symlinks:
+- **Frontend**: http://localhost:8000
+- **Admin**: http://localhost:8000/admin
+- **Credentials**: `admin@example.com` / `password`
+
+## 📚 Documentation
+
+- [STAGING_SETUP.md](STAGING_SETUP.md) - Complete staging/pre-production setup
+- [docs/DEVELOPMENT_COMMANDS.md](docs/DEVELOPMENT_COMMANDS.md) - Useful development commands
+
+## 🧪 Testing
 
 ```bash
-# Crear copia para testing paralelo
-ln -s ~/SitesLR12/larafactu ~/SitesLR12/larafactu-int
-cd ~/SitesLR12/larafactu-int
-git checkout model/autoincrement
+# Full test suite
+php artisan test
 
-# Herd creará automáticamente:
-# - larafactu.test → model/uuid-binary
-# - larafactu-int.test → model/autoincrement
+# With coverage
+composer test-coverage
+
+# Invoice tests only
+php artisan test --filter=Invoice
 ```
 
-## 🌍 Normativa de Lenguaje
+**Coverage targets**:
+- Packages: 80-95%
+- Staging app: 60-70%
 
-- **Código**: Todo en inglés (variables, clases, comentarios, docblocks)
-- **Chat/Docs**: En español (documentación de usuario, comunicación)
+## 🛠️ Tech Stack
 
-Ver `.cursor/rules/larafactu.mdc` para más detalles.
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| **Framework** | Laravel | 12.x |
+| **PHP** | PHP | 8.4+ |
+| **Admin Panel** | Filament | 4.x |
+| **Testing** | Pest | 4.x |
+| **Frontend** | Livewire + Tailwind | 3.x + 4.x |
+| **Database** | MySQL / PostgreSQL | 8.0+ / 15+ |
 
-## 📝 License
+## 📋 Roadmap
 
-The MIT License (MIT). Ver [License File](LICENSE.md).
+### ✅ v1.0 (Dec 15, 2025)
+
+- [x] Complete invoicing system
+- [x] Verifactu AEAT integration
+- [x] ROI/OSS for intra-community
+- [x] Filament admin panel
+- [x] Native UUID v7
+- [ ] Customer portal
+- [ ] WHMCS migration tool
+- [ ] Payment gateways
+
+### 🚧 v2.0 (Q1 2026)
+
+- [ ] Multi-tenant SaaS
+- [ ] More tax jurisdictions
+- [ ] Public API
+- [ ] Integrations (Stripe, PayPal, etc.)
+
+## 🤝 Contributing
+
+This project is **staging/pre-production** for package validation. To contribute:
+
+1. **Report issues** in individual packages
+2. **Pull requests** on [GitHub](https://github.com/AichaDigital)
+3. **Documentation** always welcome
+
+### Main Packages
+
+- [larabill](https://github.com/AichaDigital/larabill) - Billing system
+- [lararoi](https://github.com/AichaDigital/lararoi) - ROI tax logic
+- [lara-verifactu](https://github.com/AichaDigital/lara-verifactu) - AEAT Verifactu
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+## 🙏 Credits
+
+Built with ❤️ by [Aicha Digital](https://aichadigital.com)
+
+---
+
+**Last updated**: November 28, 2025  
+**Version**: 1.0.0-staging  
+**Target v1.0 stable**: December 15, 2025
