@@ -20,7 +20,19 @@ cd larafactu
 
 ---
 
-## 🔧 Paso 2: Instalar Dependencias
+## 🔧 Paso 2: Convertir Repositories (Solo Producción)
+
+**Si instalaste vía HTTP/HTTPS (sin git)**, ejecuta el script post-deploy:
+
+```bash
+php scripts/post-deploy.php
+```
+
+Este script convierte automáticamente los repositories locales (`path`) a VCS (GitHub) para producción.
+
+---
+
+## 📦 Paso 3: Instalar Dependencias
 
 ```bash
 # PHP dependencies
@@ -33,7 +45,7 @@ npm run build
 
 ---
 
-## ⚙️ Paso 3: Configurar Entorno
+## ⚙️ Paso 4: Configurar Entorno
 
 ```bash
 # Copiar .env
@@ -93,7 +105,7 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 ---
 
-## 🗄️ Paso 4: Crear Base de Datos
+## 🗄️ Paso 5: Crear Base de Datos
 
 ```sql
 CREATE DATABASE larafactu_prod CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -104,7 +116,7 @@ FLUSH PRIVILEGES;
 
 ---
 
-## 🔄 Paso 5: Instalar Larabill (IMPORTANTE)
+## 🔄 Paso 6: Instalar Larabill (IMPORTANTE)
 
 ```bash
 # Instalar migraciones de Larabill en orden correcto
@@ -118,7 +130,7 @@ php artisan larabill:install --no-interaction
 
 ---
 
-## 📊 Paso 6: Migrar Base de Datos
+## 📊 Paso 7: Migrar Base de Datos
 
 ```bash
 # Si no se migraron en el paso anterior
@@ -127,7 +139,7 @@ php artisan migrate --force
 
 ---
 
-## 👤 Paso 7: Crear Usuario Admin
+## 👤 Paso 8: Crear Usuario Admin
 
 ```bash
 php artisan tinker
@@ -145,7 +157,7 @@ exit
 
 ---
 
-## 🔐 Paso 8: Configurar Permisos
+## 🔐 Paso 9: Configurar Permisos
 
 ```bash
 # Owner correcto
@@ -157,7 +169,7 @@ sudo chmod -R 775 storage bootstrap/cache
 
 ---
 
-## 🌐 Paso 9: Configurar Nginx
+## 🌐 Paso 10: Configurar Nginx
 
 ```nginx
 server {
@@ -217,7 +229,7 @@ sudo systemctl reload nginx
 
 ---
 
-## 🔄 Paso 10: Configurar Supervisor (Queue)
+## 🔄 Paso 11: Configurar Supervisor (Queue)
 
 ```bash
 sudo nano /etc/supervisor/conf.d/larafactu-worker.conf
@@ -247,7 +259,7 @@ sudo supervisorctl start larafactu-worker:*
 
 ---
 
-## 📅 Paso 11: Configurar Cron (Scheduler)
+## 📅 Paso 12: Configurar Cron (Scheduler)
 
 ```bash
 sudo crontab -e -u www-data
@@ -260,7 +272,7 @@ Añadir:
 
 ---
 
-## 🔒 Paso 12: Optimizar para Producción
+## 🔒 Paso 13: Optimizar para Producción
 
 ```bash
 # Cache configuración
@@ -278,7 +290,7 @@ composer dump-autoload --optimize --classmap-authoritative
 
 ---
 
-## ✅ Paso 13: Verificar Instalación
+## ✅ Paso 14: Verificar Instalación
 
 ```bash
 # Verificar conexión DB
@@ -296,7 +308,7 @@ php artisan verifactu:test-connection
 
 ---
 
-## 🔐 Paso 14: SSL con Let's Encrypt (recomendado)
+## 🔐 Paso 15: SSL con Let's Encrypt (recomendado)
 
 ```bash
 sudo apt install certbot python3-certbot-nginx
@@ -306,7 +318,7 @@ sudo certbot renew --dry-run  # Test auto-renewal
 
 ---
 
-## 📊 Paso 15: Monitoring (Opcional pero Recomendado)
+## 📊 Paso 16: Monitoring (Opcional pero Recomendado)
 
 ### Laravel Pulse (incluido)
 Acceder a: `https://tudominio.com/pulse`
