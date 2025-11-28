@@ -47,34 +47,43 @@ npm run build
 
 ## ⚙️ Paso 4: Configurar Entorno
 
+### Crear `.env`
+
 ```bash
-# Copiar .env
+# Copiar .env desde example
 cp .env.example .env
 
-# Generar app key
-php artisan key:generate
+# Editar con tus datos reales
+nano .env  # o vim, vi, etc.
 ```
 
-### Editar `.env`
+### ⚠️ CRÍTICO: Local vs Producción
+
+**NO copies tu `.env` de local a producción.** Hay diferencias críticas:
+
+| Variable | 🏠 Local | 🚀 Producción | Impacto |
+|----------|---------|---------------|---------|
+| `APP_ENV` | `local` | `production` | Admin access, cache |
+| `APP_DEBUG` | `true` | `false` | ⚠️ Expone código |
+| `LOG_LEVEL` | `debug` | `error` | Logs masivos |
+| `MAIL_MAILER` | `log` | `smtp` | Email real |
+| `ADMIN_EMAILS` | *(todos)* | **REQUERIDO** | Sin esto: 403 |
+
+### 📋 Configuración Mínima
 
 ```env
 APP_NAME=Larafactu
-APP_ENV=production
-APP_DEBUG=false
+APP_ENV=production           # ⚠️ NO usar 'local'
+APP_DEBUG=false              # ⚠️ NUNCA true
 APP_URL=https://tudominio.com
 
-```env
-APP_NAME=Larafactu
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://tudominio.com
-
-# Admin Panel Access Control (IMPORTANTE - Seguridad)
-# Emails específicos permitidos (separados por comas)
+# Admin Panel Access Control (CRÍTICO - Seguridad)
+# Sin esto, NADIE podrá acceder al panel (excepto en local)
+# Opción 1: Emails específicos (separados por comas)
 ADMIN_EMAILS=admin@tuempresa.com,manager@tuempresa.com
-# O dominios completos permitidos (con @)
+# Opción 2: Dominios completos (con @, separados por comas)
 ADMIN_DOMAINS=@tuempresa.com,@tudominio.com
-# Nota: En local development, todos los usuarios tienen acceso
+# Opción 3: Combinar ambos (se valida con OR)
 
 # Database
 DB_CONNECTION=mysql
@@ -114,6 +123,27 @@ MAIL_PASSWORD=tu_password
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=noreply@tudominio.com
 MAIL_FROM_NAME="${APP_NAME}"
+```
+
+### 🔐 Generar Application Key
+
+```bash
+php artisan key:generate --force
+```
+
+**Output esperado:**
+```
+Application key set successfully.
+```
+
+### ✅ Verificar Configuración
+
+```bash
+# Verificar variables críticas
+php artisan config:show app.env          # Debe ser: production
+php artisan config:show app.debug        # Debe ser: false
+php artisan config:show app.admin_emails # Tu lista de emails
+php artisan config:show app.admin_domains # Tu lista de dominios
 ```
 
 ---

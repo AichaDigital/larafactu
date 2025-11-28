@@ -133,15 +133,28 @@ cp .env.example .env
 nano .env  # o vim, vi, etc.
 ```
 
+**⚠️ DIFERENCIAS: Local vs Producción**
+
+| Variable | 🏠 Local | 🚀 Producción | Nota |
+|----------|---------|---------------|------|
+| `APP_ENV` | `local` | `production` | ⚠️ Afecta acceso admin |
+| `APP_DEBUG` | `true` | `false` | ⚠️ NUNCA true en vivo |
+| `APP_URL` | `.test` | `.com` real | URLs absolutas |
+| `LOG_LEVEL` | `debug` | `error` | Menos ruido |
+| `MAIL_MAILER` | `log` | `smtp` | Email real |
+| `ADMIN_EMAILS` | *(todos)* | **REQUERIDO** | Sin esto: 403 |
+| `ADMIN_DOMAINS` | *(todos)* | **REQUERIDO** | Sin esto: 403 |
+
 **Variables CRÍTICAS en `.env`:**
 
 ```env
 APP_NAME=Larafactu
-APP_ENV=production
-APP_DEBUG=false
+APP_ENV=production           # ⚠️ Cambia comportamiento de admin access
+APP_DEBUG=false              # ⚠️ NUNCA true en producción
 APP_URL=https://tudominio.com
 
 # Admin Panel Access Control (IMPORTANTE)
+# Sin esto, NADIE podrá acceder al panel (excepto en local)
 ADMIN_EMAILS=admin@tuempresa.com,manager@tuempresa.com
 ADMIN_DOMAINS=@tuempresa.com
 
