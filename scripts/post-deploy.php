@@ -9,13 +9,12 @@
  *
  * Usage: php scripts/post-deploy.php
  */
-
 echo "🚀 Larafactu - Post-Deploy Script\n";
 echo "==================================\n\n";
 
-$composerFile = __DIR__ . '/../composer.json';
+$composerFile = __DIR__.'/../composer.json';
 
-if (!file_exists($composerFile)) {
+if (! file_exists($composerFile)) {
     echo "❌ Error: composer.json not found\n";
     exit(1);
 }
@@ -23,7 +22,7 @@ if (!file_exists($composerFile)) {
 echo "📝 Reading composer.json...\n";
 $composer = json_decode(file_get_contents($composerFile), true);
 
-if (!$composer) {
+if (! $composer) {
     echo "❌ Error: Could not parse composer.json\n";
     exit(1);
 }
@@ -39,7 +38,7 @@ if (isset($composer['repositories'])) {
     }
 }
 
-if (!$hasPathRepos) {
+if (! $hasPathRepos) {
     echo "✓ Already using VCS repositories (production mode)\n";
     echo "✓ No changes needed\n\n";
     exit(0);
@@ -51,19 +50,19 @@ echo "🔄 Converting path repositories to VCS (GitHub)...\n\n";
 $composer['repositories'] = [
     [
         'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/larabill'
+        'url' => 'https://github.com/AichaDigital/larabill',
     ],
     [
         'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/lararoi'
+        'url' => 'https://github.com/AichaDigital/lararoi',
     ],
     [
         'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/lara-verifactu'
+        'url' => 'https://github.com/AichaDigital/lara-verifactu',
     ],
     [
         'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/laratickets'
+        'url' => 'https://github.com/AichaDigital/laratickets',
     ],
 ];
 
@@ -83,4 +82,3 @@ echo "   2. Run: php artisan larabill:install --no-interaction\n";
 echo "   3. Run: php artisan migrate --force\n\n";
 
 echo "✅ Post-deploy script completed successfully!\n";
-
