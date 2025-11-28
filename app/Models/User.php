@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use AichaDigital\Larabill\Concerns\HasUuid;
+use AichaDigital\Larabill\Models\CustomerFiscalData;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\App;
@@ -63,6 +65,52 @@ class User extends Authenticatable implements FilamentUser
     {
         return new \AichaDigital\Larabill\Database\Query\BinaryUuidBuilder($query);
     }
+
+    // ========================================
+    // RELATIONSHIPS (ADR-001)
+    // ========================================
+
+    /**
+     * Get all fiscal data records for this user (historical + active).
+     *
+     * @return HasMany<CustomerFiscalData, $this>
+     */
+    public function fiscalData(): HasMany
+    {
+        return $this->hasMany(CustomerFiscalData::class, 'user_id');
+    }
+
+    /**
+     * Get the current active fiscal data for this user.
+     *
+     * Helper method for convenience.
+     */
+    public function currentFiscalData(): ?CustomerFiscalData
+    {
+        return CustomerFiscalData::getActiveForUser($this->id);
+    }
+
+    /**
+     * Get fiscal data valid at a specific date.
+     */
+    public function fiscalDataAt(\Carbon\Carbon $date): ?CustomerFiscalData
+    {
+        return CustomerFiscalData::getValidForUserAt($this->id, $date);
+    }
+
+    /**
+     * Update fiscal data for this user (creates new record, closes previous).
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function updateFiscalData(array $attributes): CustomerFiscalData
+    {
+        return CustomerFiscalData::createForUser($this->id, $attributes);
+    }
+
+    // ========================================
+    // ADMIN PANEL ACCESS CONTROL
+    // ========================================
 
     /**
      * Determine if the user can access the Filament admin panel.
