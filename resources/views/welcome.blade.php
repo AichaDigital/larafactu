@@ -22,7 +22,7 @@
                 </div>
                 <h1 class="text-2xl font-bold text-white">Larafactu</h1>
             </div>
-            
+
             <!-- Language Switcher -->
             <button @click="toggleLanguage()" class="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
                 <span class="text-xl" x-text="currentLang === 'es' ? '🇪🇸' : '🇬🇧'"></span>
@@ -36,13 +36,13 @@
                 <span class="inline-block px-4 py-2 bg-blue-500/10 text-blue-400 rounded-full text-sm font-medium mb-6">
                     <span x-text="t('badge')"></span>
                 </span>
-                
+
                 <h2 class="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                     <span x-text="t('hero.title')"></span>
                 </h2>
-                
+
                 <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto" x-text="t('hero.subtitle')"></p>
-                
+
                 <div class="flex flex-wrap gap-4 justify-center">
                     <a href="/admin" class="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg font-semibold transition-all transform hover:scale-105">
                         <span x-text="t('hero.cta_admin')"></span>
@@ -57,7 +57,7 @@
         <!-- Features Grid -->
         <section class="container mx-auto px-4 py-20">
             <h3 class="text-3xl font-bold text-center mb-12" x-text="t('features.title')"></h3>
-            
+
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <template x-for="feature in t('features.items')" :key="feature.title">
                     <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:border-blue-500/50 transition-colors">
@@ -72,7 +72,7 @@
         <!-- Tech Stack -->
         <section class="container mx-auto px-4 py-20">
             <h3 class="text-3xl font-bold text-center mb-12" x-text="t('stack.title')"></h3>
-            
+
             <div class="flex flex-wrap gap-6 justify-center max-w-4xl mx-auto">
                 <template x-for="tech in t('stack.items')" :key="tech.name">
                     <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg px-6 py-4 hover:border-purple-500/50 transition-colors">
@@ -89,7 +89,7 @@
         <!-- Packages -->
         <section class="container mx-auto px-4 py-20">
             <h3 class="text-3xl font-bold text-center mb-12" x-text="t('packages.title')"></h3>
-            
+
             <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 <template x-for="pkg in t('packages.items')" :key="pkg.name">
                     <a :href="pkg.url" target="_blank" class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-6 hover:border-blue-500/50 transition-all transform hover:scale-[1.02]">
@@ -117,7 +117,7 @@
                     <p x-text="t('footer.built_with')"></p>
                     <p class="mt-1" x-text="t('footer.version')"></p>
                 </div>
-                
+
                 <div class="flex gap-6">
                     <a href="https://github.com/AichaDigital" target="_blank" class="text-gray-400 hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -131,12 +131,12 @@
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
+
     <script>
         function larafactuApp() {
             return {
                 currentLang: 'es',
-                
+
                 translations: {
                     es: {
                         badge: 'v1.0 - Staging',
@@ -315,20 +315,20 @@
                         }
                     }
                 },
-                
+
                 toggleLanguage() {
                     this.currentLang = this.currentLang === 'es' ? 'en' : 'es';
                     document.documentElement.lang = this.currentLang;
                 },
-                
+
                 t(path) {
                     const keys = path.split('.');
                     let result = this.translations[this.currentLang];
-                    
+
                     for (const key of keys) {
                         result = result[key];
                     }
-                    
+
                     return result;
                 }
             };
