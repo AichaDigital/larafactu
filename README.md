@@ -192,6 +192,20 @@ php artisan larabill:install --no-interaction
 - ✅ Publica 30+ migraciones adicionales de facturación
 - ✅ Publica configuraciones del paquete
 - ✅ Verifica que la tabla `users` exista (paso anterior)
+- ✅ En producción: **NO** intenta migrar automáticamente (solo publica)
+
+**Output esperado:**
+```
+🚀 Installing Larabill...
+✓ User ID type: uuid_binary
+📝 Publishing configurations...
+📄 Publishing migrations in correct order...
+✓ Published 30 migrations
+✓ Migrations published successfully
+
+📋 Next step:
+   Run migrations: php artisan migrate --force
+```
 
 #### Paso 7: Migrar Tablas de Larabill
 
