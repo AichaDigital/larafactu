@@ -47,9 +47,6 @@ class DevelopmentSeeder extends Seeder
 
         $this->command->info("✅ Test user: {$testUser->email} (password: password)");
 
-        // TODO ADR-001: Seed Company Fiscal Config y Customer Fiscal Data
-        // Deshabilitado temporalmente hasta resolver carga de migraciones de Larabill
-        /*
         // Seed Company Fiscal Config (ADR-001)
         if (class_exists(\AichaDigital\Larabill\Models\CompanyFiscalConfig::class)) {
             $companyConfig = \AichaDigital\Larabill\Models\CompanyFiscalConfig::firstOrCreate(
@@ -123,7 +120,6 @@ class DevelopmentSeeder extends Seeder
 
             $this->command->info('✅ Test user fiscal data created (B2B)');
         }
-        */
 
         $this->command->newLine();
         $this->command->info('🎉 Development data seeded successfully!');
