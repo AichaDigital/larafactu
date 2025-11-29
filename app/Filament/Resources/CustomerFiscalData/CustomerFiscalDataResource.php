@@ -6,9 +6,10 @@ namespace App\Filament\Resources\CustomerFiscalData;
 
 use AichaDigital\Larabill\Models\CustomerFiscalData;
 use App\Filament\Resources\CustomerFiscalData\Pages\ManageCustomerFiscalData;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -16,17 +17,15 @@ class CustomerFiscalDataResource extends Resource
 {
     protected static ?string $model = CustomerFiscalData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
-
-    protected static ?string $navigationGroup = 'Configuración Fiscal';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationLabel = 'Datos Fiscales Clientes';
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('user_id')
                     ->label('Cliente')

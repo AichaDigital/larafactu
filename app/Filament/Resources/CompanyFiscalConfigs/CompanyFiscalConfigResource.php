@@ -6,9 +6,10 @@ namespace App\Filament\Resources\CompanyFiscalConfigs;
 
 use AichaDigital\Larabill\Models\CompanyFiscalConfig;
 use App\Filament\Resources\CompanyFiscalConfigs\Pages\ManageCompanyFiscalConfigs;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -16,17 +17,15 @@ class CompanyFiscalConfigResource extends Resource
 {
     protected static ?string $model = CompanyFiscalConfig::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
-
-    protected static ?string $navigationGroup = 'Configuración Fiscal';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
 
     protected static ?string $navigationLabel = 'Configuración Empresa';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('business_name')
                     ->label('Razón Social')
