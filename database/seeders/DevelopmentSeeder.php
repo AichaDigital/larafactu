@@ -47,25 +47,78 @@ class DevelopmentSeeder extends Seeder
 
         $this->command->info("✅ Test user: {$testUser->email} (password: password)");
 
-        // Seed Fiscal Settings (if CompanyFiscalConfig exists)
+        // Seed Company Fiscal Config (ADR-001)
         if (class_exists(\AichaDigital\Larabill\Models\CompanyFiscalConfig::class)) {
-            $fiscalConfig = \AichaDigital\Larabill\Models\CompanyFiscalConfig::firstOrCreate(
-                ['id' => 1],
+            $companyConfig = \AichaDigital\Larabill\Models\CompanyFiscalConfig::firstOrCreate(
+                ['tax_id' => 'ESB12345678'],
                 [
-                    'company_name' => 'Larafactu Development S.L.',
-                    'company_vat' => 'ESB12345678',
-                    'company_address' => 'Calle Test, 123',
-                    'company_city' => 'Madrid',
-                    'company_postal_code' => '28001',
-                    'company_country' => 'ES',
-                    'is_roi_operator' => true,
-                    'default_tax_rate_id' => null, // Set manually if needed
-                    'invoice_prefix' => 'FAC',
-                    'invoice_footer' => 'Gracias por su confianza',
+                    'business_name' => 'Aicha Digital S.L.',
+                    'legal_entity_type' => 'SL',
+                    'address' => 'Calle de la Innovación, 123',
+                    'city' => 'Madrid',
+                    'state' => 'Madrid',
+                    'zip_code' => '28001',
+                    'country_code' => 'ES',
+                    'is_oss' => false,
+                    'is_roi' => true,
+                    'currency' => 'EUR',
+                    'fiscal_year_start' => '01-01',
+                    'valid_from' => now()->startOfYear(),
+                    'valid_until' => null,
+                    'is_active' => true,
+                    'notes' => 'Configuración inicial de desarrollo',
                 ]
             );
 
-            $this->command->info('✅ Fiscal settings configured');
+            $this->command->info('✅ Company fiscal config created');
+        }
+
+        // Seed Customer Fiscal Data for Admin (ADR-001)
+        if (class_exists(\AichaDigital\Larabill\Models\CustomerFiscalData::class)) {
+            $adminFiscal = \AichaDigital\Larabill\Models\CustomerFiscalData::firstOrCreate(
+                ['user_id' => $admin->id, 'is_active' => true],
+                [
+                    'fiscal_name' => $admin->name,
+                    'tax_id' => '12345678A',
+                    'legal_entity_type' => 'Particular',
+                    'address' => 'Calle Admin, 1',
+                    'city' => 'Madrid',
+                    'state' => 'Madrid',
+                    'zip_code' => '28001',
+                    'country_code' => 'ES',
+                    'is_company' => false,
+                    'is_eu_vat_registered' => false,
+                    'is_exempt_vat' => false,
+                    'valid_from' => now()->startOfYear(),
+                    'valid_until' => null,
+                    'notes' => 'Datos fiscales iniciales',
+                ]
+            );
+
+            $this->command->info('✅ Admin fiscal data created');
+
+            // Seed Customer Fiscal Data for Test User (B2B)
+            $testFiscal = \AichaDigital\Larabill\Models\CustomerFiscalData::firstOrCreate(
+                ['user_id' => $testUser->id, 'is_active' => true],
+                [
+                    'fiscal_name' => 'Test Company S.L.',
+                    'tax_id' => 'ESB87654321',
+                    'legal_entity_type' => 'SL',
+                    'address' => 'Calle Test, 999',
+                    'city' => 'Barcelona',
+                    'state' => 'Barcelona',
+                    'zip_code' => '08001',
+                    'country_code' => 'ES',
+                    'is_company' => true,
+                    'is_eu_vat_registered' => false,
+                    'is_exempt_vat' => false,
+                    'valid_from' => now()->startOfYear(),
+                    'valid_until' => null,
+                    'notes' => 'Empresa de pruebas B2B',
+                ]
+            );
+
+            $this->command->info('✅ Test user fiscal data created (B2B)');
         }
 
         $this->command->newLine();
