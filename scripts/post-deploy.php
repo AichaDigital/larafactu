@@ -77,8 +77,14 @@ echo "   - aichadigital/lara-verifactu → GitHub\n";
 echo "   - aichadigital/laratickets → GitHub\n\n";
 
 echo "📦 Next steps:\n";
-echo "   1. Run: composer install --no-dev --optimize-autoloader\n";
-echo "   2. Run: php artisan larabill:install --no-interaction\n";
-echo "   3. Run: php artisan migrate --force\n\n";
+echo "   1. Copy .env.example to .env and configure your database\n";
+echo "   2. Run: composer install --no-dev --optimize-autoloader\n";
+echo "   3. Run: php artisan key:generate (if APP_KEY is empty)\n";
+echo "   4. Run: php artisan migrate --force\n";
+echo "   5. Run: php artisan larabill:install --no-interaction\n";
+echo "   6. Run: php artisan migrate --force (for Larabill tables)\n\n";
+
+echo "⚠️  IMPORTANT: Configure .env BEFORE running migrations!\n";
+echo "   Required: DB_*, APP_KEY, LARABILL_USER_ID_TYPE=uuid_binary\n\n";
 
 echo "✅ Post-deploy script completed successfully!\n";
