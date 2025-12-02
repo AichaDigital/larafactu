@@ -64,6 +64,47 @@ $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
 **Modelos con UUID**: User, Invoice, Ticket
 **Modelos con Integer ID**: TaxRate, CompanyFiscalConfig, CustomerFiscalData, UnitMeasure
 
+### UUID Binary + Filament (CRITICAL)
+
+Si usas `uuid_binary` (binario 16 bytes), hay reglas especiales para Filament:
+
+#### Select con relaciones de usuario
+
+```php
+// ❌ MAL - pluck directo NO aplica el cast, devuelve binario
+Forms\Components\Select::make('user_id')
+    ->options(fn () => User::pluck('name', 'id'))  // ERROR: binario
+
+// ✅ BIEN - Cargar modelos PRIMERO, luego pluck (aplica cast)
+Forms\Components\Select::make('user_id')
+    ->options(fn () => User::all()->pluck('name', 'id'))  // OK: UUID string
+```
+
+#### Modelos con user_id FK
+
+Usar el trait `HasUserRelation` de larabill:
+
+```php
+use AichaDigital\Larabill\Concerns\HasUserRelation;
+
+class CustomerFiscalData extends Model
+{
+    use HasUserRelation;  // Añade cast EfficientUuid + relación user()
+}
+```
+
+#### Filament 4 API Changes
+
+```php
+// Filament 3 → Filament 4
+->actions()     → ->recordActions()
+->bulkActions() → ->toolbarActions()
+
+// Columnas con fecha nullable
+->default('Texto')      // ❌ MAL - intenta parsear como fecha
+->placeholder('Texto')  // ✅ BIEN - muestra texto si null
+```
+
 ## 💰 Monetary Values - Base 100 (Lara100)
 
 ### CRITICAL RULE
@@ -80,6 +121,42 @@ $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
 - Ensures exact fiscal calculations
 
 ## 📦 Package Development Mode
+
+### Instalador Inteligente
+
+**Comando principal**: `php artisan larafactu:install`
+
+```bash
+# Instalación local interactiva (recomendado)
+php artisan larafactu:install
+
+# Instalación local con opciones
+php artisan larafactu:install --local --fresh
+
+# Instalación producción (sin symlinks)
+php artisan larafactu:install --production
+
+# Especificar ruta de paquetes
+php artisan larafactu:install --local --packages-path=/custom/path
+```
+
+### Qué hace el instalador en modo local
+
+1. **Crea symlinks** en `packages/aichadigital/` → `/Users/abkrim/development/packages/aichadigital/`
+2. **Modifica composer.json** añadiendo path repositories
+3. **Ejecuta composer update** para usar paquetes locales
+4. **Ejecuta migraciones** (opción fresh o migrate)
+5. **Ejecuta seeders** de desarrollo
+
+### Reset Completo (Fresh Install)
+
+```bash
+# Preserva .cursor, .claude, .env, .mcp.json
+bin/fresh-install.sh
+
+# Luego ejecutar instalador
+php artisan larafactu:install --local --fresh
+```
 
 ### Local Development Setup
 
@@ -148,6 +225,39 @@ docs/
 - ❌ SESION_*.md → no commitear
 - ❌ Documentos de versiones antiguas
 
+## 🐛 Debugging Strategy (CRITICAL)
+
+### ALWAYS Read Logs First
+
+**RULE**: Before assuming the cause of ANY error, **READ THE ACTUAL LOGS**.
+
+```bash
+# Read recent Laravel logs
+tail -100 storage/logs/laravel.log
+
+# Clear logs before testing (to get clean output)
+rm storage/logs/laravel.log && touch storage/logs/laravel.log
+
+# Then reproduce the error and read fresh logs
+cat storage/logs/laravel.log
+```
+
+### Why This Matters
+
+Browser error messages (like "Malformed UTF-8 characters") are often **symptoms**, not root causes. The actual error in logs might be:
+
+1. **Filament API changes** (`actions()` → `recordActions()` in Filament 4)
+2. **Date parsing errors** (`default()` vs `placeholder()` on date columns)
+3. **Missing relationships** (model doesn't have `user()` method)
+4. **UUID binary issues** (only after ruling out other causes)
+
+### Log Reading is Cheaper Than Playwright
+
+- ✅ `tail storage/logs/laravel.log` - **instant**, **free**
+- ❌ Browser automation - slow, complex, resource-intensive
+
+**Use browser tools for verification, not debugging.**
+
 ## 🚫 Anti-Patterns (Critical)
 
 ### DON'T Do This
@@ -156,6 +266,7 @@ docs/
 ❌ Bypass Laravel conventions
 ❌ Create complex abstractions "just in case"
 ❌ Commitear documentos temporales/obsoletos
+❌ Assume error cause without reading logs
 
 ### DO This Instead
 ✅ Follow Laravel 12 conventions strictly
@@ -163,6 +274,7 @@ docs/
 ✅ Document breaking changes in CHANGELOG
 ✅ Prioritize delivery over perfection
 ✅ Limpiar docs/ regularmente
+✅ **Read logs FIRST when debugging**
 
 ## 🔧 Arquitectura Fiscal (ADR-001)
 

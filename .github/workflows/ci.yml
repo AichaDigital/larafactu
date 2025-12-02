@@ -22,30 +22,6 @@ jobs:
           extensions: mbstring, dom, curl, libxml, mysql, zip, pcntl, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
-      - name: Switch to VCS repositories for CI
-        run: |
-          # Create temporary PHP script to modify composer.json
-          cat > modify-composer.php << 'EOFPHP'
-          <?php
-          $composer = json_decode(file_get_contents('composer.json'), true);
-
-          $composer['repositories'] = [
-              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/larabill'],
-              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lara-verifactu'],
-              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/laratickets'],
-              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lararoi'],
-          ];
-
-          file_put_contents('composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-          echo "✓ Converted path repositories to vcs for CI\n";
-          EOFPHP
-
-          # Execute the script
-          php modify-composer.php
-
-          # Remove temporary script to avoid Pint checking it
-          rm modify-composer.php
-
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -66,30 +42,6 @@ jobs:
           php-version: '8.4'
           extensions: mbstring, dom, curl, libxml, mysql, zip, pcntl, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
-
-      - name: Switch to VCS repositories for CI
-        run: |
-          # Create temporary PHP script to modify composer.json
-          cat > modify-composer.php << 'EOFPHP'
-          <?php
-          $composer = json_decode(file_get_contents('composer.json'), true);
-
-          $composer['repositories'] = [
-              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/larabill'],
-              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lara-verifactu'],
-              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/laratickets'],
-              ['type' => 'vcs', 'url' => 'https://github.com/AichaDigital/lararoi'],
-          ];
-
-          file_put_contents('composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-          echo "✓ Converted path repositories to vcs for CI\n";
-          EOFPHP
-
-          # Execute the script
-          php modify-composer.php
-
-          # Remove temporary script
-          rm modify-composer.php
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -115,4 +67,3 @@ jobs:
 
       - name: Run Tests
         run: php artisan test
-

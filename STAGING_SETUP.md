@@ -89,7 +89,7 @@ Laravel 12.39 (PHP 8.4.15)
 
 ---
 
-## 🚀 Instalación Pre-Producción
+## 🚀 Instalación
 
 ### Requisitos
 
@@ -98,18 +98,68 @@ Laravel 12.39 (PHP 8.4.15)
 - Composer 2.x
 - Node.js 20+
 
-### 1. Clonar y Configurar
+### Instalación Local (Desarrollo)
+
+El proyecto incluye un **instalador inteligente** que configura todo automáticamente:
 
 ```bash
-git clone https://github.com/tuorg/larafactu.git
+# 1. Clonar repositorio
+git clone https://github.com/AichaDigital/larafactu.git
 cd larafactu
-composer install
-npm install && npm run build
+
+# 2. Configurar entorno
 cp .env.example .env
 php artisan key:generate
+
+# 3. Ejecutar instalador interactivo
+php artisan larafactu:install
 ```
 
-### 2. Configurar Base de Datos
+El instalador preguntará:
+- **¿Local o Producción?** → Seleccionar "Local"
+- **¿Ejecutar migraciones?** → Seleccionar "FRESH" para empezar limpio
+- **¿Ejecutar seeders?** → Sí (crea usuarios de prueba)
+
+#### Opciones del Instalador
+
+```bash
+# Instalación local completa (no interactivo)
+php artisan larafactu:install --local --fresh
+
+# Especificar ruta de paquetes
+php artisan larafactu:install --local --packages-path=/custom/path
+
+# Solo migraciones (sin fresh)
+php artisan larafactu:install --local --skip-seeders
+
+# Producción
+php artisan larafactu:install --production
+```
+
+#### Qué hace el instalador en modo local
+
+1. ✅ Crea directorio `packages/aichadigital/`
+2. ✅ Crea symlinks a paquetes en `/Users/abkrim/development/packages/aichadigital/`
+3. ✅ Modifica `composer.json` añadiendo path repositories
+4. ✅ Ejecuta `composer update` para usar paquetes locales
+5. ✅ Ejecuta migraciones (`migrate` o `migrate:fresh`)
+6. ✅ Ejecuta seeders de desarrollo
+
+### Reset Completo (Fresh Install)
+
+Para resetear el proyecto preservando configuración de IDE:
+
+```bash
+# Ejecutar script de reset
+bin/fresh-install.sh
+
+# Luego ejecutar instalador
+php artisan larafactu:install --local --fresh
+```
+
+**Preserva**: `.cursor/`, `.claude/`, `.vscode/`, `.env`, `.mcp.json`
+
+### Configurar Base de Datos
 
 ```env
 DB_CONNECTION=mysql
@@ -120,24 +170,20 @@ DB_USERNAME=root
 DB_PASSWORD=
 
 # Larabill UUID Type (IMPORTANTE)
-LARABILL_USER_ID_TYPE=uuid
+LARABILL_USER_ID_TYPE=uuid_binary
 ```
 
-### 3. Migrar y Seedear
+### Resultado de la Instalación
 
-```bash
-php artisan migrate:fresh --seed
-```
-
-**Resultado**: Se crean automáticamente:
 - ✅ Admin: `admin@example.com` / `password`
 - ✅ Test: `test@example.com` / `password`
 - ✅ Configuración fiscal básica
+- ✅ Symlinks a paquetes locales
 
-### 4. Acceder
+### Acceder
 
-- **Frontend**: http://localhost (landing page bilingüe)
-- **Admin Panel**: http://localhost/admin
+- **Frontend**: http://larafactu.test (landing page bilingüe)
+- **Admin Panel**: http://larafactu.test/admin
 - **Credenciales**: `admin@example.com` / `password`
 
 ---
@@ -365,21 +411,76 @@ if (! app()->environment(['local', 'testing'])) {
 
 ## 🐛 Troubleshooting
 
-### Error: "Data too long for column 'user_id'"
+### REGLA DE ORO: Leer Logs Primero
 
-**Solución**: La columna user_id debe ser `char(36)` no `bigint`:
+**SIEMPRE** lee los logs antes de asumir la causa de un error:
 
-```sql
-ALTER TABLE invoices MODIFY COLUMN user_id CHAR(36) NULL;
+```bash
+# Limpiar logs para obtener salida limpia
+rm storage/logs/laravel.log && touch storage/logs/laravel.log
+
+# Reproducir el error en el navegador
+
+# Leer el error real
+cat storage/logs/laravel.log | head -50
 ```
 
-### Error: "Malformed UTF-8 characters"
+El mensaje del navegador ("Malformed UTF-8 characters") es un **síntoma**, no la causa real.
 
-**Causa**: Sesiones con binary UUID cuando User usa string UUID
+### Error: "Malformed UTF-8 characters" en Filament
 
-**Solución**:
-```bash
-php artisan tinker --execute="DB::table('sessions')->truncate();"
+**Posibles causas reales** (leer logs para identificar):
+
+1. **Filament 4 API cambiada**:
+   ```php
+   // ❌ Filament 3 (ya no funciona)
+   ->actions([ViewAction::make()])
+   ->bulkActions([...])
+   
+   // ✅ Filament 4
+   ->recordActions([ViewAction::make()])
+   ->toolbarActions([BulkActionGroup::make([...])])
+   ```
+
+2. **default() en columnas de fecha**:
+   ```php
+   // ❌ MAL - intenta parsear "Actual" como fecha
+   TextColumn::make('valid_until')->date('d/m/Y')->default('Actual')
+   
+   // ✅ BIEN - placeholder para valores null
+   TextColumn::make('valid_until')->date('d/m/Y')->placeholder('Actual')
+   ```
+
+3. **UUID binario en Select de Filament**:
+   ```php
+   // ❌ MAL - pluck() no aplica cast, devuelve binario
+   ->options(fn () => User::pluck('name', 'id'))
+   
+   // ✅ BIEN - all() carga modelos y aplica cast
+   ->options(fn () => User::all()->pluck('name', 'id'))
+   ```
+
+4. **Relación user() faltante**:
+   ```php
+   // Añadir trait HasUserRelation de larabill
+   use AichaDigital\Larabill\Concerns\HasUserRelation;
+   
+   class CustomerFiscalData extends Model
+   {
+       use HasUserRelation;  // Añade cast + relación
+   }
+   ```
+
+### Error: "Data too long for column 'user_id'"
+
+**Solución**: La columna user_id debe coincidir con el tipo de User.id:
+
+```sql
+-- Si User usa UUID string (char 36)
+ALTER TABLE invoices MODIFY COLUMN user_id CHAR(36) NULL;
+
+-- Si User usa UUID binary (binary 16)
+ALTER TABLE invoices MODIFY COLUMN user_id BINARY(16) NULL;
 ```
 
 ### Paquetes no se actualizan
@@ -387,7 +488,20 @@ php artisan tinker --execute="DB::table('sessions')->truncate();"
 **Verificar symlinks**:
 ```bash
 ls -la packages/aichadigital/
-# Deben mostrar -> /Users/abkrim/development/...
+# Deben mostrar -> /Users/abkrim/development/packages/aichadigital/...
+```
+
+**Si no existen**, ejecutar instalador:
+```bash
+php artisan larafactu:install --local
+```
+
+### El instalador falla
+
+**Verificar que existen los paquetes source**:
+```bash
+ls /Users/abkrim/development/packages/aichadigital/
+# Debe mostrar: larabill, lararoi, lara-verifactu, laratickets
 ```
 
 ---

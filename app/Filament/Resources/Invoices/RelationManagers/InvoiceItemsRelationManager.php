@@ -154,7 +154,7 @@ class InvoiceItemsRelationManager extends RelationManager
                         return $data;
                     }),
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])

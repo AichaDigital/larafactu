@@ -224,12 +224,12 @@ class InvoiceResource extends Resource
                         false: fn (Builder $query) => $query->whereNull('paid_at'),
                     ),
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

@@ -65,35 +65,52 @@ aichadigital/lara100         → Valores monetarios base 100
 
 ### 🏠 Desarrollo Local
 
+El proyecto incluye un **instalador inteligente** que configura todo automáticamente:
+
 ```bash
 # 1. Clonar repositorio
 git clone https://github.com/AichaDigital/larafactu.git
 cd larafactu
 
-# 2. Instalar dependencias
-composer install
-npm install && npm run build
-
-# 3. Configurar entorno
+# 2. Configurar entorno
 cp .env.example .env
 php artisan key:generate
 
-# 4. Configurar base de datos en .env
+# 3. Configurar base de datos en .env
 # DB_DATABASE=larafactu
 # DB_USERNAME=root
 # DB_PASSWORD=
 
-# 5. Migrar y seedear
-php artisan migrate:fresh --seed
+# 4. Ejecutar instalador interactivo
+php artisan larafactu:install
 
-# 6. Servir (desarrollo)
-php artisan serve
+# 5. Compilar assets
+npm install && npm run build
 ```
+
+#### Opciones del Instalador
+
+```bash
+# Instalación local completa (no interactivo)
+php artisan larafactu:install --local --fresh
+
+# Instalación producción
+php artisan larafactu:install --production
+
+# Reset completo preservando IDE config
+bin/fresh-install.sh && php artisan larafactu:install --local --fresh
+```
+
+El instalador en modo local:
+- ✅ Crea symlinks a paquetes de desarrollo
+- ✅ Configura path repositories en composer.json
+- ✅ Ejecuta migraciones y seeders
+- ✅ Crea usuarios de prueba
 
 ### 🎉 ¡Listo!
 
-- **Frontend**: http://localhost:8000
-- **Admin**: http://localhost:8000/admin
+- **Frontend**: http://larafactu.test
+- **Admin**: http://larafactu.test/admin
 - **Credenciales**: `admin@example.com` / `password`
 
 ---

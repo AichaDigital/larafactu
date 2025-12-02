@@ -7,6 +7,11 @@ namespace App\Filament\Resources\CompanyFiscalConfigs;
 use AichaDigital\Larabill\Models\CompanyFiscalConfig;
 use App\Filament\Resources\CompanyFiscalConfigs\Pages\ManageCompanyFiscalConfigs;
 use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -138,7 +143,7 @@ class CompanyFiscalConfigResource extends Resource
                 Tables\Columns\TextColumn::make('valid_until')
                     ->label('Vigente Hasta')
                     ->date('d/m/Y')
-                    ->default('Actual')
+                    ->placeholder('Actual')
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('is_active')
@@ -173,14 +178,14 @@ class CompanyFiscalConfigResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_roi')
                     ->label('Operador ROI'),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('valid_from', 'desc');
