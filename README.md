@@ -84,6 +84,8 @@ cd larafactu
 El script `local-install.sh` realiza automáticamente:
 
 - ✅ Detecta paquetes de desarrollo en rutas comunes
+- ✅ Pregunta qué BD usar (SQLite o MySQL)
+- ✅ Configura `.env` con los datos de conexión
 - ✅ Crea symlinks a paquetes locales
 - ✅ Configura path repositories en composer.json
 - ✅ Ejecuta `composer install`
@@ -94,6 +96,15 @@ El script `local-install.sh` realiza automáticamente:
 #### Opciones del Instalador
 
 ```bash
+# Instalación rápida con SQLite (sin preguntas de BD)
+./bin/local-install.sh --sqlite
+
+# Instalación con MySQL (interactivo)
+./bin/local-install.sh --mysql
+
+# MySQL no interactivo (CI/scripts)
+./bin/local-install.sh --mysql --db-database=larafactu --db-username=root --db-password=secret
+
 # Especificar ruta a paquetes
 ./bin/local-install.sh --packages-path=/ruta/a/paquetes
 
