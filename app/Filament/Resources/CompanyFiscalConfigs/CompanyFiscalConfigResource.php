@@ -24,100 +24,113 @@ class CompanyFiscalConfigResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationLabel = 'Configuración Empresa';
-
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.company_fiscal_config.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.company_fiscal_config.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.company_fiscal_config.plural_model_label');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
                 Forms\Components\TextInput::make('business_name')
-                    ->label('Razón Social')
+                    ->label(__('filament.company_fiscal_config.fields.business_name'))
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('tax_id')
-                    ->label('CIF/NIF')
+                    ->label(__('filament.company_fiscal_config.fields.tax_id'))
                     ->required()
                     ->maxLength(255)
-                    ->placeholder('ESB12345678'),
+                    ->placeholder(__('filament.company_fiscal_config.fields.tax_id_placeholder')),
 
                 Forms\Components\TextInput::make('legal_entity_type')
-                    ->label('Tipo de Entidad')
+                    ->label(__('filament.company_fiscal_config.fields.legal_entity_type'))
                     ->required()
                     ->maxLength(255)
-                    ->placeholder('SL, SA, Autónomo...'),
+                    ->placeholder(__('filament.company_fiscal_config.fields.legal_entity_placeholder')),
 
                 Forms\Components\TextInput::make('address')
-                    ->label('Dirección Fiscal')
+                    ->label(__('filament.company_fiscal_config.fields.address'))
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('city')
-                    ->label('Ciudad')
+                    ->label(__('filament.company_fiscal_config.fields.city'))
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('state')
-                    ->label('Provincia/Estado')
+                    ->label(__('filament.company_fiscal_config.fields.state'))
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('zip_code')
-                    ->label('Código Postal')
+                    ->label(__('filament.company_fiscal_config.fields.zip_code'))
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('country_code')
-                    ->label('País (ISO)')
+                    ->label(__('filament.company_fiscal_config.fields.country_code'))
                     ->required()
                     ->maxLength(2)
                     ->default('ES')
-                    ->placeholder('ES'),
+                    ->placeholder(__('filament.company_fiscal_config.fields.country_placeholder')),
 
                 Forms\Components\Toggle::make('is_oss')
-                    ->label('Operador OSS')
-                    ->helperText('One Stop Shop (IVA intracomunitario)'),
+                    ->label(__('filament.company_fiscal_config.fields.is_oss'))
+                    ->helperText(__('filament.company_fiscal_config.fields.is_oss_helper')),
 
                 Forms\Components\Toggle::make('is_roi')
-                    ->label('Operador ROI')
-                    ->helperText('Registro de Operadores Intracomunitarios'),
+                    ->label(__('filament.company_fiscal_config.fields.is_roi'))
+                    ->helperText(__('filament.company_fiscal_config.fields.is_roi_helper')),
 
                 Forms\Components\TextInput::make('currency')
-                    ->label('Moneda')
+                    ->label(__('filament.company_fiscal_config.fields.currency'))
                     ->required()
                     ->maxLength(3)
                     ->default('EUR'),
 
                 Forms\Components\TextInput::make('fiscal_year_start')
-                    ->label('Inicio Año Fiscal (MM-DD)')
+                    ->label(__('filament.company_fiscal_config.fields.fiscal_year_start'))
                     ->required()
                     ->maxLength(5)
                     ->default('01-01')
-                    ->placeholder('01-01'),
+                    ->placeholder(__('filament.company_fiscal_config.fields.fiscal_year_placeholder')),
 
                 Forms\Components\DatePicker::make('valid_from')
-                    ->label('Vigente Desde')
+                    ->label(__('filament.company_fiscal_config.fields.valid_from'))
                     ->required()
                     ->default(now())
-                    ->helperText('Fecha de inicio de vigencia de esta configuración'),
+                    ->helperText(__('filament.company_fiscal_config.fields.valid_from_helper')),
 
                 Forms\Components\DatePicker::make('valid_until')
-                    ->label('Vigente Hasta')
-                    ->helperText('Dejar vacío para configuración actual activa'),
+                    ->label(__('filament.company_fiscal_config.fields.valid_until'))
+                    ->helperText(__('filament.company_fiscal_config.fields.valid_until_helper')),
 
                 Forms\Components\Toggle::make('is_active')
-                    ->label('Activa')
+                    ->label(__('filament.company_fiscal_config.fields.is_active'))
                     ->default(true)
-                    ->helperText('Solo una configuración puede estar activa sin fecha fin'),
+                    ->helperText(__('filament.company_fiscal_config.fields.is_active_helper')),
 
                 Forms\Components\Textarea::make('notes')
-                    ->label('Notas')
+                    ->label(__('filament.company_fiscal_config.fields.notes'))
                     ->rows(3)
                     ->columnSpanFull()
-                    ->placeholder('Motivo del cambio: fusión, cambio de CIF, etc.'),
+                    ->placeholder(__('filament.company_fiscal_config.fields.notes_placeholder')),
             ]);
     }
 
@@ -126,57 +139,57 @@ class CompanyFiscalConfigResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('business_name')
-                    ->label('Razón Social')
+                    ->label(__('filament.company_fiscal_config.fields.business_name'))
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('tax_id')
-                    ->label('CIF/NIF')
+                    ->label(__('filament.company_fiscal_config.fields.tax_id'))
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('valid_from')
-                    ->label('Vigente Desde')
+                    ->label(__('filament.company_fiscal_config.fields.valid_from'))
                     ->date('d/m/Y')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('valid_until')
-                    ->label('Vigente Hasta')
+                    ->label(__('filament.company_fiscal_config.fields.valid_until'))
                     ->date('d/m/Y')
-                    ->placeholder('Actual')
+                    ->placeholder(__('filament.company_fiscal_config.table.valid_until_placeholder'))
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label('Activa')
+                    ->label(__('filament.company_fiscal_config.fields.is_active'))
                     ->boolean()
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('is_oss')
-                    ->label('OSS')
+                    ->label(__('filament.company_fiscal_config.fields.is_oss'))
                     ->boolean(),
 
                 Tables\Columns\IconColumn::make('is_roi')
-                    ->label('ROI')
+                    ->label(__('filament.company_fiscal_config.fields.is_roi'))
                     ->boolean(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Creada')
+                    ->label(__('filament.company_fiscal_config.fields.created_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Activa')
-                    ->placeholder('Todas')
-                    ->trueLabel('Solo activas')
-                    ->falseLabel('Solo históricas'),
+                    ->label(__('filament.company_fiscal_config.filters.is_active'))
+                    ->placeholder(__('filament.company_fiscal_config.filters.is_active_all'))
+                    ->trueLabel(__('filament.company_fiscal_config.filters.is_active_true'))
+                    ->falseLabel(__('filament.company_fiscal_config.filters.is_active_false')),
 
                 Tables\Filters\TernaryFilter::make('is_oss')
-                    ->label('Operador OSS'),
+                    ->label(__('filament.company_fiscal_config.filters.is_oss')),
 
                 Tables\Filters\TernaryFilter::make('is_roi')
-                    ->label('Operador ROI'),
+                    ->label(__('filament.company_fiscal_config.filters.is_roi')),
             ])
             ->recordActions([
                 ViewAction::make(),

@@ -25,16 +25,29 @@ class CustomerFiscalDataResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationLabel = 'Datos Fiscales Clientes';
-
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.customer_fiscal_data.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.customer_fiscal_data.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.customer_fiscal_data.plural_model_label');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
                 Forms\Components\Select::make('user_id')
-                    ->label('Cliente')
+                    ->label(__('filament.customer_fiscal_data.fields.user_id'))
                     ->options(fn () => User::all()->pluck('name', 'id'))
                     ->searchable()
                     ->preload()
@@ -42,77 +55,77 @@ class CustomerFiscalDataResource extends Resource
                     ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('fiscal_name')
-                    ->label('Nombre Fiscal')
+                    ->label(__('filament.customer_fiscal_data.fields.fiscal_name'))
                     ->required()
                     ->maxLength(255)
-                    ->helperText('Puede diferir del nombre del usuario')
+                    ->helperText(__('filament.customer_fiscal_data.fields.fiscal_name_helper'))
                     ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('tax_id')
-                    ->label('NIF/CIF')
+                    ->label(__('filament.customer_fiscal_data.fields.tax_id'))
                     ->maxLength(255)
-                    ->placeholder('12345678A o ESB12345678'),
+                    ->placeholder(__('filament.customer_fiscal_data.fields.tax_id_placeholder')),
 
                 Forms\Components\TextInput::make('legal_entity_type')
-                    ->label('Tipo de Entidad')
+                    ->label(__('filament.customer_fiscal_data.fields.legal_entity_type'))
                     ->maxLength(255)
-                    ->placeholder('Particular, SL, Autónomo...'),
+                    ->placeholder(__('filament.customer_fiscal_data.fields.legal_entity_placeholder')),
 
                 Forms\Components\Toggle::make('is_company')
-                    ->label('Es Empresa (B2B)')
-                    ->helperText('Marca si es empresa en lugar de particular'),
+                    ->label(__('filament.customer_fiscal_data.fields.is_company'))
+                    ->helperText(__('filament.customer_fiscal_data.fields.is_company_helper')),
 
                 Forms\Components\TextInput::make('address')
-                    ->label('Dirección Fiscal')
+                    ->label(__('filament.customer_fiscal_data.fields.address'))
                     ->maxLength(255)
                     ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('city')
-                    ->label('Ciudad')
+                    ->label(__('filament.customer_fiscal_data.fields.city'))
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('state')
-                    ->label('Provincia/Estado')
+                    ->label(__('filament.customer_fiscal_data.fields.state'))
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('zip_code')
-                    ->label('Código Postal')
+                    ->label(__('filament.customer_fiscal_data.fields.zip_code'))
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('country_code')
-                    ->label('País (ISO)')
+                    ->label(__('filament.customer_fiscal_data.fields.country_code'))
                     ->required()
                     ->maxLength(2)
                     ->default('ES')
-                    ->placeholder('ES'),
+                    ->placeholder(__('filament.customer_fiscal_data.fields.country_placeholder')),
 
                 Forms\Components\Toggle::make('is_eu_vat_registered')
-                    ->label('Registro IVA UE')
-                    ->helperText('Cliente con VAT ID intracomunitario (reverse charge)'),
+                    ->label(__('filament.customer_fiscal_data.fields.is_eu_vat_registered'))
+                    ->helperText(__('filament.customer_fiscal_data.fields.is_eu_vat_helper')),
 
                 Forms\Components\Toggle::make('is_exempt_vat')
-                    ->label('Exento de IVA')
-                    ->helperText('Cliente con exención fiscal'),
+                    ->label(__('filament.customer_fiscal_data.fields.is_exempt_vat'))
+                    ->helperText(__('filament.customer_fiscal_data.fields.is_exempt_helper')),
 
                 Forms\Components\DatePicker::make('valid_from')
-                    ->label('Vigente Desde')
+                    ->label(__('filament.customer_fiscal_data.fields.valid_from'))
                     ->required()
                     ->default(now())
-                    ->helperText('Fecha de inicio de vigencia'),
+                    ->helperText(__('filament.customer_fiscal_data.fields.valid_from_helper')),
 
                 Forms\Components\DatePicker::make('valid_until')
-                    ->label('Vigente Hasta')
-                    ->helperText('Dejar vacío para configuración actual activa'),
+                    ->label(__('filament.customer_fiscal_data.fields.valid_until'))
+                    ->helperText(__('filament.customer_fiscal_data.fields.valid_until_helper')),
 
                 Forms\Components\Toggle::make('is_active')
-                    ->label('Activa')
+                    ->label(__('filament.customer_fiscal_data.fields.is_active'))
                     ->default(true),
 
                 Forms\Components\Textarea::make('notes')
-                    ->label('Notas')
+                    ->label(__('filament.customer_fiscal_data.fields.notes'))
                     ->rows(3)
                     ->columnSpanFull()
-                    ->placeholder('Motivo del cambio: cambio de domicilio, CIF, etc.'),
+                    ->placeholder(__('filament.customer_fiscal_data.fields.notes_placeholder')),
             ]);
     }
 
@@ -121,71 +134,71 @@ class CustomerFiscalDataResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Cliente')
+                    ->label(__('filament.customer_fiscal_data.table.customer'))
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('fiscal_name')
-                    ->label('Nombre Fiscal')
+                    ->label(__('filament.customer_fiscal_data.fields.fiscal_name'))
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('tax_id')
-                    ->label('NIF/CIF')
+                    ->label(__('filament.customer_fiscal_data.fields.tax_id'))
                     ->searchable(),
 
                 Tables\Columns\IconColumn::make('is_company')
-                    ->label('Empresa')
+                    ->label(__('filament.customer_fiscal_data.table.company'))
                     ->boolean(),
 
                 Tables\Columns\TextColumn::make('valid_from')
-                    ->label('Vigente Desde')
+                    ->label(__('filament.customer_fiscal_data.fields.valid_from'))
                     ->date('d/m/Y')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('valid_until')
-                    ->label('Vigente Hasta')
+                    ->label(__('filament.customer_fiscal_data.fields.valid_until'))
                     ->date('d/m/Y')
-                    ->placeholder('Actual')
+                    ->placeholder(__('filament.customer_fiscal_data.table.valid_until_placeholder'))
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label('Activa')
+                    ->label(__('filament.customer_fiscal_data.fields.is_active'))
                     ->boolean()
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('is_eu_vat_registered')
-                    ->label('VAT UE')
+                    ->label(__('filament.customer_fiscal_data.table.vat_eu'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Creada')
+                    ->label(__('filament.customer_fiscal_data.fields.created_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('user_id')
-                    ->label('Cliente')
+                    ->label(__('filament.customer_fiscal_data.filters.user_id'))
                     ->options(fn () => User::all()->pluck('name', 'id'))
                     ->searchable()
                     ->preload(),
 
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Activa')
-                    ->placeholder('Todas')
-                    ->trueLabel('Solo activas')
-                    ->falseLabel('Solo históricas'),
+                    ->label(__('filament.customer_fiscal_data.filters.is_active'))
+                    ->placeholder(__('filament.customer_fiscal_data.filters.is_active_all'))
+                    ->trueLabel(__('filament.customer_fiscal_data.filters.is_active_true'))
+                    ->falseLabel(__('filament.customer_fiscal_data.filters.is_active_false')),
 
                 Tables\Filters\TernaryFilter::make('is_company')
-                    ->label('Tipo')
-                    ->placeholder('Todas')
-                    ->trueLabel('Solo empresas')
-                    ->falseLabel('Solo particulares'),
+                    ->label(__('filament.customer_fiscal_data.filters.is_company'))
+                    ->placeholder(__('filament.customer_fiscal_data.filters.is_company_all'))
+                    ->trueLabel(__('filament.customer_fiscal_data.filters.is_company_true'))
+                    ->falseLabel(__('filament.customer_fiscal_data.filters.is_company_false')),
 
                 Tables\Filters\TernaryFilter::make('is_eu_vat_registered')
-                    ->label('VAT UE'),
+                    ->label(__('filament.customer_fiscal_data.filters.is_eu_vat')),
             ])
             ->recordActions([
                 ViewAction::make(),

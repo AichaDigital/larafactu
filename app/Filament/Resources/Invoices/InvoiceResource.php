@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Invoices;
 
 use AichaDigital\Larabill\Enums\InvoiceSerieType;
@@ -35,27 +37,36 @@ class InvoiceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
-    protected static ?string $navigationLabel = 'Facturas';
-
-    protected static ?string $modelLabel = 'Factura';
-
-    protected static ?string $pluralModelLabel = 'Facturas';
-
     protected static ?int $navigationSort = 10;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.invoice.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.invoice.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.invoice.plural_model_label');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Forms\Components\TextInput::make('prefix')
-                    ->label('Prefijo')
+                    ->label(__('filament.invoice.fields.prefix'))
                     ->default('FAC')
                     ->maxLength(10)
                     ->required()
                     ->columnSpan(1),
 
                 Forms\Components\Select::make('serie')
-                    ->label('Serie')
+                    ->label(__('filament.invoice.fields.serie'))
                     ->options(InvoiceSerieType::class)
                     ->enum(InvoiceSerieType::class)
                     ->default(InvoiceSerieType::INVOICE)
@@ -63,7 +74,7 @@ class InvoiceResource extends Resource
                     ->columnSpan(1),
 
                 Forms\Components\Select::make('status')
-                    ->label('Estado')
+                    ->label(__('filament.invoice.fields.status'))
                     ->options(InvoiceStatus::class)
                     ->enum(InvoiceStatus::class)
                     ->default(InvoiceStatus::DRAFT)
@@ -71,20 +82,20 @@ class InvoiceResource extends Resource
                     ->columnSpan(1),
 
                 Forms\Components\DatePicker::make('invoice_date')
-                    ->label('Fecha Factura')
+                    ->label(__('filament.invoice.fields.invoice_date'))
                     ->default(now())
                     ->required()
                     ->native(false)
                     ->columnSpan(1),
 
                 Forms\Components\DatePicker::make('due_date')
-                    ->label('Fecha Vencimiento')
+                    ->label(__('filament.invoice.fields.due_date'))
                     ->default(now()->addDays(30))
                     ->native(false)
                     ->columnSpan(1),
 
                 Forms\Components\Select::make('user_id')
-                    ->label('Usuario/Cliente')
+                    ->label(__('filament.invoice.fields.user_id'))
                     ->relationship('user', 'name')
                     ->searchable(['name', 'email'])
                     ->preload()
@@ -105,17 +116,17 @@ class InvoiceResource extends Resource
                     ]),
 
                 Forms\Components\Textarea::make('notes')
-                    ->label('Notas')
+                    ->label(__('filament.invoice.fields.notes'))
                     ->rows(3)
                     ->columnSpan(2),
 
                 Forms\Components\TextInput::make('payment_terms')
-                    ->label('Condiciones de Pago')
+                    ->label(__('filament.invoice.fields.payment_terms'))
                     ->maxLength(255)
                     ->columnSpan(1),
 
                 Forms\Components\DateTimePicker::make('paid_at')
-                    ->label('Fecha de Pago')
+                    ->label(__('filament.invoice.fields.paid_at'))
                     ->native(false)
                     ->columnSpan(1),
             ])
@@ -127,35 +138,35 @@ class InvoiceResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('fiscal_number')
-                    ->label('Número')
+                    ->label(__('filament.invoice.fields.fiscal_number'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->weight('bold'),
 
                 TextColumn::make('serie')
-                    ->label('Serie')
+                    ->label(__('filament.invoice.fields.serie'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('status')
-                    ->label('Estado')
+                    ->label(__('filament.invoice.fields.status'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('user.name')
-                    ->label('Cliente')
+                    ->label(__('filament.invoice.table.customer'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('invoice_date')
-                    ->label('Fecha')
+                    ->label(__('filament.invoice.fields.invoice_date'))
                     ->date('d/m/Y')
                     ->sortable(),
 
                 TextColumn::make('total_amount')
-                    ->label('Total')
+                    ->label(__('filament.invoice.fields.total_amount'))
                     ->money('EUR', locale: 'es')
                     ->sortable()
                     ->summarize([
@@ -164,42 +175,42 @@ class InvoiceResource extends Resource
                     ]),
 
                 TextColumn::make('due_date')
-                    ->label('Vencimiento')
+                    ->label(__('filament.invoice.fields.due_date'))
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('paid_at')
-                    ->label('Pagado')
+                    ->label(__('filament.invoice.fields.paid_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable()
-                    ->placeholder('Pendiente'),
+                    ->placeholder(__('filament.invoice.table.paid_placeholder')),
 
                 TextColumn::make('created_at')
-                    ->label('Creado')
+                    ->label(__('filament.invoice.fields.created_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label('Estado')
+                    ->label(__('filament.invoice.filters.status'))
                     ->options(InvoiceStatus::class)
                     ->multiple(),
 
                 SelectFilter::make('serie')
-                    ->label('Serie')
+                    ->label(__('filament.invoice.filters.serie'))
                     ->options(InvoiceSerieType::class)
                     ->multiple(),
 
                 Filter::make('invoice_date')
                     ->form([
                         Forms\Components\DatePicker::make('from')
-                            ->label('Desde')
+                            ->label(__('filament.invoice.filters.from'))
                             ->native(false),
                         Forms\Components\DatePicker::make('until')
-                            ->label('Hasta')
+                            ->label(__('filament.invoice.filters.until'))
                             ->native(false),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -215,10 +226,10 @@ class InvoiceResource extends Resource
                     }),
 
                 TernaryFilter::make('paid')
-                    ->label('Pagado')
-                    ->placeholder('Todos')
-                    ->trueLabel('Pagadas')
-                    ->falseLabel('Pendientes')
+                    ->label(__('filament.invoice.filters.paid'))
+                    ->placeholder(__('filament.invoice.filters.paid_all'))
+                    ->trueLabel(__('filament.invoice.filters.paid_true'))
+                    ->falseLabel(__('filament.invoice.filters.paid_false'))
                     ->queries(
                         true: fn (Builder $query) => $query->whereNotNull('paid_at'),
                         false: fn (Builder $query) => $query->whereNull('paid_at'),
@@ -260,9 +271,10 @@ class InvoiceResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         try {
-            return static::getModel()::where('status', InvoiceStatus::DRAFT)->count();
+            $count = static::getModel()::where('status', InvoiceStatus::DRAFT)->count();
+
+            return $count > 0 ? (string) $count : null;
         } catch (\Exception $e) {
-            // Graceful degradation if table doesn't exist yet (e.g., before migrations)
             return null;
         }
     }

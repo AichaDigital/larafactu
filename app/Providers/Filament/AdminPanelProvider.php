@@ -2,6 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use AichaDigital\LarabillFilament\LarabillFilamentPlugin;
+use AichaDigital\LararoiFilament\LararoiFilamentPlugin;
+use AichaDigital\LaraticketsFilament\LaraticketsFilamentPlugin;
+use AichaDigital\LaraVerifactuFilament\LaraVerifactuFilamentPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -54,6 +58,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->plugins([
+                LarabillFilamentPlugin::make(),
+                LaraVerifactuFilamentPlugin::make(),
+                LararoiFilamentPlugin::make(),
+                LaraticketsFilamentPlugin::make(),
             ]);
     }
 }

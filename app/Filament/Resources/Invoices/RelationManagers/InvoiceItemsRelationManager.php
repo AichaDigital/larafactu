@@ -17,18 +17,27 @@ class InvoiceItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';
 
-    protected static ?string $title = 'Líneas de Factura';
+    public static function getTitle($ownerRecord, string $pageClass): string
+    {
+        return __('filament.invoice_items.title');
+    }
 
-    protected static ?string $modelLabel = 'Línea';
+    public static function getModelLabel(): string
+    {
+        return __('filament.invoice_items.model_label');
+    }
 
-    protected static ?string $pluralModelLabel = 'Líneas';
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.invoice_items.plural_model_label');
+    }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Forms\Components\Select::make('item_type')
-                    ->label('Tipo')
+                    ->label(__('filament.invoice_items.fields.item_type'))
                     ->options(ItemType::class)
                     ->enum(ItemType::class)
                     ->default(ItemType::GOOD)
@@ -36,7 +45,7 @@ class InvoiceItemsRelationManager extends RelationManager
                     ->columnSpan(1),
 
                 Forms\Components\TextInput::make('quantity')
-                    ->label('Cantidad')
+                    ->label(__('filament.invoice_items.fields.quantity'))
                     ->numeric()
                     ->default(1.0)
                     ->required()
@@ -44,13 +53,13 @@ class InvoiceItemsRelationManager extends RelationManager
                     ->columnSpan(1),
 
                 Forms\Components\Textarea::make('description')
-                    ->label('Descripción')
+                    ->label(__('filament.invoice_items.fields.description'))
                     ->required()
                     ->rows(2)
                     ->columnSpan(2),
 
                 Forms\Components\TextInput::make('unit_price')
-                    ->label('Precio Unitario')
+                    ->label(__('filament.invoice_items.fields.unit_price'))
                     ->numeric()
                     ->required()
                     ->prefix('€')
@@ -58,7 +67,7 @@ class InvoiceItemsRelationManager extends RelationManager
                     ->columnSpan(1),
 
                 Forms\Components\TextInput::make('taxable_amount')
-                    ->label('Base Imponible')
+                    ->label(__('filament.invoice_items.fields.taxable_amount'))
                     ->numeric()
                     ->required()
                     ->prefix('€')
@@ -66,7 +75,7 @@ class InvoiceItemsRelationManager extends RelationManager
                     ->columnSpan(1),
 
                 Forms\Components\TextInput::make('total_tax_amount')
-                    ->label('IVA')
+                    ->label(__('filament.invoice_items.fields.total_tax_amount'))
                     ->numeric()
                     ->required()
                     ->prefix('€')
@@ -75,7 +84,7 @@ class InvoiceItemsRelationManager extends RelationManager
                     ->columnSpan(1),
 
                 Forms\Components\TextInput::make('total_amount')
-                    ->label('Total')
+                    ->label(__('filament.invoice_items.fields.total_amount'))
                     ->numeric()
                     ->required()
                     ->prefix('€')
@@ -91,42 +100,42 @@ class InvoiceItemsRelationManager extends RelationManager
             ->recordTitleAttribute('description')
             ->columns([
                 TextColumn::make('item_type')
-                    ->label('Tipo')
+                    ->label(__('filament.invoice_items.fields.item_type'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('description')
-                    ->label('Descripción')
+                    ->label(__('filament.invoice_items.fields.description'))
                     ->searchable()
                     ->limit(50)
                     ->wrap(),
 
                 TextColumn::make('quantity')
-                    ->label('Cantidad')
+                    ->label(__('filament.invoice_items.fields.quantity'))
                     ->numeric(decimalPlaces: 2)
                     ->sortable()
                     ->alignEnd(),
 
                 TextColumn::make('unit_price')
-                    ->label('Precio')
+                    ->label(__('filament.invoice_items.table.price'))
                     ->money('EUR', locale: 'es')
                     ->sortable()
                     ->alignEnd(),
 
                 TextColumn::make('taxable_amount')
-                    ->label('Base')
+                    ->label(__('filament.invoice_items.table.base'))
                     ->money('EUR', locale: 'es')
                     ->sortable()
                     ->alignEnd(),
 
                 TextColumn::make('total_tax_amount')
-                    ->label('IVA')
+                    ->label(__('filament.invoice_items.fields.total_tax_amount'))
                     ->money('EUR', locale: 'es')
                     ->sortable()
                     ->alignEnd(),
 
                 TextColumn::make('total_amount')
-                    ->label('Total')
+                    ->label(__('filament.invoice_items.fields.total_amount'))
                     ->money('EUR', locale: 'es')
                     ->sortable()
                     ->weight('bold')
