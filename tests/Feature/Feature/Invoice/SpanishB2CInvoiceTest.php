@@ -1,5 +1,6 @@
 <?php
 
+use AichaDigital\Larabill\Enums\BillingFrequency;
 use AichaDigital\Larabill\Enums\InvoiceStatus;
 use AichaDigital\Larabill\Enums\RelationshipType;
 use AichaDigital\Larabill\Models\Article;
@@ -45,7 +46,7 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
         'description' => 'Plan de hosting compartido básico',
         'base_price' => 999, // €9.99 en base100 (campo correcto: base_price)
         'is_recurring' => true,
-        'billing_frequency' => 'M', // Monthly
+        'billing_frequency' => BillingFrequency::MONTHLY,
     ]);
 
     // Act: Create invoice
