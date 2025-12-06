@@ -287,6 +287,9 @@ else
     # ─────────────────────────────────────────────────────────
     # MySQL: Pedir datos de conexión
     # ─────────────────────────────────────────────────────────
+    echo -e "   ${YELLOW}⚠️  IMPORTANTE: La base de datos debe existir previamente${NC}"
+    echo -e "   ${YELLOW}   Créala con: mysql -e \"CREATE DATABASE larafactu\"${NC}"
+    echo ""
 
     # Nombre de base de datos
     if [[ -z "$DB_DATABASE" ]]; then
