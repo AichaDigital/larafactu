@@ -122,6 +122,29 @@ bin/fresh-install.sh && ./bin/local-install.sh
 php artisan larafactu:install --local --fresh
 ```
 
+#### Nota sobre `composer.json` en desarrollo
+
+El `composer.json` del repositorio usa **paths locales** para los paquetes de desarrollo. El instalador aplica `git skip-worktree` para evitar commits accidentales.
+
+**Si necesitas modificar `composer.json` legítimamente** (añadir dependencias, etc.):
+
+```bash
+# 1. Quitar protección
+git update-index --no-skip-worktree composer.json
+
+# 2. Restaurar versión original del repo
+git checkout composer.json
+
+# 3. Hacer tus cambios (añadir dependencias, etc.)
+composer require nuevo/paquete
+
+# 4. Commitear
+git add composer.json && git commit -m "feat: Add nuevo/paquete"
+
+# 5. Volver a aplicar paths locales y protección
+php artisan larafactu:install --local --skip-migrations
+```
+
 ### 🎉 ¡Listo!
 
 - **Frontend**: http://larafactu.test
