@@ -1,6 +1,7 @@
 <?php
 
 use AichaDigital\Larabill\Enums\InvoiceStatus;
+use AichaDigital\Larabill\Enums\RelationshipType;
 use AichaDigital\Larabill\Models\Article;
 use AichaDigital\Larabill\Models\Customer;
 use AichaDigital\Larabill\Models\Invoice;
@@ -28,7 +29,7 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
         'user_id' => $issuer->id,
         'display_name' => 'Juan Pérez',
         'legal_entity_type_code' => 'PERSONA_FISICA',
-        'relationship_type' => 'client',
+        'relationship_type' => RelationshipType::CLIENT,
     ]);
 
     // Factory auto-creates tax profile, so we update it
