@@ -22,6 +22,9 @@ jobs:
           extensions: mbstring, dom, curl, libxml, mysql, zip, pcntl, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
+      - name: Convert to GitHub repositories
+        run: php scripts/post-deploy.php
+
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -42,6 +45,9 @@ jobs:
           php-version: '8.4'
           extensions: mbstring, dom, curl, libxml, mysql, zip, pcntl, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
+
+      - name: Convert to GitHub repositories
+        run: php scripts/post-deploy.php
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
