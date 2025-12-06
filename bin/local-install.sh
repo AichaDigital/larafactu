@@ -419,7 +419,11 @@ file_put_contents(
 echo "   ✓ composer.json actualizado con paths locales\n";
 PHPSCRIPT
 
-echo -e "   ${YELLOW}⚠️  IMPORTANTE: No commitear composer.json modificado${NC}"
+# Marcar composer.json para que git ignore los cambios locales
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    git update-index --skip-worktree composer.json 2>/dev/null || true
+    echo -e "   ✓ composer.json protegido (git skip-worktree)"
+fi
 echo ""
 
 # ═══════════════════════════════════════════════════════════
@@ -494,5 +498,6 @@ if [[ "$DB_TYPE" == "mysql" ]]; then
     echo -e "      └─ ${DB_DATABASE}"
 fi
 echo ""
-echo -e "   ${YELLOW}⚠️  RECUERDA: No commitear composer.json modificado${NC}"
+echo -e "   ${GREEN}✓ composer.json protegido con git skip-worktree${NC}"
+echo -e "     (Para restaurar: git update-index --no-skip-worktree composer.json)"
 echo ""
