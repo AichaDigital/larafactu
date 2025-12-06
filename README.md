@@ -65,47 +65,51 @@ aichadigital/lara100         → Valores monetarios base 100
 
 ### 🏠 Desarrollo Local
 
-El proyecto incluye un **instalador inteligente** que configura todo automáticamente:
+El proyecto incluye un **instalador bash** que configura todo automáticamente desde cero:
 
 ```bash
 # 1. Clonar repositorio
 git clone https://github.com/AichaDigital/larafactu.git
 cd larafactu
 
-# 2. Configurar entorno
-cp .env.example .env
-php artisan key:generate
-
-# 3. Configurar base de datos en .env
+# 2. Configurar base de datos en .env.example (o crear .env)
 # DB_DATABASE=larafactu
 # DB_USERNAME=root
 # DB_PASSWORD=
 
-# 4. Ejecutar instalador interactivo
-php artisan larafactu:install
-
-# 5. Compilar assets
-npm install && npm run build
+# 3. Ejecutar instalador local (hace TODO automáticamente)
+./bin/local-install.sh
 ```
+
+El script `local-install.sh` realiza automáticamente:
+
+- ✅ Detecta paquetes de desarrollo en rutas comunes
+- ✅ Crea symlinks a paquetes locales
+- ✅ Configura path repositories en composer.json
+- ✅ Ejecuta `composer install`
+- ✅ Genera APP_KEY
+- ✅ Ejecuta migraciones y seeders
+- ✅ Compila assets (npm install && build)
 
 #### Opciones del Instalador
 
 ```bash
-# Instalación local completa (no interactivo)
-php artisan larafactu:install --local --fresh
+# Especificar ruta a paquetes
+./bin/local-install.sh --packages-path=/ruta/a/paquetes
 
-# Instalación producción
-php artisan larafactu:install --production
+# Sin compilar assets
+./bin/local-install.sh --skip-npm
 
-# Reset completo preservando IDE config
-bin/fresh-install.sh && php artisan larafactu:install --local --fresh
+# Reset completo preservando IDE config (para reinstalar)
+bin/fresh-install.sh && ./bin/local-install.sh
 ```
 
-El instalador en modo local:
-- ✅ Crea symlinks a paquetes de desarrollo
-- ✅ Configura path repositories en composer.json
-- ✅ Ejecuta migraciones y seeders
-- ✅ Crea usuarios de prueba
+#### Comandos Post-Instalación
+
+```bash
+# Reinstalar limpio (si ya tienes el proyecto funcionando)
+php artisan larafactu:install --local --fresh
+```
 
 ### 🎉 ¡Listo!
 
