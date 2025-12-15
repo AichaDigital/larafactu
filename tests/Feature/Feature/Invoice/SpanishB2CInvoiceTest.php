@@ -29,14 +29,13 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
     $customer = Customer::factory()->create([
         'user_id' => $issuer->id,
         'display_name' => 'Juan Pérez',
-        'legal_entity_type_code' => 'PERSONA_FISICA',
+        'legal_entity_type_code' => 'INDIVIDUAL',
         'relationship_type' => RelationshipType::CLIENT,
     ]);
 
     // Factory auto-creates tax profile, so we update it
     $customer->currentTaxProfile->update([
-        'email' => 'juan@example.es',
-        'tax_code' => '12345678Z',
+        'tax_id' => '12345678Z',
         'country_code' => 'ES',
     ]);
 
@@ -44,9 +43,7 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
     $article = Article::factory()->create([
         'name' => 'Hosting Básico Mensual',
         'description' => 'Plan de hosting compartido básico',
-        'base_price' => 999, // €9.99 en base100 (campo correcto: base_price)
-        'is_recurring' => true,
-        'billing_frequency' => BillingFrequency::MONTHLY,
+        'cost_price' => 999, // €9.99 en base100
     ]);
 
     // Act: Create invoice
@@ -89,7 +86,7 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
 
     // Assert: Customer tax profile exists
     expect($customer->currentTaxProfile)->not->toBeNull();
-    expect($customer->currentTaxProfile->tax_code)->toBe('12345678Z');
+    expect($customer->currentTaxProfile->tax_id)->toBe('12345678Z');
     expect($customer->currentTaxProfile->country_code)->toBe('ES');
 
     // Assert: Tax methods work correctly
@@ -101,7 +98,7 @@ it('calculates correct VAT for multiple items', function () {
     $issuer = User::factory()->create();
     $customer = Customer::factory()->create([
         'user_id' => $issuer->id,
-        'legal_entity_type_code' => 'PERSONA_FISICA',
+        'legal_entity_type_code' => 'INDIVIDUAL',
     ]);
 
     // Update tax profile with Spanish data
@@ -164,21 +161,21 @@ it('validates Spanish DNI format', function () {
 
     $customer = Customer::factory()->create([
         'user_id' => $issuer->id,
-        'legal_entity_type_code' => 'PERSONA_FISICA',
+        'legal_entity_type_code' => 'INDIVIDUAL',
     ]);
 
     // Update tax profile with Spanish DNI
     $customer->currentTaxProfile->update([
-        'tax_code' => '12345678Z',
+        'tax_id' => '12345678Z',
         'country_code' => 'ES',
     ]);
 
     $customer->refresh();
 
     // Assert tax profile was updated
-    expect($customer->currentTaxProfile->tax_code)->toBe('12345678Z');
+    expect($customer->currentTaxProfile->tax_id)->toBe('12345678Z');
     expect($customer->currentTaxProfile->country_code)->toBe('ES');
 
-    // TODO: Implement DNI validation in CustomerTaxProfile model
-    // expect($customer->currentTaxProfile->hasValidTaxCode())->toBeTrue();
+    // TODO: Implement DNI validation in UserTaxProfile model
+    // expect($customer->currentTaxProfile->hasValidTaxId())->toBeTrue();
 });
