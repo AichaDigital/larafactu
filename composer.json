@@ -18,7 +18,21 @@
         },
         {
             "type": "path",
+            "url": "./packages/aichadigital/larabill-filament",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
             "url": "./packages/aichadigital/lara-verifactu",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "./packages/aichadigital/lara-verifactu-filament",
             "options": {
                 "symlink": true
             }
@@ -32,7 +46,21 @@
         },
         {
             "type": "path",
+            "url": "./packages/aichadigital/laratickets-filament",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
             "url": "./packages/aichadigital/lararoi",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "./packages/aichadigital/lararoi-filament",
             "options": {
                 "symlink": true
             }
@@ -40,12 +68,20 @@
     ],
     "require": {
         "php": "^8.3",
-        "aichadigital/larabill": "dev-main",
         "aichadigital/lara-verifactu": "dev-main",
+        "aichadigital/lara-verifactu-filament": "dev-main",
+        "aichadigital/larabill": "dev-main",
+        "aichadigital/larabill-filament": "dev-main",
+        "aichadigital/lararoi": "dev-main",
+        "aichadigital/lararoi-filament": "dev-main",
         "aichadigital/laratickets": "dev-main",
+        "aichadigital/laratickets-filament": "dev-main",
+        "bezhansalleh/filament-language-switch": "^4.0",
         "filament/filament": "^4.0",
+        "lara-zeus/spatie-translatable": "^1.0",
         "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/tinker": "^2.10.1",
+        "matriphe/bendera": "^0.4.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
