@@ -30,7 +30,13 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignUuid('user_id')->nullable()->index(); // UUID v7 string (char 36)
+            // UUID v7 string - FK to users with cascade delete
+            // When user is deleted, their sessions are automatically removed
+            $table->foreignUuid('user_id')
+                ->nullable()
+                ->index()
+                ->constrained()
+                ->cascadeOnDelete();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
