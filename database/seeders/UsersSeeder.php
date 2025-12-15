@@ -30,18 +30,18 @@ class UsersSeeder extends Seeder
      */
     private const ES_ENTITY_DISTRIBUTION = [
         // Personas físicas (~30%)
-        'INDIVIDUAL'     => 15,
-        'SELF_EMPLOYED'  => 15,
+        'INDIVIDUAL' => 15,
+        'SELF_EMPLOYED' => 15,
 
         // Empresas más comunes (~50%)
-        'LIMITED_COMPANY'        => 30,
+        'LIMITED_COMPANY' => 30,
         'PUBLIC_LIMITED_COMPANY' => 10,
-        'COOPERATIVE'            => 5,
-        'COMMUNITY_OF_GOODS'     => 5,
+        'COOPERATIVE' => 5,
+        'COMMUNITY_OF_GOODS' => 5,
 
         // Asociaciones y fundaciones (~20%)
         'ASSOCIATION' => 10,
-        'FOUNDATION'  => 5,
+        'FOUNDATION' => 5,
         'CIVIL_PARTNERSHIP' => 5,
     ];
 
@@ -163,9 +163,9 @@ class UsersSeeder extends Seeder
         $email = $this->generateUniqueEmail($emailPrefix);
 
         return User::create([
-            'name'              => $name,
-            'email'             => $email,
-            'password'          => Hash::make('password'),
+            'name' => $name,
+            'email' => $email,
+            'password' => Hash::make('password'),
             'email_verified_at' => $this->generate2025Date(),
         ]);
     }
@@ -186,9 +186,9 @@ class UsersSeeder extends Seeder
         $email = $this->generateUniqueEmail($emailPrefix, strtolower($countryCode));
 
         return User::create([
-            'name'              => $name,
-            'email'             => $email,
-            'password'          => Hash::make('password'),
+            'name' => $name,
+            'email' => $email,
+            'password' => Hash::make('password'),
             'email_verified_at' => $this->generate2025Date(),
         ]);
     }
@@ -205,22 +205,22 @@ class UsersSeeder extends Seeder
             : $this->generateSpanishNIF();
 
         UserTaxProfile::create([
-            'user_id'              => $user->id,
-            'fiscal_name'          => $user->name,
-            'tax_id'               => $taxId,
+            'user_id' => $user->id,
+            'fiscal_name' => $user->name,
+            'tax_id' => $taxId,
             'legal_entity_type_code' => $entityCode,
-            'address'              => $this->fakerEs->streetAddress(),
-            'city'                 => $location['city'],
-            'state'                => $location['state'],
-            'zip_code'             => $location['zip_prefix'] . str_pad((string) $this->fakerEs->numberBetween(0, 999), 3, '0', STR_PAD_LEFT),
-            'country_code'         => $countryCode,
-            'is_company'           => $isCompany,
+            'address' => $this->fakerEs->streetAddress(),
+            'city' => $location['city'],
+            'state' => $location['state'],
+            'zip_code' => $location['zip_prefix'].str_pad((string) $this->fakerEs->numberBetween(0, 999), 3, '0', STR_PAD_LEFT),
+            'country_code' => $countryCode,
+            'is_company' => $isCompany,
             'is_eu_vat_registered' => false,
-            'is_exempt_vat'        => $this->isVatExempt($entityCode),
-            'valid_from'           => $this->generate2025ValidFrom(),
-            'valid_until'          => null,
-            'is_active'            => true,
-            'notes'                => "Seeder 2025 - {$entityCode}",
+            'is_exempt_vat' => $this->isVatExempt($entityCode),
+            'valid_from' => $this->generate2025ValidFrom(),
+            'valid_until' => null,
+            'is_active' => true,
+            'notes' => "Seeder 2025 - {$entityCode}",
         ]);
     }
 
@@ -232,22 +232,22 @@ class UsersSeeder extends Seeder
         $vatNumber = $this->generateEuVatNumber($countryCode);
 
         UserTaxProfile::create([
-            'user_id'              => $user->id,
-            'fiscal_name'          => $user->name,
-            'tax_id'               => $vatNumber,
+            'user_id' => $user->id,
+            'fiscal_name' => $user->name,
+            'tax_id' => $vatNumber,
             'legal_entity_type_code' => $isCompany ? 'LIMITED_COMPANY' : 'INDIVIDUAL',
-            'address'              => $faker->streetAddress(),
-            'city'                 => $faker->city(),
-            'state'                => '',
-            'zip_code'             => $faker->postcode(),
-            'country_code'         => $countryCode,
-            'is_company'           => $isCompany,
+            'address' => $faker->streetAddress(),
+            'city' => $faker->city(),
+            'state' => '',
+            'zip_code' => $faker->postcode(),
+            'country_code' => $countryCode,
+            'is_company' => $isCompany,
             'is_eu_vat_registered' => $isCompany, // B2B intra-community
-            'is_exempt_vat'        => false,
-            'valid_from'           => $this->generate2025ValidFrom(),
-            'valid_until'          => null,
-            'is_active'            => true,
-            'notes'                => "Seeder 2025 - EU {$countryCode}",
+            'is_exempt_vat' => false,
+            'valid_from' => $this->generate2025ValidFrom(),
+            'valid_until' => null,
+            'is_active' => true,
+            'notes' => "Seeder 2025 - EU {$countryCode}",
         ]);
     }
 
@@ -262,7 +262,7 @@ class UsersSeeder extends Seeder
         do {
             $number = $this->fakerEs->numberBetween(10000000, 99999999);
             $letter = $letters[$number % 23];
-            $nif = $number . $letter;
+            $nif = $number.$letter;
         } while (in_array($nif, $this->usedTaxIds, true));
 
         $this->usedTaxIds[] = $nif;
@@ -295,8 +295,8 @@ class UsersSeeder extends Seeder
             $digits = str_pad((string) $this->fakerEs->numberBetween(1000000, 9999999), 7, '0', STR_PAD_LEFT);
 
             // Calculate control character (simplified)
-            $control = $this->calculateCifControl($prefix . $digits);
-            $cif = $prefix . $digits . $control;
+            $control = $this->calculateCifControl($prefix.$digits);
+            $cif = $prefix.$digits.$control;
         } while (in_array($cif, $this->usedTaxIds, true));
 
         $this->usedTaxIds[] = $cif;
@@ -363,7 +363,7 @@ class UsersSeeder extends Seeder
             $digits .= $this->fakerEs->randomDigit();
         }
 
-        return $countryCode . $digits;
+        return $countryCode.$digits;
     }
 
     /**
@@ -391,14 +391,14 @@ class UsersSeeder extends Seeder
         if ($entityCode === 'ASSOCIATION') {
             $topics = ['Cultural', 'Deportiva', 'Vecinal', 'Profesional', 'Juvenil', 'de Comerciantes'];
 
-            return 'Asociación ' . $this->fakerEs->randomElement($topics) . ' ' . $this->fakerEs->city();
+            return 'Asociación '.$this->fakerEs->randomElement($topics).' '.$this->fakerEs->city();
         }
 
         if ($entityCode === 'FOUNDATION') {
-            return 'Fundación ' . $this->fakerEs->lastName();
+            return 'Fundación '.$this->fakerEs->lastName();
         }
 
-        return $baseName . $suffix;
+        return $baseName.$suffix;
     }
 
     /**

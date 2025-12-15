@@ -1,6 +1,5 @@
 <?php
 
-use AichaDigital\Larabill\Enums\BillingFrequency;
 use AichaDigital\Larabill\Enums\InvoiceStatus;
 use AichaDigital\Larabill\Enums\RelationshipType;
 use AichaDigital\Larabill\Models\Article;
