@@ -99,4 +99,6 @@ database/dumps/
 database/*.sql
 database/*.dump
 
-docs/
+## Docs - subcarpetas ignoradas (documentos internos/temporales)
+docs/internal/
+docs/in-progress/

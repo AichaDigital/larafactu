@@ -2,10 +2,14 @@
 
 **Estado**: ⚠️ **PARCIALMENTE SUPERSEDED**
 **Fecha**: 2025-11-28
-**Contexto**: Staging Pre-Producción (antes del 15 dic 2025)
+**Actualizado**: 2025-12-15
+**Contexto**: Staging Pre-Producción
+**Deadline**: ~15 febrero 2026 (extendido desde 15 dic 2025)
 **Impacto**: 🔴 **CRÍTICO** - Cambio arquitectónico fundamental
 **Aprobado por**: @abkrim
 
+> **NOTA (2025-12-15)**: Timeline extendido 2 meses para implementación correcta.
+>
 > **NOTA (2025-12-08)**: La sección de `CustomerFiscalData` ha sido superseded por
 > [ADR-003: Unificación Users/Customers](../packages/aichadigital/larabill/docs/ADR-003-user-customer-unification.md)
 >
@@ -292,7 +296,7 @@ $invoice = Invoice::create([
 - [ ] Code review completo
 - [ ] Testing en staging
 - [ ] Documentación de usuario
-- [ ] **Deadline**: 15 dic 2025 (v1.0.0)
+- [ ] **Deadline**: ~15 feb 2026 (v1.0.0) - *Extendido desde 15 dic 2025*
 
 ---
 
