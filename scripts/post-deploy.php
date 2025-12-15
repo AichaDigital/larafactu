@@ -54,7 +54,7 @@ $composer['repositories'] = [
     ],
     [
         'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/lararoi',
+        'url' => 'https://github.com/AichaDigital/larabill-filament',
     ],
     [
         'type' => 'vcs',
@@ -62,7 +62,23 @@ $composer['repositories'] = [
     ],
     [
         'type' => 'vcs',
+        'url' => 'https://github.com/AichaDigital/lara-verifactu-filament',
+    ],
+    [
+        'type' => 'vcs',
         'url' => 'https://github.com/AichaDigital/laratickets',
+    ],
+    [
+        'type' => 'vcs',
+        'url' => 'https://github.com/AichaDigital/laratickets-filament',
+    ],
+    [
+        'type' => 'vcs',
+        'url' => 'https://github.com/AichaDigital/lararoi',
+    ],
+    [
+        'type' => 'vcs',
+        'url' => 'https://github.com/AichaDigital/lararoi-filament',
     ],
 ];
 
@@ -72,9 +88,13 @@ file_put_contents($composerFile, $json);
 
 echo "✅ Updated composer.json for production:\n";
 echo "   - aichadigital/larabill → GitHub\n";
-echo "   - aichadigital/lararoi → GitHub\n";
+echo "   - aichadigital/larabill-filament → GitHub\n";
 echo "   - aichadigital/lara-verifactu → GitHub\n";
-echo "   - aichadigital/laratickets → GitHub\n\n";
+echo "   - aichadigital/lara-verifactu-filament → GitHub\n";
+echo "   - aichadigital/laratickets → GitHub\n";
+echo "   - aichadigital/laratickets-filament → GitHub\n";
+echo "   - aichadigital/lararoi → GitHub\n";
+echo "   - aichadigital/lararoi-filament → GitHub\n\n";
 
 echo "📦 Next steps:\n";
 echo "   1. Copy .env.example to .env and configure your database\n";
