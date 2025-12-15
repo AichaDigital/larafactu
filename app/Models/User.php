@@ -51,21 +51,6 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-    /**
-     * Create a new Eloquent query builder for the model.
-     *
-     * Uses custom BinaryUuidBuilder to handle UUID binary conversions in relationships.
-     * This is CRITICAL for relationships with Larabill models (Invoice, FiscalSettings, etc.)
-     * that reference user_id as binary UUID.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return \AichaDigital\Larabill\Database\Query\BinaryUuidBuilder
-     */
-    public function newEloquentBuilder($query)
-    {
-        return new \AichaDigital\Larabill\Database\Query\BinaryUuidBuilder($query);
-    }
-
     // ========================================
     // RELATIONSHIPS (ADR-001)
     // ========================================

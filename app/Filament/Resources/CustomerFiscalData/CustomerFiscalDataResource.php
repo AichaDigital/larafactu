@@ -25,7 +25,12 @@ class CustomerFiscalDataResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 20;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.groups.billing');
+    }
 
     public static function getNavigationLabel(): string
     {

@@ -59,6 +59,7 @@ bun.lock
 bun.lock.json
 bun.lock.yaml
 bun.lock.json
+bun.lock.json
 
 ## Docker/Sail (responsabilidad del usuario)
 docker/

@@ -26,6 +26,11 @@ class CompanyFiscalConfigResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.groups.internal');
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('filament.company_fiscal_config.navigation_label');

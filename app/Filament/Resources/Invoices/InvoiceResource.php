@@ -39,6 +39,11 @@ class InvoiceResource extends Resource
 
     protected static ?int $navigationSort = 10;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.groups.billing');
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('filament.invoice.navigation_label');

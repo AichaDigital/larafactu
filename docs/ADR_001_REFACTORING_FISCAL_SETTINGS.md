@@ -1,10 +1,16 @@
 # ADR 001: Refactorización de FiscalSettings - Separación Empresa vs Usuario
 
-**Estado**: ✅ **APROBADO**  
-**Fecha**: 2025-11-28  
-**Contexto**: Staging Pre-Producción (antes del 15 dic 2025)  
-**Impacto**: 🔴 **CRÍTICO** - Cambio arquitectónico fundamental  
+**Estado**: ⚠️ **PARCIALMENTE SUPERSEDED**
+**Fecha**: 2025-11-28
+**Contexto**: Staging Pre-Producción (antes del 15 dic 2025)
+**Impacto**: 🔴 **CRÍTICO** - Cambio arquitectónico fundamental
 **Aprobado por**: @abkrim
+
+> **NOTA (2025-12-08)**: La sección de `CustomerFiscalData` ha sido superseded por
+> [ADR-003: Unificación Users/Customers](../packages/aichadigital/larabill/docs/ADR-003-user-customer-unification.md)
+>
+> - `CompanyFiscalConfig` → **VIGENTE** (este ADR)
+> - `CustomerFiscalData` → **SUPERSEDED** por `UserTaxProfile` (ADR-003)
 
 ---
 

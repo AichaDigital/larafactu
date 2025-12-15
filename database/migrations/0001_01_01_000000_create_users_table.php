@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            // UUID v7 binary (16 bytes) - OPINADO para Larafactu
-            $table->binary('id', 16)->primary();
+            // UUID v7 string (char 36) - ADR-002: UUID v7 consolidation
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -30,7 +30,7 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->binary('user_id', 16)->nullable()->index(); // UUID binary (16 bytes)
+            $table->foreignUuid('user_id')->nullable()->index(); // UUID v7 string (char 36)
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');

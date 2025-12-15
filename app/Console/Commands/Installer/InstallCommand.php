@@ -324,12 +324,38 @@ class InstallCommand extends Command
     }
 
     /**
-     * Actualiza composer.json para usar paths locales.
+     * Actualiza composer.json para usar paths locales desde composer.local.json.
      */
     private function updateComposerForLocal(): void
     {
-        info('📝 Actualizando composer.json para desarrollo local...');
+        info('📝 Configurando composer.json para desarrollo local...');
 
+        $composerLocalPath = base_path('composer.local.json');
+        $composerPath = base_path('composer.json');
+
+        if (! File::exists($composerLocalPath)) {
+            warning('   ⚠️  No existe composer.local.json');
+            warning('   Generando paths locales dinámicamente...');
+            $this->generateLocalComposerFallback();
+
+            return;
+        }
+
+        // Copiar composer.local.json → composer.json
+        File::copy($composerLocalPath, $composerPath);
+        info('   ✓ composer.json actualizado desde composer.local.json');
+
+        // Proteger de commits accidentales con skip-worktree
+        $this->protectComposerJson();
+
+        $this->newLine();
+    }
+
+    /**
+     * Fallback: genera composer.json con paths locales si no existe composer.local.json.
+     */
+    private function generateLocalComposerFallback(): void
+    {
         $composerPath = base_path('composer.json');
         $composer = json_decode(File::get($composerPath), true);
 
@@ -347,15 +373,28 @@ class InstallCommand extends Command
 
         $composer['repositories'] = $newRepositories;
 
-        // Guardar
         File::put(
             $composerPath,
             json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n"
         );
 
-        info('   ✓ composer.json actualizado con paths locales');
-        warning('   ⚠️  IMPORTANTE: No commitear este cambio a Git');
-        $this->newLine();
+        info('   ✓ composer.json generado con paths locales');
+        $this->protectComposerJson();
+    }
+
+    /**
+     * Protege composer.json de commits accidentales usando git skip-worktree.
+     */
+    private function protectComposerJson(): void
+    {
+        $result = Process::run('git update-index --skip-worktree composer.json');
+
+        if ($result->successful()) {
+            info('   ✓ composer.json protegido (skip-worktree)');
+            note('   Para desproteger: git update-index --no-skip-worktree composer.json');
+        } else {
+            warning('   ⚠️  No se pudo aplicar skip-worktree');
+        }
     }
 
     /**
@@ -599,8 +638,9 @@ class InstallCommand extends Command
             $this->line('   🔑 Password: <fg=yellow>password</>');
             $this->newLine();
             note('   Los paquetes están enlazados vía symlinks');
+            note('   composer.json protegido con skip-worktree');
             $this->newLine();
-            warning('   ⚠️  RECUERDA: No commitear composer.json modificado');
+            info('   Para resetear a producción: php artisan larafactu:composer-reset');
         } else {
             info('🌐 Modo PRODUCCIÓN configurado');
             $this->newLine();
