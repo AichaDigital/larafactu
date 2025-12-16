@@ -1,6 +1,6 @@
 # TODO - Implementación ADRs
 
-**Última actualización**: 2025-12-15  
+**Última actualización**: 2025-12-16  
 **Deadline**: ~15 febrero 2026  
 **Contexto**: Larafactu v1.0 - Staging Pre-Producción
 
@@ -12,7 +12,7 @@
 |-----|--------|--------|----------|
 | [ADR-001](./ADR_001_REFACTORING_FISCAL_SETTINGS.md) | Refactorización Fiscal Settings | ⚠️ PARCIAL | 60% |
 | [ADR-002](./ADR_002_UUID_V7_CONSOLIDATION.md) | UUID v7 String | ⚠️ PARCIAL | 80% |
-| [ADR-003](./ADR_003_USER_CUSTOMER_UNIFICATION.md) | Unificación Users/Customers | 🚧 EN PROGRESO | 40% |
+| [ADR-003](./ADR_003_USER_CUSTOMER_UNIFICATION.md) | Unificación Users/Customers | 🚧 EN PROGRESO | 60% |
 
 ---
 
@@ -20,10 +20,10 @@
 
 ### 🔴 Crítico - Esta Semana
 
-- [ ] **ADR-003**: Actualizar estado en ADR-003 (CustomerFiscalData → UserTaxProfile completado)
-- [ ] **Tests**: Ejecutar suite completa de tests en larafactu
-- [ ] **Composer**: `composer update aichadigital/*` para actualizar paquetes locales
-- [ ] **Validación**: Verificar que Filament Resources funcionan correctamente
+- [x] **ADR-003**: Actualizar estado en ADR-003 (CustomerFiscalData → UserTaxProfile completado) ✅ 2025-12-16
+- [x] **Tests**: Ejecutar suite completa de tests en larafactu (11 passed) ✅ 2025-12-16
+- [x] **Composer**: `composer update aichadigital/*` para actualizar paquetes locales ✅ 2025-12-16
+- [x] **Validación**: Verificar que Filament Resources funcionan correctamente ✅ 2025-12-16
 
 ### 🟡 Alta - Próximas 2 Semanas
 
@@ -100,7 +100,7 @@
 
 ## 📋 ADR-003: Unificación Users/Customers
 
-### ✅ Completado (2025-12-15)
+### ✅ Fase 1 Completada (2025-12-16)
 
 - [x] Crear modelo `UserTaxProfile` en larabill
 - [x] Crear migración `user_tax_profiles`
@@ -116,8 +116,10 @@
 - [x] Corregir `LegalEntityTypesSeeder` (JSON translatable)
 - [x] Actualizar códigos legal entity types (INDIVIDUAL, LIMITED_COMPANY)
 - [x] Tests de Invoice pasando (3/3)
+- [x] Verificar Filament Resources funcionan (2025-12-16)
+- [x] Actualizar documentación ADR-003 (2025-12-16)
 
-### 🚧 En Progreso
+### 🚧 Fase 2 - Eliminar tabla customers
 
 - [ ] **Eliminar tabla `customers`**
   - [ ] Analizar dependencias de Customer model
@@ -244,7 +246,7 @@
 
 ---
 
-**Mantenido por**: @abkrim  
-**Última revisión**: 2025-12-15  
-**Próxima revisión**: 2025-12-22
+**Mantenido por**: @abkrim
+**Última revisión**: 2025-12-16
+**Próxima revisión**: 2025-12-23
 

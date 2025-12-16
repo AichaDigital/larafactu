@@ -1,8 +1,8 @@
 # ADR-003: Unificación Users/Customers
 
-> **Estado**: 🚧 EN IMPLEMENTACIÓN
+> **Estado**: 🚧 EN IMPLEMENTACIÓN (Fase 1 ✅ | Fase 2 ⏳)
 > **Fecha**: 2025-12-08
-> **Actualizado**: 2025-12-15
+> **Actualizado**: 2025-12-16
 > **Deadline**: ~15 febrero 2026
 > **Ubicación canónica**: `packages/aichadigital/larabill/docs/ADR-003-user-customer-unification.md`
 
@@ -16,22 +16,31 @@ Este documento referencia el ADR-003 ubicado en el paquete larabill, que define 
 
 ## Cambios clave
 
-### Estado de implementación (2025-12-15)
+### Estado de implementación (2025-12-16)
 
 | Componente | Estado | Notas |
 |------------|--------|-------|
-| `UserTaxProfile` modelo | ✅ Creado | En larabill |
-| `UserRelationshipType` enum | ✅ Creado | En larabill |
-| `CustomerFiscalData` modelo | ⏳ Pendiente eliminar | Invoice aún lo usa |
-| `Invoice` → `user_tax_profile_id` | ⏳ Pendiente | Renombrar FK |
-| `customers` tabla | ⏳ Pendiente eliminar | Unificar en users |
+| `UserTaxProfile` modelo | ✅ Completado | En larabill |
+| `UserRelationshipType` enum | ✅ Completado | En larabill |
+| `CustomerFiscalData` modelo | ✅ Eliminado | Ya no existe |
+| `CustomerFiscalDataFactory` | ✅ Eliminado | Ya no existe |
+| `Invoice` → `user_tax_profile_id` | ✅ Completado | FK actualizada |
+| `InvoiceService` | ✅ Completado | Usa UserTaxProfile |
+| `VatVerification` relación | ✅ Completado | `userTaxProfiles()` |
+| `Customer.currentTaxProfile()` | ✅ Completado | Relación añadida |
+| `CustomerFactory` | ✅ Completado | Auto-crea UserTaxProfile |
+| Tests Invoice | ✅ Pasando | 3/3 tests |
+| `customers` tabla | ⏳ Pendiente eliminar | Fase 2: unificar en users |
+| `parent_user_id` en users | ⏳ Pendiente | Fase 2: self-reference |
 
-### Entidades a eliminar (en progreso)
+### Entidades a eliminar (Fase 2)
 
-| Tabla | Razón | Estado |
-|-------|-------|--------|
-| `customers` | Unificado en `users` con `parent_user_id` | ⏳ Pendiente |
-| `customer_fiscal_data` | Renombrado a `user_tax_profiles` | ⏳ Pendiente |
+| Tabla/Modelo | Razón | Estado |
+|--------------|-------|--------|
+| `customers` | Unificado en `users` con `parent_user_id` | ⏳ Fase 2 |
+| `customer_fiscal_data` | Reemplazado por `user_tax_profiles` | ✅ Eliminado |
+| `CustomerFiscalData` modelo | Reemplazado por `UserTaxProfile` | ✅ Eliminado |
+| `CustomerFiscalDataFactory` | Reemplazado | ✅ Eliminado |
 | `customer_tax_profiles` | Duplicaba funcionalidad | ✅ Eliminado |
 | `issuer_config` | Reemplazado por `company_fiscal_configs` | ✅ Eliminado |
 | `issuer_tax_profiles` | Reemplazado por `company_fiscal_configs` | ✅ Eliminado |
@@ -92,4 +101,4 @@ enum UserRelationshipType: int implements HasLabel, HasColor, HasIcon
 ---
 
 *Documento de referencia creado: 2025-12-08*
-*Actualizado: 2025-12-15 - Estado de implementación añadido*
+*Actualizado: 2025-12-16 - Fase 1 completada (UserTaxProfile, CustomerFiscalData eliminado)*
