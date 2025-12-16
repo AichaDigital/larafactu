@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use AichaDigital\Larabill\Concerns\HasUuid;
-use AichaDigital\Larabill\Models\CustomerFiscalData;
+use AichaDigital\Larabill\Models\UserTaxProfile;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -52,45 +52,59 @@ class User extends Authenticatable implements FilamentUser
     }
 
     // ========================================
-    // RELATIONSHIPS (ADR-001)
+    // RELATIONSHIPS (ADR-003)
     // ========================================
 
     /**
-     * Get all fiscal data records for this user (historical + active).
+     * Get all tax profiles for this user (historical + active).
      *
-     * @return HasMany<CustomerFiscalData, $this>
+     * @return HasMany<UserTaxProfile, $this>
      */
-    public function fiscalData(): HasMany
+    public function taxProfiles(): HasMany
     {
-        return $this->hasMany(CustomerFiscalData::class, 'user_id');
+        return $this->hasMany(UserTaxProfile::class, 'user_id');
     }
 
     /**
-     * Get the current active fiscal data for this user.
+     * Get the current active tax profile for this user.
      *
      * Helper method for convenience.
      */
-    public function currentFiscalData(): ?CustomerFiscalData
+    public function currentTaxProfile(): ?UserTaxProfile
     {
-        return CustomerFiscalData::getActiveForUser($this->id);
+        return UserTaxProfile::getValidForUserAt($this->id, now());
     }
 
     /**
-     * Get fiscal data valid at a specific date.
+     * Get tax profile valid at a specific date.
      */
-    public function fiscalDataAt(\Carbon\Carbon $date): ?CustomerFiscalData
+    public function taxProfileAt(\Carbon\Carbon $date): ?UserTaxProfile
     {
-        return CustomerFiscalData::getValidForUserAt($this->id, $date);
+        return UserTaxProfile::getValidForUserAt($this->id, $date);
     }
 
     /**
-     * Update fiscal data for this user (creates new record, closes previous).
+     * Update tax profile for this user (creates new record, closes previous).
      *
      * @param  array<string, mixed>  $attributes
      */
-    public function updateFiscalData(array $attributes): CustomerFiscalData
+    public function updateTaxProfile(array $attributes): UserTaxProfile
     {
-        return CustomerFiscalData::createForUser($this->id, $attributes);
+        // Close previous profile
+        $current = $this->currentTaxProfile();
+        if ($current) {
+            $current->valid_until = now()->subDay();
+            $current->save();
+        }
+
+        // Create new profile
+        return UserTaxProfile::create([
+            'user_id' => $this->id,
+            'valid_from' => now(),
+            'valid_until' => null,
+            'is_active' => true,
+            ...$attributes,
+        ]);
     }
 
     // ========================================
