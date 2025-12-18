@@ -35,7 +35,11 @@
 ### 🟢 Media - Próximo Mes
 
 - [ ] **ADR-001**: Implementar gestión de proformas con cambio fiscal
-- [ ] **Filament**: UserResource con gestión de delegados
+- [x] **Filament**: UserResource con gestión de delegados ✅ 2025-12-18
+  - [x] Form con relationship_type, parent_user_id
+  - [x] DelegatedUsersRelationManager
+  - [x] TaxProfilesRelationManager
+  - [x] Traducciones ES/EN completas
 - [ ] **Docs**: Actualizar documentación de API
 - [ ] **Seeding**: Crear seeders de producción
 
