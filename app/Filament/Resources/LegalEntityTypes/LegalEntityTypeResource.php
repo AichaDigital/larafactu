@@ -34,12 +34,17 @@ class LegalEntityTypeResource extends Resource
 
     /**
      * Locale to flag/name mapping.
+     *
+     * @var array<string, array{flag: string, name: string}>
      */
     protected static array $localeLabels = [
         'es' => ['flag' => 'es', 'name' => 'Español'],
         'en' => ['flag' => 'gb', 'name' => 'English'],
     ];
 
+    /**
+     * @return array<string>
+     */
     public static function getTranslatableLocales(): array
     {
         return ['es', 'en'];

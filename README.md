@@ -6,7 +6,7 @@
 [![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=flat&logo=php)](https://php.net)
 [![Filament](https://img.shields.io/badge/Filament-4.x-FFAA00?style=flat)](https://filamentphp.com)
 [![Pest](https://img.shields.io/badge/Tested-Pest-22C55E?style=flat)](https://pestphp.com)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
 ---
 
@@ -399,7 +399,7 @@ Este proyecto es **staging/pre-producción** para validar paquetes. Para contrib
 
 ## 📄 Licencia
 
-MIT License - Consulta [LICENSE](LICENSE) para más detalles.
+AGPL-3.0 License - Consulta [LICENSE](LICENSE) para más detalles.
 
 ---
 
@@ -555,7 +555,7 @@ This project is **staging/pre-production** for package validation. To contribute
 
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE) for details.
+AGPL-3.0 License - See [LICENSE](LICENSE) for details.
 
 ---
 

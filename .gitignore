@@ -29,6 +29,7 @@ CLAUDE.md
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/phpstan
 /vendor
 /packages
 Homestead.json

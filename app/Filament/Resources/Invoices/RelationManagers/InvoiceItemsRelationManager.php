@@ -17,7 +17,7 @@ class InvoiceItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';
 
-    public static function getTitle($ownerRecord, string $pageClass): string
+    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
     {
         return __('filament.invoice_items.title');
     }
@@ -150,7 +150,7 @@ class InvoiceItemsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->mutateFormDataUsing(function (array $data): array {
+                    ->mutateDataUsing(function (array $data): array {
                         // Calcular totales automáticamente si no se proporcionan
                         if (! isset($data['taxable_amount'])) {
                             $data['taxable_amount'] = $data['quantity'] * $data['unit_price'];

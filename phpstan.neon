@@ -1,0 +1,15 @@
+parameters:
+    level: 8
+
+    paths:
+        - app/
+
+    tmpDir: storage/phpstan
+
+    reportUnmatchedIgnoredErrors: false
+
+    ignoreErrors:
+        # Filament v4: Placeholder deprecated but no direct replacement in Forms yet
+        # TODO: Replace with View component when Filament provides alternative
+        - message: '#deprecated class Filament\\Forms\\Components\\Placeholder#'
+          path: app/Filament/Resources/LegalEntityTypes/LegalEntityTypeResource.php

@@ -1,7 +1,7 @@
 # TODO - Implementación ADRs
 
-**Última actualización**: 2025-12-16  
-**Deadline**: ~15 febrero 2026  
+**Última actualización**: 2025-12-18
+**Deadline**: ~15 febrero 2026
 **Contexto**: Larafactu v1.0 - Staging Pre-Producción
 
 ---
@@ -10,9 +10,9 @@
 
 | ADR | Título | Estado | Progreso |
 |-----|--------|--------|----------|
-| [ADR-001](./ADR_001_REFACTORING_FISCAL_SETTINGS.md) | Refactorización Fiscal Settings | ⚠️ PARCIAL | 60% |
-| [ADR-002](./ADR_002_UUID_V7_CONSOLIDATION.md) | UUID v7 String | ⚠️ PARCIAL | 80% |
-| [ADR-003](./ADR_003_USER_CUSTOMER_UNIFICATION.md) | Unificación Users/Customers | 🚧 EN PROGRESO | 60% |
+| [ADR-001](./ADR_001_REFACTORING_FISCAL_SETTINGS.md) | Refactorización Fiscal Settings | ⚠️ PARCIAL | 90% |
+| [ADR-002](./ADR_002_UUID_V7_CONSOLIDATION.md) | UUID v7 String | ✅ COMPLETADO | 95% |
+| [ADR-003](./ADR_003_USER_CUSTOMER_UNIFICATION.md) | Unificación Users/Customers | ✅ COMPLETADO | 100% |
 
 ---
 
@@ -20,23 +20,22 @@
 
 ### 🔴 Crítico - Esta Semana
 
-- [x] **ADR-003**: Actualizar estado en ADR-003 (CustomerFiscalData → UserTaxProfile completado) ✅ 2025-12-16
-- [x] **Tests**: Ejecutar suite completa de tests en larafactu (11 passed) ✅ 2025-12-16
-- [x] **Composer**: `composer update aichadigital/*` para actualizar paquetes locales ✅ 2025-12-16
-- [x] **Validación**: Verificar que Filament Resources funcionan correctamente ✅ 2025-12-16
+- [x] **ADR-003**: Fase 1 - UserTaxProfile reemplaza CustomerFiscalData ✅ 2025-12-16
+- [x] **ADR-003**: Fase 2 - Eliminar tabla customers, unificar en users ✅ 2025-12-16
+- [x] **Tests**: Suite completa pasando (13/13) ✅ 2025-12-16
+- [x] **ADR-001**: Implementar snapshot fiscal automático en Invoice ✅ 2025-12-16
 
 ### 🟡 Alta - Próximas 2 Semanas
 
-- [ ] **ADR-003**: Eliminar tabla `customers` (unificar en `users`)
-- [ ] **ADR-003**: Implementar `parent_user_id` en `users` (self-reference)
-- [ ] **ADR-003**: Crear enum `UserRelationshipType` (DIRECT, DELEGATED)
-- [ ] **ADR-001**: Implementar lógica de snapshot fiscal en Invoice
-- [ ] **Tests**: Crear tests para temporalidad fiscal
+- [x] **ADR-001**: Gestión de cambios fiscales (cerrar config anterior) ✅ 2025-12-18 - Implementado en model boot()
+- [x] **Tests**: Crear tests para temporalidad fiscal ✅ 2025-12-16
+- [x] **ADR-001**: FiscalIntegrityChecker para detectar configs duplicadas ✅ 2025-12-18
+- [ ] **Docs**: Actualizar ADR-003 con Fase 2 completada
 
 ### 🟢 Media - Próximo Mes
 
 - [ ] **ADR-001**: Implementar gestión de proformas con cambio fiscal
-- [ ] **Filament**: Actualizar Resources para nueva arquitectura
+- [ ] **Filament**: UserResource con gestión de delegados
 - [ ] **Docs**: Actualizar documentación de API
 - [ ] **Seeding**: Crear seeders de producción
 
@@ -51,22 +50,31 @@
 - [x] Implementar temporalidad (`valid_from`, `valid_until`)
 - [x] Crear factory y seeder
 - [x] Tests básicos de CompanyFiscalConfig
+- [x] **Implementar snapshot fiscal automático en Invoice** ✅ 2025-12-16
+  - [x] Capturar `CompanyFiscalConfig` vigente en `invoice_date`
+  - [x] Capturar `UserTaxProfile` vigente en `invoice_date`
+  - [x] Guardar snapshots inmutables (encrypted)
+  - [x] Métodos: `generateIssuerSnapshot()`, `generateBillableUserSnapshot()`, `generateFiscalContextSnapshot()`
+  - [x] Helpers: `hasEncryptedSnapshots()`, `hasFiscalSnapshots()`, `regenerateEncryptedSnapshots()`
+  - [x] Auto-generación en `boot::creating`
+- [x] Gestión de cambios fiscales (en model boot)
+  - [x] Al crear nueva config, cerrar anterior (`valid_until = hoy - 1`)
+  - [x] Método `closeActiveConfig()` en CompanyFiscalConfig
+  - [x] Método `closeActiveForUser()` en UserTaxProfile
 
 ### 🚧 En Progreso
 
-- [ ] Implementar snapshot fiscal automático en Invoice
-  - [ ] Capturar `CompanyFiscalConfig` vigente en `invoice_date`
-  - [ ] Capturar `UserTaxProfile` vigente en `invoice_date`
-  - [ ] Guardar snapshots inmutables (encrypted)
-- [ ] Gestión de cambios fiscales
-  - [ ] Al crear nueva config, cerrar anterior (`valid_until = hoy`)
+- [ ] Gestión de proformas con cambio fiscal
   - [ ] Actualizar proformas pendientes antes de conversión
   - [ ] Validar que solo hay UNA config activa
 
 ### ⏳ Pendiente
 
 - [ ] Documentar API de CompanyFiscalConfig
-- [ ] Tests de edge cases (múltiples configs, cambios retroactivos)
+- [x] Tests de edge cases (múltiples configs activas - validación) ✅ 2025-12-18
+  - [x] FiscalIntegrityChecker service (32 tests)
+  - [x] FiscalIntegrityBanner widget en larabill-filament
+  - [x] FiscalIntegrityAlert notification
 - [ ] Filament Resource para gestión de configs históricas
 
 ---
@@ -81,16 +89,10 @@
 - [x] Eliminar dependencia `dyrynda/laravel-model-uuid`
 - [x] Actualizar modelos para usar `Str::orderedUuid()`
 - [x] Validar compatibilidad con FilamentPHP v4
+- [x] User model con UUID v7
+- [x] Invoice model con UUID v7
 
-### 🚧 En Progreso
-
-- [ ] Actualizar todos los modelos que usan UUID
-  - [x] User
-  - [x] Invoice
-  - [ ] Ticket (si existe)
-  - [ ] Otros modelos pendientes
-
-### ⏳ Pendiente
+### ⏳ Pendiente (menor prioridad)
 
 - [ ] Documentar estrategia UUID en README
 - [ ] Tests de performance con UUID v7
@@ -106,75 +108,75 @@
 - [x] Crear migración `user_tax_profiles`
 - [x] Eliminar modelo `CustomerFiscalData`
 - [x] Eliminar factory `CustomerFiscalDataFactory`
-- [x] Eliminar test `CustomerFiscalDataTest`
 - [x] Actualizar `Invoice` model para usar `user_tax_profile_id`
 - [x] Actualizar `InvoiceService` para usar `UserTaxProfile`
 - [x] Actualizar `VatVerification` relación → `userTaxProfiles()`
 - [x] Actualizar `ModelMappingService` → `user_tax_profile`
-- [x] Añadir `Customer.currentTaxProfile()` relación
-- [x] Actualizar `CustomerFactory` para auto-crear `UserTaxProfile`
 - [x] Corregir `LegalEntityTypesSeeder` (JSON translatable)
-- [x] Actualizar códigos legal entity types (INDIVIDUAL, LIMITED_COMPANY)
-- [x] Tests de Invoice pasando (3/3)
-- [x] Verificar Filament Resources funcionan (2025-12-16)
-- [x] Actualizar documentación ADR-003 (2025-12-16)
+- [x] Tests de Invoice pasando
 
-### 🚧 Fase 2 - Eliminar tabla customers
+### ✅ Fase 2 Completada (2025-12-16)
 
-- [ ] **Eliminar tabla `customers`**
-  - [ ] Analizar dependencias de Customer model
-  - [ ] Migrar datos de `customers` a `users`
-  - [ ] Implementar `parent_user_id` en users
-  - [ ] Crear enum `RelationshipType` (CLIENT, SELF, SELF_COMPANY)
-  - [ ] Actualizar Invoice para usar `user_id` en lugar de `customer_id`
-  - [ ] Eliminar modelo Customer
-  - [ ] Eliminar migración de customers
+- [x] Crear migración `add_billing_fields_to_users_table`
+  - [x] `parent_user_id` (UUID, self-reference)
+  - [x] `relationship_type` (unsignedTinyInteger → enum)
+  - [x] `display_name` (nullable)
+  - [x] `legal_entity_type_code` (FK)
+- [x] Actualizar User model con relaciones:
+  - [x] `parentUser()` - Usuario padre (si es delegado)
+  - [x] `delegatedUsers()` - Usuarios delegados (hijos)
+  - [x] `legalEntityType()` - Tipo de entidad legal
+  - [x] `taxProfiles()` - Histórico fiscal
+  - [x] `currentTaxProfile()` - Perfil fiscal activo
+- [x] Helper methods: `isDirect()`, `isDelegated()`, `billableName()`, `hasDelegatedUsers()`
+- [x] Actualizar UserFactory con estados `delegatedOf()`, `direct()`, `withDisplayName()`
+- [x] Modificar Invoice migration: `customer_id` → `billable_user_id`
+- [x] Actualizar Invoice model: `customer()` → `billableUser()`
+- [x] Refactorizar InvoiceService sin Customer
+- [x] Actualizar InvoiceFactory
+- [x] Actualizar InvoiceResource (Filament)
+- [x] Eliminar Customer model, factory, resource, migration
+- [x] Actualizar LegalEntityType: `customers()` → `users()`
+- [x] Actualizar ModelMappingService: eliminar 'customer'
+- [x] Actualizar LarabillFilamentPlugin: eliminar CustomerResource
+- [x] Actualizar tests SpanishB2CInvoiceTest
+- [x] Validar con `larafactu:install --local --fresh`
+- [x] Tests pasando (11/11)
 
-- [ ] **Implementar arquitectura User unificada**
-  - [ ] Añadir columna `parent_user_id` a users (self-reference)
-  - [ ] Crear enum `UserRelationshipType` (DIRECT, DELEGATED)
-  - [ ] Actualizar User model con relaciones:
-    - [ ] `parent()` - Usuario padre (si es delegado)
-    - [ ] `delegatedUsers()` - Usuarios delegados (hijos)
-    - [ ] `taxProfiles()` - Histórico fiscal
-    - [ ] `currentTaxProfile()` - Perfil fiscal activo
-  - [ ] Actualizar UserFactory
-  - [ ] Tests de relaciones User
+### Archivos Eliminados (Fase 2)
 
-### ⏳ Pendiente
-
-- [ ] Migración de datos existentes
-  - [ ] Script de migración `customers` → `users`
-  - [ ] Validar integridad referencial
-  - [ ] Backup antes de migración
-- [ ] Actualizar Filament Resources
-  - [ ] UserResource con gestión de delegados
-  - [ ] UserTaxProfileResource (histórico)
-  - [ ] Eliminar CustomerResource
-- [ ] Documentación
-  - [ ] Guía de migración para usuarios
-  - [ ] API de UserTaxProfile
-  - [ ] Ejemplos de uso
+```
+packages/aichadigital/larabill/src/Models/Customer.php
+packages/aichadigital/larabill/src/Database/Factories/CustomerFactory.php
+packages/aichadigital/larabill/database/migrations/2025_01_25_000004_create_customers_table.php
+packages/aichadigital/larabill-filament/src/Resources/CustomerResource.php
+packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
+```
 
 ---
 
 ## 🧪 Testing
 
-### ✅ Tests Pasando
+### ✅ Tests Pasando (13/13)
 
-- [x] SpanishB2CInvoiceTest (3/3)
-- [x] UserTaxProfileTest (básico)
+- [x] AdminAccessTest (8/8)
+- [x] SpanishB2CInvoiceTest (5/5) - Actualizado para ADR-001 + ADR-003
+  - [x] Create invoice for spanish B2C customer
+  - [x] Calculates correct VAT for multiple items
+  - [x] Validates Spanish DNI format
+  - [x] **Generates encrypted fiscal snapshots on creation (ADR-001)** ✅ 2025-12-16
+  - [x] **Creates fiscal snapshots with temporal validity (ADR-001)** ✅ 2025-12-16
 
 ### 🚧 Tests Pendientes
 
-- [ ] CompanyFiscalConfig temporalidad
-- [ ] Invoice snapshot fiscal
-- [ ] User relaciones (parent/delegated)
-- [ ] UserTaxProfile histórico
-- [ ] Migración customers → users
+- [x] CompanyFiscalConfig temporalidad - Cubierto en tests existentes
+- [x] Invoice snapshot fiscal ✅ 2025-12-16
+- [x] FiscalIntegrityChecker (32 tests) ✅ 2025-12-18
+- [ ] User relaciones (parent/delegated) - tests adicionales
+- [ ] UserTaxProfile histórico - tests edge cases
 - [ ] Edge cases:
   - [ ] Cambio fiscal durante período de facturación
-  - [ ] Múltiples configs activas (validación)
+  - [x] Múltiples configs activas (validación) ✅ 2025-12-18
   - [ ] Proformas con cambio fiscal
 
 ---
@@ -184,14 +186,15 @@
 ### Estado Actual
 
 - **Versión**: dev-main
-- **Último commit**: `5b54f8e` (ADR-003 unification)
-- **Tests**: Pasando en larafactu
+- **Tests**: Pasando en larafactu (13/13)
+- **ADR-003**: Fase 1 + Fase 2 completadas
+- **ADR-001**: Snapshot fiscal automático implementado
 
 ### Próximos Pasos
 
-1. [ ] Crear tag `v0.5.0-alpha` (ADR-003 completado parcialmente)
+1. [ ] Crear tag `v0.6.0-alpha` (ADR-003 completado)
 2. [ ] Actualizar CHANGELOG.md
-3. [ ] Documentar breaking changes
+3. [ ] Documentar breaking changes (Customer → User)
 4. [ ] Preparar v1.0.0 para febrero 2026
 
 ---
@@ -201,23 +204,23 @@
 ### Diciembre 2025
 
 - [x] ADR-003: CustomerFiscalData → UserTaxProfile ✅
-- [ ] ADR-003: Eliminar tabla customers
-- [ ] ADR-001: Snapshot fiscal en Invoice
-- [ ] Tests de integración
+- [x] ADR-003: Eliminar tabla customers ✅
+- [x] ADR-001: Snapshot fiscal en Invoice ✅ 2025-12-16
+- [x] Tests de integración adicionales (13/13) ✅ 2025-12-16
 
 ### Enero 2026
 
-- [ ] ADR-003: Arquitectura User unificada completa
-- [ ] Filament Resources actualizados
-- [ ] Migración de datos staging → producción
+- [ ] ADR-001: Gestión completa de cambios fiscales
+- [ ] Filament Resources actualizados (UserResource delegados)
 - [ ] Documentación completa
+- [ ] Seeders de producción
 
 ### Febrero 2026
 
 - [ ] Testing exhaustivo
 - [ ] Code review final
 - [ ] Deploy a producción
-- [ ] **v1.0.0 Release** 🎉
+- [ ] **v1.0.0 Release**
 
 ---
 
@@ -229,11 +232,46 @@
 - **UserTaxProfile**: Nombre más claro que CustomerFiscalData
 - **Temporalidad**: `valid_from`/`valid_until` para inmutabilidad fiscal
 - **JSON translatable**: Spatie para legal entity types
+- **billable_user_id**: Reemplaza customer_id en invoices (ADR-003)
+- **UserRelationshipType**: DIRECT (0) / DELEGATED (1) enum
+
+### Arquitectura Final (ADR-003)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  users                                                          │
+│  - id (UUID v7 string)                                          │
+│  - parent_user_id (nullable) → FK self-reference                │
+│  - relationship_type (PHP Enum → unsignedTinyInteger)           │
+│  - display_name, legal_entity_type_code                         │
+│                                                                 │
+│  parent_user_id = NULL   → Cliente directo de la Empresa        │
+│  parent_user_id = X      → Cliente del User X (delegado)        │
+└─────────────────────────────────────────────────────────────────┘
+                        │
+                        │ 1:N
+                        ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  user_tax_profiles (histórico fiscal)                           │
+│  - user_id → FK users.id                                        │
+│  - fiscal_name, tax_id, address, country_code...                │
+│  - valid_from / valid_until (temporalidad)                      │
+└─────────────────────────────────────────────────────────────────┘
+                        │
+                        │ N:1
+                        ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  invoices                                                       │
+│  - user_id → FK users.id (owner/issuer)                         │
+│  - billable_user_id → FK users.id (user being billed)           │
+│  - user_tax_profile_id → FK user_tax_profiles.id (snapshot)     │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ### Riesgos Identificados
 
-1. **Migración customers → users**: Requiere planificación cuidadosa
-2. **Snapshot fiscal**: Debe ser inmutable y encrypted
+1. ~~**Migración customers → users**~~: ✅ Completado (no había datos legacy)
+2. ~~**Snapshot fiscal**~~: ✅ Implementado - inmutable y encrypted (AES-256-CBC)
 3. **Tests**: Cobertura de edge cases temporales crítica
 4. **Performance**: Validar con 100k+ facturas
 
@@ -242,11 +280,10 @@
 - [Documentación Laravel 12](https://laravel.com/docs/12.x)
 - [FilamentPHP v4](https://filamentphp.com/docs/4.x)
 - [Spatie Translatable](https://github.com/spatie/laravel-translatable)
-- [ADRs completos](./docs/)
 
 ---
 
 **Mantenido por**: @abkrim
-**Última revisión**: 2025-12-16
-**Próxima revisión**: 2025-12-23
+**Última revisión**: 2025-12-18
+**Próxima revisión**: 2025-12-25
 

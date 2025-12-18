@@ -99,9 +99,9 @@ class InvoiceResource extends Resource
                     ->native(false)
                     ->columnSpan(1),
 
-                Forms\Components\Select::make('user_id')
-                    ->label(__('filament.invoice.fields.user_id'))
-                    ->relationship('user', 'name')
+                Forms\Components\Select::make('billable_user_id')
+                    ->label(__('filament.invoice.fields.billable_user'))
+                    ->relationship('billableUser', 'name')
                     ->searchable(['name', 'email'])
                     ->preload()
                     ->required()
@@ -119,6 +119,14 @@ class InvoiceResource extends Resource
                             ->required()
                             ->minLength(8),
                     ]),
+
+                Forms\Components\Select::make('user_id')
+                    ->label(__('filament.invoice.fields.user_id'))
+                    ->relationship('user', 'name')
+                    ->searchable(['name', 'email'])
+                    ->preload()
+                    ->columnSpan(2)
+                    ->helperText(__('filament.invoice.fields.user_id_help')),
 
                 Forms\Components\Textarea::make('notes')
                     ->label(__('filament.invoice.fields.notes'))
@@ -159,7 +167,7 @@ class InvoiceResource extends Resource
                     ->badge()
                     ->sortable(),
 
-                TextColumn::make('user.name')
+                TextColumn::make('billableUser.name')
                     ->label(__('filament.invoice.table.customer'))
                     ->searchable()
                     ->sortable()
@@ -210,7 +218,7 @@ class InvoiceResource extends Resource
                     ->multiple(),
 
                 Filter::make('invoice_date')
-                    ->form([
+                    ->schema([
                         Forms\Components\DatePicker::make('from')
                             ->label(__('filament.invoice.filters.from'))
                             ->native(false),

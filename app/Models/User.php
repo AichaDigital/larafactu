@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use AichaDigital\Larabill\Concerns\HasUuid;
+use AichaDigital\Larabill\Enums\UserRelationshipType;
+use AichaDigital\Larabill\Models\LegalEntityType;
 use AichaDigital\Larabill\Models\UserTaxProfile;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -26,6 +29,10 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'parent_user_id',
+        'relationship_type',
+        'display_name',
+        'legal_entity_type_code',
     ];
 
     /**
@@ -48,12 +55,43 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'relationship_type' => UserRelationshipType::class,
         ];
     }
 
     // ========================================
     // RELATIONSHIPS (ADR-003)
     // ========================================
+
+    /**
+     * Get the parent user (for delegated users).
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function parentUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'parent_user_id');
+    }
+
+    /**
+     * Get all delegated users (children) for this user.
+     *
+     * @return HasMany<User, $this>
+     */
+    public function delegatedUsers(): HasMany
+    {
+        return $this->hasMany(User::class, 'parent_user_id');
+    }
+
+    /**
+     * Get the legal entity type for this user.
+     *
+     * @return BelongsTo<LegalEntityType, $this>
+     */
+    public function legalEntityType(): BelongsTo
+    {
+        return $this->belongsTo(LegalEntityType::class, 'legal_entity_type_code', 'code');
+    }
 
     /**
      * Get all tax profiles for this user (historical + active).
@@ -108,6 +146,44 @@ class User extends Authenticatable implements FilamentUser
     }
 
     // ========================================
+    // HELPER METHODS (ADR-003 Fase 2)
+    // ========================================
+
+    /**
+     * Check if this user is a direct client (no parent).
+     */
+    public function isDirect(): bool
+    {
+        return $this->parent_user_id === null;
+    }
+
+    /**
+     * Check if this user is delegated to another user.
+     */
+    public function isDelegated(): bool
+    {
+        return $this->parent_user_id !== null;
+    }
+
+    /**
+     * Get the name to use for billing purposes.
+     *
+     * Priority: display_name > name
+     */
+    public function billableName(): string
+    {
+        return $this->display_name ?? $this->name;
+    }
+
+    /**
+     * Check if this user has any delegated users.
+     */
+    public function hasDelegatedUsers(): bool
+    {
+        return $this->delegatedUsers()->exists();
+    }
+
+    // ========================================
     // ADMIN PANEL ACCESS CONTROL
     // ========================================
 
@@ -149,7 +225,8 @@ class User extends Authenticatable implements FilamentUser
                 return ltrim($domain, '@');
             }, explode(',', $allowedDomains));
 
-            $userDomain = substr(strrchr($this->email, '@'), 1);
+            $emailPart = strrchr($this->email, '@');
+            $userDomain = $emailPart !== false ? substr($emailPart, 1) : '';
 
             if (in_array($userDomain, $domainList, true)) {
                 return true;

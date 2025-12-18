@@ -55,9 +55,9 @@ class InstallCommand extends Command
 
     private const DEFAULT_PACKAGES_PATH = '../../development/packages/aichadigital';
 
-    private string $installMode;
+    private string $installMode = '';
 
-    private string $packagesPath;
+    private string $packagesPath = '';
 
     private bool $isInteractive;
 
@@ -70,13 +70,15 @@ class InstallCommand extends Command
         // ═══════════════════════════════════════════════════════════
         // PASO 1: Seleccionar modo de instalación (PRIMERO)
         // ═══════════════════════════════════════════════════════════
-        $this->installMode = $this->selectInstallMode();
+        $selectedMode = $this->selectInstallMode();
 
-        if (! $this->installMode) {
+        if ($selectedMode === null) {
             warning('❌ Instalación cancelada');
 
             return self::FAILURE;
         }
+
+        $this->installMode = $selectedMode;
 
         info("📋 Modo de instalación: {$this->installMode}");
         $this->newLine();
@@ -181,15 +183,18 @@ class InstallCommand extends Command
         }
         $hint = $hints ? 'Detectado: '.implode(', ', $hints) : null;
 
-        return select(
+        /** @var string */
+        $result = select(
             label: '¿Qué tipo de instalación deseas?',
             options: [
                 'local' => '🏠 LOCAL - Desarrollo con paquetes locales (symlinks)',
                 'production' => '🌐 PRODUCCIÓN - Paquetes desde GitHub',
             ],
             default: $isLocalEnv ? 'local' : 'production',
-            hint: $hint
+            hint: $hint ?? ''
         );
+
+        return $result;
     }
 
     /**
@@ -201,14 +206,16 @@ class InstallCommand extends Command
         $this->newLine();
 
         // Determinar ruta a paquetes
-        $this->packagesPath = $this->resolvePackagesPath();
+        $resolvedPath = $this->resolvePackagesPath();
 
-        if (! $this->packagesPath) {
+        if ($resolvedPath === null) {
             warning('❌ No se encontró la ruta a los paquetes locales');
             $this->line('   Usa --packages-path=/ruta/a/paquetes');
 
             return false;
         }
+
+        $this->packagesPath = $resolvedPath;
 
         // Resolver ruta absoluta para mostrar
         $absolutePath = realpath($this->packagesPath) ?: $this->packagesPath;
@@ -297,17 +304,22 @@ class InstallCommand extends Command
             // Si ya existe el symlink, verificar que apunta al lugar correcto
             if (is_link($linkPath)) {
                 $currentTarget = readlink($linkPath);
-                // Comparar rutas normalizadas
-                $normalizedCurrent = realpath($currentTarget) ?: $currentTarget;
-                $normalizedSource = realpath($sourcePath) ?: $sourcePath;
+                if ($currentTarget === false) {
+                    // Symlink roto, eliminar
+                    unlink($linkPath);
+                } else {
+                    // Comparar rutas normalizadas
+                    $normalizedCurrent = realpath($currentTarget) ?: $currentTarget;
+                    $normalizedSource = realpath($sourcePath) ?: $sourcePath;
 
-                if ($normalizedCurrent === $normalizedSource) {
-                    $this->line("   ✓ Symlink OK: {$package}");
+                    if ($normalizedCurrent === $normalizedSource) {
+                        $this->line("   ✓ Symlink OK: {$package}");
 
-                    continue;
+                        continue;
+                    }
+                    // Symlink incorrecto, eliminar
+                    unlink($linkPath);
                 }
-                // Symlink incorrecto, eliminar
-                unlink($linkPath);
             } elseif (File::exists($linkPath)) {
                 // Es un directorio real, no symlink
                 warning("   ⚠️  {$package} existe pero no es symlink, saltando");
@@ -531,7 +543,8 @@ class InstallCommand extends Command
         // En local, recomendar fresh
         $default = $this->installMode === 'local' ? 'fresh' : 'migrate';
 
-        return select(
+        /** @var string */
+        $result = select(
             label: 'Ya existen tablas en la base de datos. ¿Qué deseas hacer?',
             options: $options,
             default: $default,
@@ -539,6 +552,8 @@ class InstallCommand extends Command
                 ? 'En desarrollo local, fresh evita problemas de estado inconsistente'
                 : 'En producción, usa migrate para preservar datos'
         );
+
+        return $result;
     }
 
     /**
