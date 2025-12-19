@@ -164,10 +164,10 @@ class SpanishHostingProductsSeeder extends Seeder
 
         $this->command->info('✅ Spanish hosting products created successfully!');
         $this->command->newLine();
-        $this->command->line('  Hosting: '.count(self::HOSTING_PLANS).' plans × 3 frequencies');
-        $this->command->line('  VPS: '.count(self::VPS_PLANS).' plans × 3 frequencies');
-        $this->command->line('  Domains: '.count(self::DOMAINS).' TLDs (yearly)');
-        $this->command->line('  SSL: '.count(self::SSL_CERTIFICATES).' certificates (yearly)');
+        $this->command->line('  Hosting: '.count(self::HOSTING_PLANS).' plans × 3 frequencies (monthly, quarterly, yearly)');
+        $this->command->line('  VPS: '.count(self::VPS_PLANS).' plans × 3 frequencies (monthly, quarterly, yearly)');
+        $this->command->line('  Domains: '.count(self::DOMAINS).' TLDs × 3 frequencies (1, 2, 3 years)');
+        $this->command->line('  SSL: '.count(self::SSL_CERTIFICATES).' certificates × 2 frequencies (1, 2 years)');
     }
 
     /**
@@ -240,6 +240,9 @@ class SpanishHostingProductsSeeder extends Seeder
 
     /**
      * Create domain products.
+     *
+     * Domains are recurring registration services with 1, 2, or 3 year terms.
+     * No discount for longer terms (proportional pricing).
      */
     private function createDomains(): void
     {
@@ -260,16 +263,15 @@ class SpanishHostingProductsSeeder extends Seeder
                         'instance_label' => 'Nombre de dominio',
                     ],
                     'tld' => $tld,
-                    'registration_period' => '1 year',
+                    'type' => 'registration',
                 ]
             );
 
-            // Domains only have yearly pricing
-            $this->createPrice(
-                $article,
-                BillingFrequency::YEARLY,
-                $this->eurosToCents($config['yearly_price'])
-            );
+            // Domain registration: 1, 2, 3 years (no discount, proportional)
+            $yearlyPrice = $this->eurosToCents($config['yearly_price']);
+            $this->createPrice($article, BillingFrequency::YEARLY, $yearlyPrice);
+            $this->createPrice($article, BillingFrequency::BIENNIAL, $yearlyPrice * 2);
+            $this->createPrice($article, BillingFrequency::TRIENNIAL, $yearlyPrice * 3);
         }
 
         $this->command->info('  ✓ Domain products created');
@@ -277,6 +279,9 @@ class SpanishHostingProductsSeeder extends Seeder
 
     /**
      * Create SSL certificate products.
+     *
+     * SSL certificates are recurring services with 1 or 2 year terms.
+     * No discount for longer terms (proportional pricing).
      */
     private function createSslCertificates(): void
     {
@@ -296,16 +301,13 @@ class SpanishHostingProductsSeeder extends Seeder
                     ],
                     'ssl_type' => str_contains($code, 'WILDCARD') ? 'wildcard' : 'single',
                     'validation' => 'DV',
-                    'validity_period' => '1 year',
                 ]
             );
 
-            // SSL certificates only have yearly pricing
-            $this->createPrice(
-                $article,
-                BillingFrequency::YEARLY,
-                $this->eurosToCents($config['yearly_price'])
-            );
+            // SSL certificates: 1, 2 years (no discount, proportional)
+            $yearlyPrice = $this->eurosToCents($config['yearly_price']);
+            $this->createPrice($article, BillingFrequency::YEARLY, $yearlyPrice);
+            $this->createPrice($article, BillingFrequency::BIENNIAL, $yearlyPrice * 2);
         }
 
         $this->command->info('  ✓ SSL certificates created');
