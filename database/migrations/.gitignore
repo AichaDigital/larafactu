@@ -12,3 +12,6 @@
 !0001_01_01_000001_create_cache_table.php
 !0001_01_01_000002_create_jobs_table.php
 
+# ADR-003 Fase 2: billing fields added to users table (required for larabill)
+!*_add_billing_fields_to_users_table.php
+
