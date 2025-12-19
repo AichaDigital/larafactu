@@ -30,7 +30,7 @@
 - [x] **ADR-001**: Gestión de cambios fiscales (cerrar config anterior) ✅ 2025-12-18 - Implementado en model boot()
 - [x] **Tests**: Crear tests para temporalidad fiscal ✅ 2025-12-16
 - [x] **ADR-001**: FiscalIntegrityChecker para detectar configs duplicadas ✅ 2025-12-18
-- [ ] **Docs**: Actualizar ADR-003 con Fase 2 completada
+- [x] **Docs**: Actualizar ADR-003 con Fase 2 completada ✅ 2025-12-19
 
 ### 🟢 Media - Próximo Mes
 
