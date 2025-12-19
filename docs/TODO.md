@@ -1,6 +1,6 @@
 # TODO - Implementación ADRs
 
-**Última actualización**: 2025-12-18
+**Última actualización**: 2025-12-19
 **Deadline**: ~15 febrero 2026
 **Contexto**: Larafactu v1.0 - Staging Pre-Producción
 
@@ -10,7 +10,7 @@
 
 | ADR | Título | Estado | Progreso |
 |-----|--------|--------|----------|
-| [ADR-001](./ADR_001_REFACTORING_FISCAL_SETTINGS.md) | Refactorización Fiscal Settings | ⚠️ PARCIAL | 90% |
+| [ADR-001](./ADR_001_REFACTORING_FISCAL_SETTINGS.md) | Refactorización Fiscal Settings | ✅ COMPLETADO | 95% |
 | [ADR-002](./ADR_002_UUID_V7_CONSOLIDATION.md) | UUID v7 String | ✅ COMPLETADO | 95% |
 | [ADR-003](./ADR_003_USER_CUSTOMER_UNIFICATION.md) | Unificación Users/Customers | ✅ COMPLETADO | 100% |
 
@@ -34,7 +34,7 @@
 
 ### 🟢 Media - Próximo Mes
 
-- [ ] **ADR-001**: Implementar gestión de proformas con cambio fiscal
+- [x] **ADR-001**: Implementar gestión de proformas con cambio fiscal ✅ 2025-12-18
 - [x] **Filament**: UserResource con gestión de delegados ✅ 2025-12-18
   - [x] Form con relationship_type, parent_user_id
   - [x] DelegatedUsersRelationManager
@@ -66,11 +66,20 @@
   - [x] Método `closeActiveConfig()` en CompanyFiscalConfig
   - [x] Método `closeActiveForUser()` en UserTaxProfile
 
-### 🚧 En Progreso
+### ✅ Proforma Fiscal Change Handling (2025-12-18)
 
-- [ ] Gestión de proformas con cambio fiscal
-  - [ ] Actualizar proformas pendientes antes de conversión
-  - [ ] Validar que solo hay UNA config activa
+- [x] FiscalChangeDetector service
+  - [x] Detect critical changes (tax_id, country_code, is_eu_vat_registered)
+  - [x] Detect warning changes (business_name, address, fiscal_name...)
+  - [x] Compare CompanyFiscalConfig at proforma creation vs conversion
+  - [x] Compare UserTaxProfile at proforma creation vs conversion
+- [x] FiscalConfigChangedException
+  - [x] Thrown when critical fiscal changes block conversion
+  - [x] Methods: getChanges(), hasCriticalChanges(), getCriticalFields()
+- [x] InvoiceService.convertProformaToInvoice integration
+  - [x] Options: force, on_changes ('throw'|'warn'|'ignore')
+  - [x] Returns Invoice|array{invoice, warnings}
+- [x] Tests: 15 new tests covering all fiscal change scenarios
 
 ### ⏳ Pendiente
 
@@ -176,12 +185,13 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
 - [x] CompanyFiscalConfig temporalidad - Cubierto en tests existentes
 - [x] Invoice snapshot fiscal ✅ 2025-12-16
 - [x] FiscalIntegrityChecker (32 tests) ✅ 2025-12-18
+- [x] FiscalChangeDetector (15 tests) ✅ 2025-12-18
 - [ ] User relaciones (parent/delegated) - tests adicionales
 - [ ] UserTaxProfile histórico - tests edge cases
 - [ ] Edge cases:
   - [ ] Cambio fiscal durante período de facturación
   - [x] Múltiples configs activas (validación) ✅ 2025-12-18
-  - [ ] Proformas con cambio fiscal
+  - [x] Proformas con cambio fiscal ✅ 2025-12-18
 
 ---
 
@@ -214,7 +224,7 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
 
 ### Enero 2026
 
-- [ ] ADR-001: Gestión completa de cambios fiscales
+- [x] ADR-001: Gestión completa de cambios fiscales ✅ 2025-12-18
 - [ ] Filament Resources actualizados (UserResource delegados)
 - [ ] Documentación completa
 - [ ] Seeders de producción
@@ -288,6 +298,6 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
 ---
 
 **Mantenido por**: @abkrim
-**Última revisión**: 2025-12-18
-**Próxima revisión**: 2025-12-25
+**Última revisión**: 2025-12-19
+**Próxima revisión**: 2025-12-26
 
