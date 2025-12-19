@@ -61,7 +61,10 @@ class DevelopmentSeeder extends Seeder
         $this->createAdminTaxProfile($admin);
         $this->createTestUserTaxProfile($testUser);
 
-        // 7. Create additional users (100 users with fiscal profiles)
+        // 7. Create Spanish hosting products (hosting, VPS, domains, SSL)
+        $this->call(SpanishHostingProductsSeeder::class);
+
+        // 8. Create additional users (100 users with fiscal profiles)
         $this->call(UsersSeeder::class);
 
         // Summary
@@ -71,6 +74,7 @@ class DevelopmentSeeder extends Seeder
         $this->command->line('Admin: admin@example.com / password');
         $this->command->line('Test:  test@example.com / password');
         $this->command->line('Additional users: 100 (password: password)');
+        $this->command->line('Products: Hosting (3), VPS (3), Domains (6), SSL (4)');
     }
 
     /**
