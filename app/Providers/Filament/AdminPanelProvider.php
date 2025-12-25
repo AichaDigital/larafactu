@@ -61,7 +61,8 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                SpatieTranslatablePlugin::make(),
+                SpatieTranslatablePlugin::make()
+                    ->defaultLocales(['es', 'en']),
                 LarabillFilamentPlugin::make(),
                 LaraVerifactuFilamentPlugin::make(),
                 LararoiFilamentPlugin::make(),
