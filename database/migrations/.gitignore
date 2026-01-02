@@ -15,3 +15,6 @@
 # ADR-003 Fase 2: billing fields added to users table (required for larabill)
 !*_add_billing_fields_to_users_table.php
 
+# ADR-005: user preferences table (theme, locale, timezone)
+!*_create_user_preferences_table.php
+
