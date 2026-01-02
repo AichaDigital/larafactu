@@ -4,7 +4,8 @@
 
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat&logo=laravel)](https://laravel.com)
 [![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=flat&logo=php)](https://php.net)
-[![Filament](https://img.shields.io/badge/Filament-4.x-FFAA00?style=flat)](https://filamentphp.com)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![DaisyUI](https://img.shields.io/badge/daisyui-5A0EF8?style=for-the-badge&logo=daisyui&logoColor=white)
 [![Pest](https://img.shields.io/badge/Tested-Pest-22C55E?style=flat)](https://pestphp.com)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
@@ -30,7 +31,7 @@
 - 🏛️ **Verifactu AEAT** - Integración nativa con el sistema español
 - 💰 **Base 100** - Cálculos monetarios precisos sin errores de float
 - 🎫 **Soporte Integrado** - Sistema de tickets incorporado
-- 📊 **Panel Admin** - Filament 4 para gestión completa
+- 📊 **Panel Admin** - Livewire + DaisyUI para gestion completa
 - 🔐 **UUID v7** - Seguridad contra ataques de descubrimiento
 
 ### 🎯 Mercado Objetivo
@@ -358,9 +359,9 @@ php artisan test --filter=Invoice
 |------------|-----------|---------|
 | **Framework** | Laravel | 12.x |
 | **PHP** | PHP | 8.4+ |
-| **Admin Panel** | Filament | 4.x |
-| **Testing** | Pest | 4.x |
-| **Frontend** | Livewire + Tailwind | 3.x + 4.x |
+| **Admin Panel** | Livewire + DaisyUI | 3.x + 5.x |
+| **Testing** | Pest | 3.x |
+| **Frontend** | TailwindCSS + Alpine.js | 4.x + 3.x |
 | **Database** | MySQL / PostgreSQL | 8.0+ / 15+ |
 
 ## 📋 Roadmap
@@ -370,7 +371,7 @@ php artisan test --filter=Invoice
 - [x] Sistema de facturación completo
 - [x] Integración Verifactu AEAT
 - [x] ROI/OSS para intracomunitario
-- [x] Panel admin Filament
+- [x] Panel admin Livewire + DaisyUI
 - [x] UUID v7 nativo
 - [ ] Portal de clientes
 - [ ] Herramienta migración WHMCS
@@ -422,7 +423,7 @@ Desarrollado con ❤️ por [Aicha Digital](https://aichadigital.com)
 - 🏛️ **Verifactu AEAT** - Native integration with Spanish tax system
 - 💰 **Base 100** - Precise monetary calculations without float errors
 - 🎫 **Integrated Support** - Built-in ticket system
-- 📊 **Admin Panel** - Filament 4 for complete management
+- 📊 **Admin Panel** - Livewire + DaisyUI for complete management
 - 🔐 **UUID v7** - Security against discovery attacks
 
 ### 🎯 Target Market
@@ -514,9 +515,9 @@ php artisan test --filter=Invoice
 |-----------|-----------|---------|
 | **Framework** | Laravel | 12.x |
 | **PHP** | PHP | 8.4+ |
-| **Admin Panel** | Filament | 4.x |
-| **Testing** | Pest | 4.x |
-| **Frontend** | Livewire + Tailwind | 3.x + 4.x |
+| **Admin Panel** | Livewire + DaisyUI | 3.x + 5.x |
+| **Testing** | Pest | 3.x |
+| **Frontend** | TailwindCSS + Alpine.js | 4.x + 3.x |
 | **Database** | MySQL / PostgreSQL | 8.0+ / 15+ |
 
 ## 📋 Roadmap
@@ -526,7 +527,7 @@ php artisan test --filter=Invoice
 - [x] Complete invoicing system
 - [x] Verifactu AEAT integration
 - [x] ROI/OSS for intra-community
-- [x] Filament admin panel
+- [x] Livewire + DaisyUI admin panel
 - [x] Native UUID v7
 - [ ] Customer portal
 - [ ] WHMCS migration tool

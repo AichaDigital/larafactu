@@ -114,7 +114,22 @@ Route::middleware(['auth', 'admin', 'block-impersonation'])->prefix('admin')->na
         return view('admin.dashboard');
     })->name('dashboard');
 
+    // Users management
     Route::get('/users', App\Livewire\Admin\UserList::class)->name('users');
+    Route::get('/users/create', App\Livewire\Admin\UserCreate::class)->name('users.create');
+    Route::get('/users/{user}/edit', App\Livewire\Admin\UserEdit::class)->name('users.edit');
+
+    // Fiscal Configuration management
+    Route::get('/fiscal-configs', App\Livewire\Admin\FiscalConfigList::class)->name('fiscal-configs');
+    Route::get('/fiscal-configs/create', App\Livewire\Admin\FiscalConfigCreate::class)->name('fiscal-configs.create');
+    Route::get('/fiscal-configs/{fiscalConfig}', App\Livewire\Admin\FiscalConfigShow::class)->name('fiscal-configs.show');
+    Route::get('/fiscal-configs/{fiscalConfig}/edit', App\Livewire\Admin\FiscalConfigEdit::class)->name('fiscal-configs.edit');
+
+    // Invoice Series management
+    Route::get('/invoice-series', App\Livewire\Admin\InvoiceSeriesList::class)->name('invoice-series');
+    Route::get('/invoice-series/create', App\Livewire\Admin\InvoiceSeriesCreate::class)->name('invoice-series.create');
+    Route::get('/invoice-series/{invoiceSeries}', App\Livewire\Admin\InvoiceSeriesShow::class)->name('invoice-series.show');
+    Route::get('/invoice-series/{invoiceSeries}/edit', App\Livewire\Admin\InvoiceSeriesEdit::class)->name('invoice-series.edit');
 
     // Impersonation routes (stop must be before {user} to avoid route conflict)
     Route::post('/impersonate-stop', function () {
