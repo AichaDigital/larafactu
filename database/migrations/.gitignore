@@ -21,3 +21,6 @@
 # ADR-004: staff department access (authorization)
 !*_create_user_department_access_table.php
 
+# ADR-004: user customer access (delegate permissions)
+!*_create_user_customer_access_table.php
+
