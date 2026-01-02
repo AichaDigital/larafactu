@@ -227,14 +227,33 @@ Componentes de autenticacion implementados:
 - ForgotPassword: Solicitud de enlace de recuperacion
 - ResetPassword: Restablecimiento de contrasena con token
 
-### Fase 5: Autorizacion en Aplicacion - PARCIAL
+### Fase 5: Autorizacion en Aplicacion - COMPLETADA
 
 - [x] Middleware EnsureUserIsAdmin
 - [x] Rutas admin protegidas con ['auth', 'admin']
-- [ ] Mover enums UserType/AccessLevel a larafactu
-- [ ] Crear Policies para modelos principales
-- [ ] Implementar Gates para acciones especificas
-- [ ] Resolver conflicto Department (laratickets vs authorization)
+- [x] Crear enums UserType/AccessLevel en app/Enums/
+- [x] Crear Policies para modelos principales (Invoice, UserTaxProfile, Article)
+- [x] Implementar Gates en AuthServiceProvider (access-admin, impersonate, manage-users, view-reports, manage-settings)
+- [x] Resolver conflicto Department: usar laratickets Department + crear user_department_access en larafactu
+
+**Resolucion del conflicto Department**:
+
+El ADR-004 proponia una tabla `departments` con `code` como PK. Sin embargo, laratickets ya tiene una tabla `departments` con `id` integer. La solucion adoptada:
+
+1. **Reutilizar** laratickets Department (ya existe, funciona para routing de tickets)
+2. **Crear** `user_department_access` en larafactu que referencia `departments.id`
+3. **No modificar** laratickets - mantener paquete agnostico
+
+Archivos creados en Fase 5:
+
+- `app/Enums/UserType.php` - STAFF, CUSTOMER, DELEGATE
+- `app/Enums/AccessLevel.php` - FULL, WRITE, READ, NONE
+- `app/Policies/InvoicePolicy.php`
+- `app/Policies/UserTaxProfilePolicy.php`
+- `app/Policies/ArticlePolicy.php`
+- `app/Providers/AuthServiceProvider.php`
+- `app/Models/UserDepartmentAccess.php`
+- `database/migrations/2026_01_02_000001_create_user_department_access_table.php`
 
 ---
 

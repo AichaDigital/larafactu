@@ -244,6 +244,64 @@ class User extends Authenticatable
     }
 
     // ========================================
+    // DEPARTMENT ACCESS (ADR-004)
+    // ========================================
+
+    /**
+     * Get all department access records for this user.
+     *
+     * @return HasMany<UserDepartmentAccess, $this>
+     */
+    public function departmentAccess(): HasMany
+    {
+        return $this->hasMany(UserDepartmentAccess::class);
+    }
+
+    /**
+     * Get access level for a specific department.
+     */
+    public function getAccessForDepartment(int $departmentId): ?UserDepartmentAccess
+    {
+        return $this->departmentAccess()
+            ->where('department_id', $departmentId)
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->first();
+    }
+
+    /**
+     * Check if user has any access to a department.
+     */
+    public function hasAccessToDepartment(int $departmentId): bool
+    {
+        $access = $this->getAccessForDepartment($departmentId);
+
+        return $access !== null && $access->access_level->value < 3; // Not NONE
+    }
+
+    /**
+     * Check if user can write in a department.
+     */
+    public function canWriteInDepartment(int $departmentId): bool
+    {
+        $access = $this->getAccessForDepartment($departmentId);
+
+        return $access !== null && $access->canWrite();
+    }
+
+    /**
+     * Check if user can escalate in a department.
+     */
+    public function canEscalateInDepartment(int $departmentId): bool
+    {
+        $access = $this->getAccessForDepartment($departmentId);
+
+        return $access !== null && $access->canEscalate();
+    }
+
+    // ========================================
     // ADMIN ACCESS CONTROL
     // ========================================
 
