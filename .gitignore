@@ -106,3 +106,6 @@ docs/internal/
 docs/in-progress/
 docs/themes/nexus/
 
+## Browser Testing screenshots
+tests/Browser/Screenshots/
+
