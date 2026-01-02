@@ -161,15 +161,15 @@ class DevelopmentSeeder extends Seeder
             return;
         }
 
-        // Check if profile already exists
-        if (UserTaxProfile::where('user_id', $admin->id)->exists()) {
+        // Check if profile already exists (ADR-004: use owner_user_id)
+        if (UserTaxProfile::where('owner_user_id', $admin->id)->exists()) {
             $this->command->line('Admin tax profile already exists');
 
             return;
         }
 
         UserTaxProfile::create([
-            'user_id' => $admin->id,
+            'owner_user_id' => $admin->id,
             'fiscal_name' => $admin->name,
             'tax_id' => '12345678Z',
             'legal_entity_type_code' => 'SELF_EMPLOYED',
@@ -201,15 +201,15 @@ class DevelopmentSeeder extends Seeder
             return;
         }
 
-        // Check if profile already exists
-        if (UserTaxProfile::where('user_id', $testUser->id)->exists()) {
+        // Check if profile already exists (ADR-004: use owner_user_id)
+        if (UserTaxProfile::where('owner_user_id', $testUser->id)->exists()) {
             $this->command->line('Test user tax profile already exists');
 
             return;
         }
 
         UserTaxProfile::create([
-            'user_id' => $testUser->id,
+            'owner_user_id' => $testUser->id,
             'fiscal_name' => 'Test Company S.L.',
             'tax_id' => 'B87654321',
             'legal_entity_type_code' => 'LIMITED_COMPANY',

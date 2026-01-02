@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use AichaDigital\Larabill\Support\MigrationHelper;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -22,9 +23,11 @@ return new class extends Migration
         Schema::create('user_department_access', function (Blueprint $table) {
             $table->id();
 
-            // FK to users
-            $table->foreignId('user_id')
-                ->constrained('users')
+            // FK to users (uses MigrationHelper for UUID compatibility)
+            MigrationHelper::userIdColumn($table, 'user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
                 ->cascadeOnDelete();
 
             // FK to laratickets departments
@@ -36,10 +39,11 @@ return new class extends Migration
             // 0=FULL, 1=WRITE, 2=READ, 3=NONE
             $table->unsignedTinyInteger('access_level')->default(2);
 
-            // Audit fields
-            $table->foreignId('granted_by')
-                ->nullable()
-                ->constrained('users')
+            // Audit fields (uses MigrationHelper for UUID compatibility)
+            MigrationHelper::userIdColumn($table, 'granted_by', nullable: true);
+            $table->foreign('granted_by')
+                ->references('id')
+                ->on('users')
                 ->nullOnDelete();
             $table->timestamp('granted_at')->useCurrent();
             $table->timestamp('expires_at')->nullable();
@@ -49,7 +53,7 @@ return new class extends Migration
             // Constraints
             $table->unique(['user_id', 'department_id']);
 
-            // Indexes
+            // Indexes (user_id already indexed by MigrationHelper)
             $table->index(['user_id', 'access_level']);
             $table->index('department_id');
         });

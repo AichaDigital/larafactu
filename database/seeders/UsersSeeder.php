@@ -205,7 +205,7 @@ class UsersSeeder extends Seeder
             : $this->generateSpanishNIF();
 
         UserTaxProfile::create([
-            'user_id' => $user->id,
+            'owner_user_id' => $user->id,
             'fiscal_name' => $user->name,
             'tax_id' => $taxId,
             'legal_entity_type_code' => $entityCode,
@@ -232,7 +232,7 @@ class UsersSeeder extends Seeder
         $vatNumber = $this->generateEuVatNumber($countryCode);
 
         UserTaxProfile::create([
-            'user_id' => $user->id,
+            'owner_user_id' => $user->id,
             'fiscal_name' => $user->name,
             'tax_id' => $vatNumber,
             'legal_entity_type_code' => $isCompany ? 'LIMITED_COMPANY' : 'INDIVIDUAL',
