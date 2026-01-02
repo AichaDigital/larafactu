@@ -6,16 +6,14 @@ use AichaDigital\Larabill\Concerns\HasUuid;
 use AichaDigital\Larabill\Enums\UserRelationshipType;
 use AichaDigital\Larabill\Models\LegalEntityType;
 use AichaDigital\Larabill\Models\UserTaxProfile;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\App;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasUuid, Notifiable;
@@ -33,6 +31,7 @@ class User extends Authenticatable implements FilamentUser
         'relationship_type',
         'display_name',
         'legal_entity_type_code',
+        'current_tax_profile_id',
     ];
 
     /**
@@ -94,35 +93,66 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Get all tax profiles for this user (historical + active).
+     * Get the tax profile currently assigned to this user.
+     *
+     * ADR-004: Users point to a tax profile via current_tax_profile_id.
+     * Multiple users can share the same profile.
+     *
+     * @return BelongsTo<UserTaxProfile, $this>
+     */
+    public function currentTaxProfileRelation(): BelongsTo
+    {
+        return $this->belongsTo(UserTaxProfile::class, 'current_tax_profile_id');
+    }
+
+    /**
+     * Get all tax profiles owned by this user (historical + active).
+     *
+     * ADR-004: Changed FK from user_id to owner_user_id.
+     *
+     * @return HasMany<UserTaxProfile, $this>
+     */
+    public function ownedTaxProfiles(): HasMany
+    {
+        return $this->hasMany(UserTaxProfile::class, 'owner_user_id');
+    }
+
+    /**
+     * Alias for ownedTaxProfiles().
+     *
+     * @deprecated Use ownedTaxProfiles() instead. Will be removed in v2.0.
      *
      * @return HasMany<UserTaxProfile, $this>
      */
     public function taxProfiles(): HasMany
     {
-        return $this->hasMany(UserTaxProfile::class, 'user_id');
+        return $this->ownedTaxProfiles();
     }
 
     /**
      * Get the current active tax profile for this user.
      *
-     * Helper method for convenience.
+     * ADR-004: Uses owner-based lookup.
      */
     public function currentTaxProfile(): ?UserTaxProfile
     {
-        return UserTaxProfile::getValidForUserAt($this->id, now());
+        return UserTaxProfile::getValidForOwnerAt($this->id, now());
     }
 
     /**
      * Get tax profile valid at a specific date.
+     *
+     * ADR-004: Uses owner-based lookup.
      */
     public function taxProfileAt(\Carbon\Carbon $date): ?UserTaxProfile
     {
-        return UserTaxProfile::getValidForUserAt($this->id, $date);
+        return UserTaxProfile::getValidForOwnerAt($this->id, $date);
     }
 
     /**
      * Update tax profile for this user (creates new record, closes previous).
+     *
+     * ADR-004: Uses owner_user_id.
      *
      * @param  array<string, mixed>  $attributes
      */
@@ -135,9 +165,9 @@ class User extends Authenticatable implements FilamentUser
             $current->save();
         }
 
-        // Create new profile
+        // Create new profile (ADR-004: owner_user_id)
         return UserTaxProfile::create([
-            'user_id' => $this->id,
+            'owner_user_id' => $this->id,
             'valid_from' => now(),
             'valid_until' => null,
             'is_active' => true,
@@ -184,27 +214,43 @@ class User extends Authenticatable implements FilamentUser
     }
 
     // ========================================
-    // ADMIN PANEL ACCESS CONTROL
+    // USER PREFERENCES (ADR-005)
     // ========================================
 
     /**
-     * Determine if the user can access the Filament admin panel.
+     * Get the user's preferences.
+     *
+     * @return HasOne<UserPreference, $this>
      */
-    public function canAccessPanel(Panel $panel): bool
+    public function preferences(): HasOne
     {
-        // In local development, allow access to all users
-        if (App::environment('local')) {
-            return true;
-        }
-
-        // Production: Check against allowed emails and domains
-        return $this->isAllowedAdminUser();
+        return $this->hasOne(UserPreference::class);
     }
 
     /**
-     * Check if user is allowed to access admin panel.
+     * Get or create preferences for this user.
      */
-    protected function isAllowedAdminUser(): bool
+    public function getPreferences(): UserPreference
+    {
+        return UserPreference::forUser($this);
+    }
+
+    /**
+     * Get the user's preferred theme.
+     */
+    public function preferredTheme(): string
+    {
+        return $this->preferences?->theme ?? UserPreference::DEFAULT_THEME;
+    }
+
+    // ========================================
+    // ADMIN ACCESS CONTROL
+    // ========================================
+
+    /**
+     * Check if user is allowed to access admin area.
+     */
+    public function isAdmin(): bool
     {
         // Get allowed emails (comma-separated)
         $allowedEmails = config('app.admin_emails', '');

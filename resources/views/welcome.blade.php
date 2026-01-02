@@ -202,9 +202,9 @@
                             items: [
                                 { icon: '🐘', name: 'PHP', version: '8.4+' },
                                 { icon: '🔴', name: 'Laravel', version: '12.x' },
-                                { icon: '🎨', name: 'Filament', version: '4.x' },
                                 { icon: '⚡', name: 'Livewire', version: '3.x' },
                                 { icon: '🎯', name: 'Tailwind', version: '4.x' },
+                                { icon: '🌼', name: 'DaisyUI', version: '5.x' },
                                 { icon: '🧪', name: 'Pest', version: '4.x' }
                             ]
                         },
@@ -295,9 +295,9 @@
                             items: [
                                 { icon: '🐘', name: 'PHP', version: '8.4+' },
                                 { icon: '🔴', name: 'Laravel', version: '12.x' },
-                                { icon: '🎨', name: 'Filament', version: '4.x' },
                                 { icon: '⚡', name: 'Livewire', version: '3.x' },
                                 { icon: '🎯', name: 'Tailwind', version: '4.x' },
+                                { icon: '🌼', name: 'DaisyUI', version: '5.x' },
                                 { icon: '🧪', name: 'Pest', version: '4.x' }
                             ]
                         },

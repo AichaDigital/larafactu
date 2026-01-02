@@ -29,9 +29,14 @@ return new class extends Migration
             // Legal entity type code (FK to legal_entity_types.code)
             $table->string('legal_entity_type_code', 50)->nullable()->after('display_name');
 
+            // ADR-004: Current tax profile (shared profiles pattern)
+            // Multiple users can point to the same tax profile
+            $table->foreignId('current_tax_profile_id')->nullable();
+
             // Indexes
             $table->index('parent_user_id', 'idx_users_parent');
             $table->index('relationship_type', 'idx_users_relationship_type');
+            $table->index('current_tax_profile_id', 'idx_users_current_tax_profile');
 
             // Foreign key self-reference
             $table->foreign('parent_user_id')
@@ -54,11 +59,13 @@ return new class extends Migration
             $table->dropForeign(['legal_entity_type_code']);
             $table->dropIndex('idx_users_parent');
             $table->dropIndex('idx_users_relationship_type');
+            $table->dropIndex('idx_users_current_tax_profile');
             $table->dropColumn([
                 'parent_user_id',
                 'relationship_type',
                 'display_name',
                 'legal_entity_type_code',
+                'current_tax_profile_id',
             ]);
         });
     }

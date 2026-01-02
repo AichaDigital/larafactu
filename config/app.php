@@ -46,7 +46,7 @@ return [
     | Admin Panel Access Control
     |--------------------------------------------------------------------------
     |
-    | Configure who can access the Filament admin panel in production.
+    | Configure who can access the admin panel in production.
     | In local environment, all users have access by default.
     |
     | - admin_emails: Comma-separated list of exact email addresses

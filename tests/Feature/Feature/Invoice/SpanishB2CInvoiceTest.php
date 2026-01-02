@@ -41,7 +41,7 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
 
     // Create tax profile for billable user
     $taxProfile = UserTaxProfile::factory()->create([
-        'user_id' => $billableUser->id,
+        'owner_user_id' => $billableUser->id,
         'fiscal_name' => 'Juan Pérez García',
         'tax_id' => '12345678Z',
         'country_code' => 'ES',
@@ -119,7 +119,7 @@ it('calculates correct VAT for multiple items', function () {
 
     // Create tax profile with Spanish data
     UserTaxProfile::factory()->create([
-        'user_id' => $billableUser->id,
+        'owner_user_id' => $billableUser->id,
         'country_code' => 'ES',
         'valid_from' => now()->subYear(),
         'valid_until' => null,
@@ -188,7 +188,7 @@ it('validates Spanish DNI format', function () {
 
     // Create tax profile with Spanish DNI
     $taxProfile = UserTaxProfile::factory()->create([
-        'user_id' => $billableUser->id,
+        'owner_user_id' => $billableUser->id,
         'tax_id' => '12345678Z',
         'country_code' => 'ES',
         'valid_from' => now()->subYear(),
@@ -226,7 +226,7 @@ it('generates encrypted fiscal snapshots on invoice creation (ADR-001)', functio
 
     // Create tax profile for billable user
     $taxProfile = UserTaxProfile::factory()->create([
-        'user_id' => $billableUser->id,
+        'owner_user_id' => $billableUser->id,
         'fiscal_name' => 'Juan Pérez García',
         'tax_id' => '12345678Z',
         'country_code' => 'ES',
@@ -307,7 +307,7 @@ it('creates fiscal snapshots with temporal validity (ADR-001)', function () {
 
     // Create historical tax profile (closed)
     $oldTaxProfile = UserTaxProfile::factory()->create([
-        'user_id' => $billableUser->id,
+        'owner_user_id' => $billableUser->id,
         'fiscal_name' => 'Old Name',
         'tax_id' => '00000000A',
         'country_code' => 'ES',
@@ -318,7 +318,7 @@ it('creates fiscal snapshots with temporal validity (ADR-001)', function () {
 
     // Create current tax profile
     $currentTaxProfile = UserTaxProfile::factory()->create([
-        'user_id' => $billableUser->id,
+        'owner_user_id' => $billableUser->id,
         'fiscal_name' => 'Current Name',
         'tax_id' => '12345678Z',
         'country_code' => 'ES',

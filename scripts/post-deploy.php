@@ -47,6 +47,7 @@ if (! $hasPathRepos) {
 echo "🔄 Converting path repositories to VCS (GitHub)...\n\n";
 
 // Replace path repositories with VCS (GitHub)
+// Note: *-filament packages are DEPRECATED (ADR-005)
 $composer['repositories'] = [
     [
         'type' => 'vcs',
@@ -54,15 +55,7 @@ $composer['repositories'] = [
     ],
     [
         'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/larabill-filament',
-    ],
-    [
-        'type' => 'vcs',
         'url' => 'https://github.com/AichaDigital/lara-verifactu',
-    ],
-    [
-        'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/lara-verifactu-filament',
     ],
     [
         'type' => 'vcs',
@@ -70,15 +63,7 @@ $composer['repositories'] = [
     ],
     [
         'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/laratickets-filament',
-    ],
-    [
-        'type' => 'vcs',
         'url' => 'https://github.com/AichaDigital/lararoi',
-    ],
-    [
-        'type' => 'vcs',
-        'url' => 'https://github.com/AichaDigital/lararoi-filament',
     ],
 ];
 
@@ -86,15 +71,11 @@ $composer['repositories'] = [
 $json = json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 file_put_contents($composerFile, $json);
 
-echo "✅ Updated composer.json for production:\n";
-echo "   - aichadigital/larabill → GitHub\n";
-echo "   - aichadigital/larabill-filament → GitHub\n";
-echo "   - aichadigital/lara-verifactu → GitHub\n";
-echo "   - aichadigital/lara-verifactu-filament → GitHub\n";
-echo "   - aichadigital/laratickets → GitHub\n";
-echo "   - aichadigital/laratickets-filament → GitHub\n";
-echo "   - aichadigital/lararoi → GitHub\n";
-echo "   - aichadigital/lararoi-filament → GitHub\n\n";
+echo "Updated composer.json for production:\n";
+echo "   - aichadigital/larabill -> GitHub\n";
+echo "   - aichadigital/lara-verifactu -> GitHub\n";
+echo "   - aichadigital/laratickets -> GitHub\n";
+echo "   - aichadigital/lararoi -> GitHub\n\n";
 
 echo "📦 Next steps:\n";
 echo "   1. Copy .env.example to .env and configure your database\n";
