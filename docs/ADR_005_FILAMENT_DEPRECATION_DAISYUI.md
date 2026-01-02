@@ -199,10 +199,6 @@ El ADR-004 (Autorizacion y Permisos) requiere revision:
 - [x] Recuperacion de contrasena (forgot-password + reset-password)
 - [x] Perfil de usuario (edicion, cambio contrasena, preferencias)
 
-NOTA: Los componentes de clientes usan DB::table() en lugar del modelo
-UserTaxProfile debido a discrepancia entre columna BD (user_id) y modelo
-(owner_user_id). Pendiente migrar columna o ajustar modelo.
-
 Componentes de facturas implementados:
 
 - InvoiceList: Listado con filtros por ano, serie, estado y busqueda
@@ -215,6 +211,12 @@ Componentes de articulos implementados:
 - ArticleList: Listado con filtros por tipo, categoria, estado
 - ArticleCreate: Creacion con codigo, nombre translatable, precio base
 - ArticleEdit: Edicion de articulo existente
+
+Componentes de clientes implementados:
+
+- CustomerList: Listado con filtros por tipo (empresa/particular), busqueda por nombre/email/NIF
+- CustomerCreate: Creacion de usuario + perfil fiscal usando UserTaxProfile model
+- CustomerEdit: Edicion con versionado automatico de perfiles fiscales
 
 Componente de perfil implementado:
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Customers;
 
+use AichaDigital\Larabill\Models\UserTaxProfile;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
@@ -85,10 +86,8 @@ class CustomerCreate extends Component
                 'password' => Hash::make(Str::random(32)),
             ]);
 
-            // Create tax profile using DB::table to avoid model mismatch
-            // (model expects owner_user_id but DB has user_id)
-            DB::table('user_tax_profiles')->insert([
-                'user_id' => $user->id,
+            // Create tax profile using model
+            UserTaxProfile::createForOwner($user->id, [
                 'fiscal_name' => $this->fiscalName,
                 'tax_id' => $this->taxId ?: null,
                 'address' => $this->address ?: null,
@@ -100,11 +99,7 @@ class CustomerCreate extends Component
                 'is_eu_vat_registered' => $this->isEuVatRegistered,
                 'is_exempt_vat' => $this->isExemptVat,
                 'valid_from' => now(),
-                'valid_until' => null,
-                'is_active' => true,
                 'notes' => $this->notes ?: null,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         });
 

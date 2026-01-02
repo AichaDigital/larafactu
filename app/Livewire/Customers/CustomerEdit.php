@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Customers;
 
+use AichaDigital\Larabill\Models\UserTaxProfile;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ class CustomerEdit extends Component
 {
     public User $customer;
 
-    public ?object $taxProfile = null;
+    public ?UserTaxProfile $taxProfile = null;
 
     // User fields
     public string $name = '';
@@ -56,12 +57,8 @@ class CustomerEdit extends Component
         $this->name = $customer->name;
         $this->email = $customer->email;
 
-        // Load active tax profile using DB::table
-        $this->taxProfile = DB::table('user_tax_profiles')
-            ->where('user_id', $customer->id)
-            ->where('is_active', true)
-            ->whereNull('valid_until')
-            ->first();
+        // Load active tax profile using model
+        $this->taxProfile = UserTaxProfile::getActiveForOwner($customer->id);
 
         if ($this->taxProfile) {
             $this->fiscalName = $this->taxProfile->fiscal_name ?? '';
@@ -117,19 +114,9 @@ class CustomerEdit extends Component
             // Check if fiscal data changed
             $fiscalDataChanged = $this->hasFiscalDataChanged();
 
-            if ($fiscalDataChanged && $this->taxProfile) {
-                // Close current profile using DB::table
-                DB::table('user_tax_profiles')
-                    ->where('id', $this->taxProfile->id)
-                    ->update([
-                        'valid_until' => now()->subDay(),
-                        'is_active' => false,
-                        'updated_at' => now(),
-                    ]);
-
-                // Create new profile
-                DB::table('user_tax_profiles')->insert([
-                    'user_id' => $this->customer->id,
+            if ($fiscalDataChanged || ! $this->taxProfile) {
+                // Create new profile (model auto-closes previous one)
+                UserTaxProfile::createForOwner($this->customer->id, [
                     'fiscal_name' => $this->fiscalName,
                     'tax_id' => $this->taxId ?: null,
                     'address' => $this->address ?: null,
@@ -141,32 +128,7 @@ class CustomerEdit extends Component
                     'is_eu_vat_registered' => $this->isEuVatRegistered,
                     'is_exempt_vat' => $this->isExemptVat,
                     'valid_from' => now(),
-                    'valid_until' => null,
-                    'is_active' => true,
                     'notes' => $this->notes ?: null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            } elseif (! $this->taxProfile) {
-                // No existing profile, create first one
-                DB::table('user_tax_profiles')->insert([
-                    'user_id' => $this->customer->id,
-                    'fiscal_name' => $this->fiscalName,
-                    'tax_id' => $this->taxId ?: null,
-                    'address' => $this->address ?: null,
-                    'city' => $this->city ?: null,
-                    'state' => $this->state ?: null,
-                    'zip_code' => $this->zipCode ?: null,
-                    'country_code' => $this->countryCode,
-                    'is_company' => $this->isCompany,
-                    'is_eu_vat_registered' => $this->isEuVatRegistered,
-                    'is_exempt_vat' => $this->isExemptVat,
-                    'valid_from' => now(),
-                    'valid_until' => null,
-                    'is_active' => true,
-                    'notes' => $this->notes ?: null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
             }
         });
@@ -189,9 +151,9 @@ class CustomerEdit extends Component
             || $this->state !== ($this->taxProfile->state ?? '')
             || $this->zipCode !== ($this->taxProfile->zip_code ?? '')
             || $this->countryCode !== ($this->taxProfile->country_code ?? 'ES')
-            || $this->isCompany !== ($this->taxProfile->is_company ?? false)
-            || $this->isEuVatRegistered !== ($this->taxProfile->is_eu_vat_registered ?? false)
-            || $this->isExemptVat !== ($this->taxProfile->is_exempt_vat ?? false);
+            || $this->isCompany !== (bool) ($this->taxProfile->is_company ?? false)
+            || $this->isEuVatRegistered !== (bool) ($this->taxProfile->is_eu_vat_registered ?? false)
+            || $this->isExemptVat !== (bool) ($this->taxProfile->is_exempt_vat ?? false);
     }
 
     public function render(): View

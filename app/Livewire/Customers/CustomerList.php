@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Customers;
 
+use AichaDigital\Larabill\Models\UserTaxProfile;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -47,9 +47,9 @@ class CustomerList extends Component
             return;
         }
 
-        // Check if user has invoices using DB query
-        $hasInvoices = DB::table('invoices')
-            ->where('customer_user_id', $id)
+        // Check if user has invoices
+        $hasInvoices = $user->ownedTaxProfiles()
+            ->whereHas('invoices')
             ->exists();
 
         if ($hasInvoices) {
@@ -58,10 +58,8 @@ class CustomerList extends Component
             return;
         }
 
-        // Delete tax profiles first using DB query
-        DB::table('user_tax_profiles')
-            ->where('user_id', $id)
-            ->delete();
+        // Delete tax profiles first
+        $user->ownedTaxProfiles()->delete();
 
         $user->delete();
 
@@ -70,8 +68,9 @@ class CustomerList extends Component
 
     public function render(): View
     {
-        // Build base query
-        $query = User::query();
+        // Build base query with tax profile relationship
+        $query = User::query()
+            ->whereHas('ownedTaxProfiles');
 
         // Apply search filter
         if ($this->search) {
@@ -79,50 +78,36 @@ class CustomerList extends Component
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhereExists(function ($sub) use ($search) {
-                        $sub->select(DB::raw(1))
-                            ->from('user_tax_profiles')
-                            ->whereColumn('user_tax_profiles.user_id', 'users.id')
-                            ->where(function ($tp) use ($search) {
-                                $tp->where('tax_id', 'like', "%{$search}%")
-                                    ->orWhere('fiscal_name', 'like', "%{$search}%");
-                            });
+                    ->orWhereHas('ownedTaxProfiles', function ($tp) use ($search) {
+                        $tp->where('tax_id', 'like', "%{$search}%")
+                            ->orWhere('fiscal_name', 'like', "%{$search}%");
                     });
             });
         }
 
         // Apply type filter
         if ($this->filter === 'company') {
-            $query->whereExists(function ($sub) {
-                $sub->select(DB::raw(1))
-                    ->from('user_tax_profiles')
-                    ->whereColumn('user_tax_profiles.user_id', 'users.id')
-                    ->where('is_company', true)
-                    ->where('is_active', true);
+            $query->whereHas('ownedTaxProfiles', function ($tp) {
+                $tp->active()->where('is_company', true);
             });
         } elseif ($this->filter === 'individual') {
-            $query->whereExists(function ($sub) {
-                $sub->select(DB::raw(1))
-                    ->from('user_tax_profiles')
-                    ->whereColumn('user_tax_profiles.user_id', 'users.id')
-                    ->where('is_company', false)
-                    ->where('is_active', true);
+            $query->whereHas('ownedTaxProfiles', function ($tp) {
+                $tp->active()->where('is_company', false);
             });
         }
 
         $customers = $query->orderBy('name')->paginate($this->perPage);
 
-        // Eager load tax profiles manually
+        // Eager load active tax profiles using model
         $customerIds = $customers->pluck('id')->toArray();
         $taxProfiles = collect();
 
         if (! empty($customerIds)) {
-            $taxProfiles = DB::table('user_tax_profiles')
-                ->whereIn('user_id', $customerIds)
-                ->where('is_active', true)
-                ->whereNull('valid_until')
+            $taxProfiles = UserTaxProfile::query()
+                ->whereIn('owner_user_id', $customerIds)
+                ->active()
                 ->get()
-                ->keyBy('user_id');
+                ->keyBy('owner_user_id');
         }
 
         return view('livewire.customers.customer-list', [
