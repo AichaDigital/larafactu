@@ -302,6 +302,98 @@ class User extends Authenticatable
     }
 
     // ========================================
+    // CUSTOMER ACCESS (ADR-004 - Delegate Permissions)
+    // ========================================
+
+    /**
+     * Get all customer access records for this user (as delegate).
+     *
+     * @return HasMany<UserCustomerAccess, $this>
+     */
+    public function customerAccess(): HasMany
+    {
+        return $this->hasMany(UserCustomerAccess::class, 'user_id');
+    }
+
+    /**
+     * Get all delegate access records for this user (as customer).
+     *
+     * @return HasMany<UserCustomerAccess, $this>
+     */
+    public function delegateAccess(): HasMany
+    {
+        return $this->hasMany(UserCustomerAccess::class, 'customer_user_id');
+    }
+
+    /**
+     * Get all customers this user has access to (as delegate).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<User, $this>
+     */
+    public function accessibleCustomers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_customer_access',
+            'user_id',
+            'customer_user_id'
+        )->withPivot(['access_level', 'can_view_invoices', 'can_view_services', 'can_manage_tickets', 'can_manage_delegates', 'granted_by', 'granted_at', 'expires_at'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get all delegates who have access to this user (as customer).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<User, $this>
+     */
+    public function delegates(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_customer_access',
+            'customer_user_id',
+            'user_id'
+        )->withPivot(['access_level', 'can_view_invoices', 'can_view_services', 'can_manage_tickets', 'can_manage_delegates', 'granted_by', 'granted_at', 'expires_at'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if this user (delegate) has active access to a customer.
+     */
+    public function hasAccessTo(User $customer): bool
+    {
+        return UserCustomerAccess::where('user_id', $this->id)
+            ->where('customer_user_id', $customer->id)
+            ->active()
+            ->exists();
+    }
+
+    /**
+     * Get the access level this user (delegate) has for a customer.
+     * Returns AccessLevel::NONE if no access or expired.
+     */
+    public function getAccessLevelFor(User $customer): \App\Enums\AccessLevel
+    {
+        $access = UserCustomerAccess::where('user_id', $this->id)
+            ->where('customer_user_id', $customer->id)
+            ->active()
+            ->first();
+
+        return $access?->access_level ?? \App\Enums\AccessLevel::NONE;
+    }
+
+    /**
+     * Get the customer access record for a specific customer.
+     */
+    public function getCustomerAccess(User $customer): ?UserCustomerAccess
+    {
+        return UserCustomerAccess::where('user_id', $this->id)
+            ->where('customer_user_id', $customer->id)
+            ->active()
+            ->first();
+    }
+
+    // ========================================
     // ADMIN ACCESS CONTROL
     // ========================================
 

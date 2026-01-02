@@ -8,8 +8,10 @@ use AichaDigital\Larabill\Models\Article;
 use AichaDigital\Larabill\Models\Invoice;
 use AichaDigital\Larabill\Models\UserTaxProfile;
 use App\Models\User;
+use App\Models\UserCustomerAccess;
 use App\Policies\ArticlePolicy;
 use App\Policies\InvoicePolicy;
+use App\Policies\UserCustomerAccessPolicy;
 use App\Policies\UserTaxProfilePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -33,6 +35,7 @@ class AuthServiceProvider extends ServiceProvider
         Invoice::class => InvoicePolicy::class,
         UserTaxProfile::class => UserTaxProfilePolicy::class,
         Article::class => ArticlePolicy::class,
+        UserCustomerAccess::class => UserCustomerAccessPolicy::class,
     ];
 
     /**

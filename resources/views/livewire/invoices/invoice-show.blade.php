@@ -204,12 +204,12 @@
             <x-ui.card>
                 <h2 class="font-semibold text-lg mb-4">Acciones</h2>
                 <div class="space-y-2">
-                    <button class="btn btn-outline btn-sm w-full gap-2" disabled>
+                    <a href="{{ route('invoices.pdf', ['invoice' => $invoice, 'download' => 1]) }}" class="btn btn-outline btn-sm w-full gap-2" target="_blank">
                         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>
                         </svg>
                         Descargar PDF
-                    </button>
+                    </a>
                     <button class="btn btn-outline btn-sm w-full gap-2" disabled>
                         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>

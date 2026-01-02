@@ -67,6 +67,25 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create', InvoiceCreate::class)->name('create');
         Route::get('/{invoice}', InvoiceShow::class)->name('show');
         Route::get('/{invoice}/edit', InvoiceEdit::class)->name('edit');
+        Route::get('/{invoice}/pdf', function (\AichaDigital\Larabill\Models\Invoice $invoice) {
+            // Generate PDF if not exists
+            $pdfPath = $invoice->getPDFPath();
+            if (! $pdfPath) {
+                $result = $invoice->generatePDF();
+                if (! $result['success']) {
+                    abort(500, 'Error generating PDF');
+                }
+                $pdfPath = $result['pdf_path'];
+            }
+
+            $filename = $invoice->fiscal_number.'.pdf';
+            $disposition = request()->has('download') ? 'attachment' : 'inline';
+
+            return response()->file($pdfPath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "{$disposition}; filename=\"{$filename}\"",
+            ]);
+        })->name('pdf');
     });
 
     // Customers
@@ -90,14 +109,31 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin', 'block-impersonation'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
         return view('admin.dashboard');
     })->name('dashboard');
 
-    Route::get('/users', function () {
-        return view('admin.users');
-    })->name('users');
+    Route::get('/users', App\Livewire\Admin\UserList::class)->name('users');
+
+    // Impersonation routes (stop must be before {user} to avoid route conflict)
+    Route::post('/impersonate-stop', function () {
+        app(App\Services\ImpersonationService::class)->stop();
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'Has vuelto a tu cuenta de administrador.');
+    })->name('impersonate.stop')->withoutMiddleware('admin');
+
+    Route::post('/impersonate/{user}', function (App\Models\User $user) {
+        $service = app(App\Services\ImpersonationService::class);
+
+        if (! $service->start($user)) {
+            abort(403, 'No puedes impersonar a este usuario.');
+        }
+
+        return redirect()->route('dashboard')
+            ->with('success', "Ahora estas viendo la aplicacion como {$user->name}");
+    })->name('impersonate.start');
 });
 
 /*

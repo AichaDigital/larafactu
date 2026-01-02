@@ -33,6 +33,9 @@
     @livewireStyles
 </head>
 <body class="min-h-screen bg-base-200 antialiased">
+    {{-- Impersonation bar --}}
+    <x-impersonation-bar />
+
     {{-- Nexus-style layout with sidebar controls --}}
     <div class="size-full">
         <div class="flex">
