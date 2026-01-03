@@ -64,11 +64,8 @@ class DevelopmentSeeder extends Seeder
         // 7. Create Spanish hosting products (hosting, VPS, domains, SSL)
         $this->call(SpanishHostingProductsSeeder::class);
 
-        // 8. Create invoice series for 2024 and 2025
-        $this->call(InvoiceSeriesSeeder::class);
-
-        // 9. Create realistic users with plans and historical invoices
-        $this->call(RealisticUsersSeeder::class);
+        // 8. Create additional users (100 users with fiscal profiles)
+        $this->call(UsersSeeder::class);
 
         // Summary
         $this->command->newLine();
@@ -76,9 +73,8 @@ class DevelopmentSeeder extends Seeder
         $this->command->newLine();
         $this->command->line('Admin: admin@example.com / password');
         $this->command->line('Test:  test@example.com / password');
-        $this->command->line('Additional users: 100 with realistic plans and invoices');
+        $this->command->line('Additional users: 100 (password: password)');
         $this->command->line('Products: Hosting (3), VPS (3), Domains (6), SSL (4)');
-        $this->command->line('Invoice series: LF24-XXXXX, LF25-XXXXX');
     }
 
     /**
