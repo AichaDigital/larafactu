@@ -67,6 +67,9 @@ class DevelopmentSeeder extends Seeder
         // 8. Create additional users (100 users with fiscal profiles)
         $this->call(UsersSeeder::class);
 
+        // 9. Create realistic services and invoices
+        $this->call(RealisticServicesSeeder::class);
+
         // Summary
         $this->command->newLine();
         $this->command->info('Development data seeded successfully!');
@@ -75,6 +78,7 @@ class DevelopmentSeeder extends Seeder
         $this->command->line('Test:  test@example.com / password');
         $this->command->line('Additional users: 100 (password: password)');
         $this->command->line('Products: Hosting (3), VPS (3), Domains (6), SSL (4)');
+        $this->command->line('Services and invoices: See RealisticServicesSeeder output');
     }
 
     /**

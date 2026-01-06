@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="group/html" data-theme="{{ session('theme', 'cupcake') }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="group/html">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,25 +7,32 @@
 
     <title>{{ $title ?? config('app.name', 'Larafactu') }}</title>
 
-    <!-- Fonts: Inter (similar to Nexus template) -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
-
-    <!-- Theme detection: session -> system preference -->
+    <!-- Theme detection: MUST run before any render to avoid flash -->
     <script>
         (function() {
-            const savedTheme = '{{ session('theme') }}';
-            if (!savedTheme) {
+            const LIGHT_THEME = 'cupcake';
+            const DARK_THEME = 'abyss';
+            const savedTheme = localStorage.getItem('theme') || '{{ session('theme') }}';
+
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', prefersDark ? 'abyss' : 'cupcake');
+                document.documentElement.setAttribute('data-theme', prefersDark ? DARK_THEME : LIGHT_THEME);
             }
+
+            // Listen for system theme changes (only if user hasn't set preference)
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                if (!document.documentElement.hasAttribute('data-theme-user-set')) {
-                    document.documentElement.setAttribute('data-theme', e.matches ? 'abyss' : 'cupcake');
+                if (!localStorage.getItem('theme')) {
+                    document.documentElement.setAttribute('data-theme', e.matches ? DARK_THEME : LIGHT_THEME);
                 }
             });
         })();
     </script>
+
+    <!-- Fonts: Inter (similar to Nexus template) -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

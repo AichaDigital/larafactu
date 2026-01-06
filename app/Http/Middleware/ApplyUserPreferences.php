@@ -29,28 +29,36 @@ class ApplyUserPreferences
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Only set session values if user has explicit preferences or session already has them
         $theme = $this->resolveTheme($request);
         $locale = $this->resolveLocale($request);
         $timezone = $this->resolveTimezone($request);
 
-        // Store in session for Blade templates
-        session(['theme' => $theme]);
-        session(['locale' => $locale]);
-        session(['timezone' => $timezone]);
+        // Store in session for Blade templates (but only if we have a valid preference source)
+        if ($theme !== null) {
+            session(['theme' => $theme]);
+        }
+        if ($locale !== null) {
+            session(['locale' => $locale]);
+        }
+        if ($timezone !== null) {
+            session(['timezone' => $timezone]);
+        }
 
         // Apply locale
-        App::setLocale($locale);
+        App::setLocale($locale ?? UserPreference::DEFAULT_LOCALE);
 
         // Apply timezone
-        config(['app.timezone' => $timezone]);
+        config(['app.timezone' => $timezone ?? UserPreference::DEFAULT_TIMEZONE]);
 
         return $next($request);
     }
 
     /**
      * Resolve the theme to use.
+     * Returns null if no explicit preference exists (let client-side detect system theme).
      */
-    private function resolveTheme(Request $request): string
+    private function resolveTheme(Request $request): ?string
     {
         // 1. Authenticated user with preferences
         if ($request->user()) {
@@ -64,22 +72,21 @@ class ApplyUserPreferences
             }
         }
 
-        // 2. Session/cookie value
+        // 2. Session/cookie value (already set by user interaction)
         $sessionTheme = session('theme');
         if ($sessionTheme && UserPreference::isValidTheme($sessionTheme)) {
             return $sessionTheme;
         }
 
-        // 3. Default based on prefers-color-scheme header (if available)
-        $prefersDark = $request->header('Sec-CH-Prefers-Color-Scheme') === 'dark';
-
-        return $prefersDark ? 'abyss' : UserPreference::DEFAULT_THEME;
+        // 3. No explicit preference - return null to let JavaScript detect system theme
+        return null;
     }
 
     /**
      * Resolve the locale to use.
+     * Returns null if no explicit preference exists (will use default).
      */
-    private function resolveLocale(Request $request): string
+    private function resolveLocale(Request $request): ?string
     {
         // 1. Authenticated user with preferences
         if ($request->user()) {
@@ -99,14 +106,15 @@ class ApplyUserPreferences
             return $sessionLocale;
         }
 
-        // 3. Default
-        return UserPreference::DEFAULT_LOCALE;
+        // 3. No explicit preference
+        return null;
     }
 
     /**
      * Resolve the timezone to use.
+     * Returns null if no explicit preference exists (will use default).
      */
-    private function resolveTimezone(Request $request): string
+    private function resolveTimezone(Request $request): ?string
     {
         // 1. Authenticated user with preferences
         if ($request->user()) {
@@ -126,7 +134,7 @@ class ApplyUserPreferences
             return $sessionTimezone;
         }
 
-        // 3. Default
-        return UserPreference::DEFAULT_TIMEZONE;
+        // 3. No explicit preference
+        return null;
     }
 }

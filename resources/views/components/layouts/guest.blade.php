@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="group/html" data-theme="{{ session('theme', 'cupcake') }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="group/html">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,20 +7,32 @@
 
     <title>{{ $title ?? config('app.name', 'Larafactu') }}</title>
 
+    <!-- Theme detection: MUST run before any render to avoid flash -->
+    <script>
+        (function() {
+            const LIGHT_THEME = 'cupcake';
+            const DARK_THEME = 'abyss';
+            const savedTheme = localStorage.getItem('theme') || '{{ session('theme') }}';
+
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefersDark ? DARK_THEME : LIGHT_THEME);
+            }
+
+            // Listen for system theme changes (only if user hasn't set preference)
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme') && !'{{ session('theme') }}') {
+                    document.documentElement.setAttribute('data-theme', e.matches ? DARK_THEME : LIGHT_THEME);
+                }
+            });
+        })();
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
-
-    <!-- Detect system theme preference -->
-    <script>
-        (function() {
-            const savedTheme = '{{ session('theme') }}';
-            if (!savedTheme) {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', prefersDark ? 'abyss' : 'cupcake');
-            }
-        })();
-    </script>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -76,6 +88,9 @@
     </div>
 
     <script>
+        const LIGHT_THEME = 'cupcake';
+        const DARK_THEME = 'abyss';
+
         function isDarkTheme(theme) {
             return theme === 'abyss' || theme === 'sunset';
         }
@@ -95,12 +110,13 @@
         function toggleTheme() {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
-            const newTheme = isDarkTheme(currentTheme) ? 'cupcake' : 'abyss';
+            const newTheme = isDarkTheme(currentTheme) ? LIGHT_THEME : DARK_THEME;
 
             html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
             updateThemeIcons();
 
-            // Persist to server
+            // Persist to server (optional, for server-side consistency)
             fetch('/api/theme', {
                 method: 'POST',
                 headers: {
@@ -108,7 +124,7 @@
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
                 body: JSON.stringify({ theme: newTheme })
-            });
+            }).catch(() => {}); // Silently fail if API not available
         }
 
         // Initialize icons on load

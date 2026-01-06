@@ -137,19 +137,71 @@ Cada color tiene su variante `-content` para texto/iconos sobre ese color.
 
 ---
 
-## Selector de Temas
+## Deteccion y Persistencia de Temas
 
-El usuario puede elegir tema mediante:
+### Estrategia de Deteccion (Prioridad)
 
-1. Atributo `data-theme` en elemento HTML
-2. Preferencia guardada en `model_preferences` (tabla users o separada)
-3. Cookie de sesion como fallback
+1. **localStorage** - Preferencia guardada en navegador (persistente)
+2. **session** - Cookie de sesion PHP (fallback servidor)
+3. **Sistema operativo** - `prefers-color-scheme: dark` (default)
+
+### Implementacion: Script Bloqueante
+
+El tema se detecta ANTES del renderizado para evitar flash de tema incorrecto.
+Este script debe estar en `<head>` antes de cualquier CSS:
 
 ```html
-<html data-theme="cupcake">
-<!-- o -->
-<html data-theme="abyss">
+<script>
+    (function() {
+        const LIGHT_THEME = 'cupcake';
+        const DARK_THEME = 'abyss';
+        const savedTheme = localStorage.getItem('theme') || '{{ session('theme') }}';
+
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', prefersDark ? DARK_THEME : LIGHT_THEME);
+        }
+    })();
+</script>
 ```
+
+### Toggle de Tema
+
+```javascript
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const isDark = currentTheme === 'abyss' || currentTheme === 'sunset';
+    const newTheme = isDark ? 'cupcake' : 'abyss';
+
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    // Opcional: persistir en servidor
+    fetch('/api/theme', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ theme: newTheme })
+    });
+}
+```
+
+### Archivos con Deteccion de Tema
+
+- `resources/views/welcome.blade.php` - Landing page
+- `resources/views/components/layouts/guest.blade.php` - Login/registro
+- `resources/views/components/layouts/app.blade.php` - Aplicacion autenticada
+
+### Regla Importante
+
+**NO** usar `data-theme` por defecto en el tag `<html>`. El script bloqueante
+se encarga de asignar el tema correcto basado en la preferencia del usuario
+o del sistema operativo.
 
 ---
 

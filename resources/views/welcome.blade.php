@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="{{ session('theme', 'cupcake') }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,20 +8,25 @@
     <title>{{ config('app.name', 'Larafactu') }} - Facturacion Electronica</title>
     <meta name="description" content="Plataforma completa de facturacion electronica con cumplimiento fiscal espanol (Verifactu AEAT).">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
-
-    <!-- Detect system theme preference -->
+    <!-- Theme detection: MUST run before any render to avoid flash -->
     <script>
         (function() {
-            const savedTheme = '{{ session('theme') }}';
-            if (!savedTheme) {
+            const LIGHT_THEME = 'cupcake';
+            const DARK_THEME = 'abyss';
+            const savedTheme = localStorage.getItem('theme') || '{{ session('theme') }}';
+
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', prefersDark ? 'abyss' : 'cupcake');
+                document.documentElement.setAttribute('data-theme', prefersDark ? DARK_THEME : LIGHT_THEME);
             }
         })();
     </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

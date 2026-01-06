@@ -65,6 +65,7 @@ it('can create invoice for spanish B2C customer with monthly hosting', function 
         'invoice_date' => now(),
         'due_date' => now()->addDays(15),
         'status' => InvoiceStatus::DRAFT,
+        'is_roi_taxed' => false, // Spanish B2C requires VAT (not reverse charge)
         'taxable_amount' => 0,
         'total_tax_amount' => 0,
         'total_amount' => 0,

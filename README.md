@@ -331,6 +331,56 @@ Para **actualizaciones futuras**, usa el script:
 
 Más detalles: [docs/UPDATE_MANAGEMENT.md](docs/UPDATE_MANAGEMENT.md)
 
+## ⚠️ Laravel Boost - Configuración Crítica
+
+**IMPORTANTE PARA DESARROLLO Y PRODUCCIÓN**
+
+Laravel Boost es una herramienta MCP para desarrollo asistido por IA, pero **puede causar problemas graves** si no se configura correctamente.
+
+### Problemas Conocidos
+
+- **Rendimiento degradado**: Páginas que tardan 30+ segundos, errores 502
+- **Seguridad en producción**: Expone credenciales, tokens, estructura de BD
+- **Procesos múltiples**: Acumulación de instancias `php artisan boost:mcp`
+
+### Configuración Obligatoria
+
+**1. Variables de entorno (.env)**
+
+```env
+# CRITICAL: MUST be false in production
+BOOST_ENABLED=true
+BOOST_BROWSER_LOGS_WATCHER=false  # Desactivado (causa problemas de rendimiento)
+```
+
+**2. Producción**
+
+```env
+APP_ENV=production
+BOOST_ENABLED=false  # OBLIGATORIO en producción
+```
+
+**NUNCA** dejes Laravel Boost activo en producción. Expone información sensible.
+
+### Diagnóstico Rápido
+
+Si experimentas lentitud o errores 502:
+
+```bash
+# Detener procesos de Boost
+pkill -f "boost:mcp"
+
+# Limpiar cache
+php artisan optimize:clear
+
+# Reiniciar servicios
+herd restart  # o tu servidor web
+```
+
+📖 **Documentación completa**: [Laravel Boost - Problemas de Rendimiento y Seguridad](https://wiki.castris.com/books/laravel/page/laravel-boost-problemas-de-rendimiento-y-seguridad)
+
+---
+
 ## 📚 Documentación
 
 - [STAGING_SETUP.md](STAGING_SETUP.md) - Configuración completa de staging/pre-producción
@@ -486,6 +536,56 @@ php artisan serve
 - **Frontend**: http://localhost:8000
 - **Admin**: http://localhost:8000/admin
 - **Credentials**: `admin@example.com` / `password`
+
+## ⚠️ Laravel Boost - Critical Configuration
+
+**IMPORTANT FOR DEVELOPMENT AND PRODUCTION**
+
+Laravel Boost is an MCP tool for AI-assisted development, but **can cause serious issues** if not configured correctly.
+
+### Known Issues
+
+- **Performance degradation**: Pages taking 30+ seconds, 502 errors
+- **Production security**: Exposes credentials, tokens, DB structure
+- **Multiple processes**: Accumulation of `php artisan boost:mcp` instances
+
+### Required Configuration
+
+**1. Environment variables (.env)**
+
+```env
+# CRITICAL: MUST be false in production
+BOOST_ENABLED=true
+BOOST_BROWSER_LOGS_WATCHER=false  # Disabled (causes performance issues)
+```
+
+**2. Production**
+
+```env
+APP_ENV=production
+BOOST_ENABLED=false  # MANDATORY in production
+```
+
+**NEVER** leave Laravel Boost active in production. It exposes sensitive information.
+
+### Quick Diagnosis
+
+If experiencing slowness or 502 errors:
+
+```bash
+# Stop Boost processes
+pkill -f "boost:mcp"
+
+# Clear cache
+php artisan optimize:clear
+
+# Restart services
+herd restart  # or your web server
+```
+
+📖 **Full documentation**: [Laravel Boost - Performance and Security Issues](https://wiki.castris.com/books/laravel/page/laravel-boost-problemas-de-rendimiento-y-seguridad)
+
+---
 
 ## 📚 Documentation
 
