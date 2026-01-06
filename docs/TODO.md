@@ -1,6 +1,6 @@
 # TODO - Larafactu Project Status
 
-**Last Update**: 2026-01-06
+**Last Update**: 2026-01-06 (evening session)
 **Current Phase**: Post-refactor Filament → DaisyUI, system adjustments
 **Deadline**: ~15 February 2026
 **Context**: Larafactu v1.0 - Staging Pre-Production
@@ -88,85 +88,33 @@
 
 **Lesson Learned**: ALWAYS use only `env()` in config files. Documented in wiki.
 
-### Current Issues
+#### 4. Browser Tests Fixed (COMPLETED - 2026-01-06)
 
-#### 1. Failing Browser Test (HIGH PRIORITY)
+**Problem**: Browser tests failing with incorrect Pest 4 syntax
 
-**Test Failing**: `Tests\Browser\AuthPagesTest > Login Page → it loads the login page successfully`
+**Root Cause**:
 
-**Error**: Timeout 5000ms waiting for text "Iniciar sesion" on login page
+- Tests used `$this->visit()` instead of global `visit()` function (Pest 4 change)
+- Tests used non-existent `waitForText()` method
+- Playwright not installed
 
-**Details**:
+**Solution Implemented**:
 
-```
-Timeout 5000ms exceeded.
-at tests/Browser/AuthPagesTest.php:24
-$this->visit(AUTH_BASE_URL.'/login')
-    ->waitForText('Iniciar sesion', PAGE_LOAD_TIMEOUT)
-    ->assertSee('Iniciar sesion');
-```
+- Fixed syntax in `AuthPagesTest.php` and `WelcomePageTest.php`
+- Installed Playwright: `npm install playwright && npx playwright install chromium`
+- Fixed flaky `SpanishB2CInvoiceTest` (added explicit `is_roi_taxed => false`)
 
 **Test Status**:
 
-- ✅ 243 tests passing
-- ❌ 1 test failing (browser test)
-- ⏸️ 19 pending tests
-- Total assertions: 557
+- ✅ **263 tests passing**
+- ✅ **586 assertions**
+- ✅ All browser tests working
 
-**Possible Causes**:
+**Commit**: `f38ed17` - Pushed to main
 
-1. Timeout too short (5000ms)
-2. Login page slow to load (possible relation with themes/preferences)
-3. Text "Iniciar sesion" changed or not visible
-4. Problem with browser testing setup (Playwright/Dusk)
+### Current Issues
 
-**Related Files**:
-
-- `tests/Browser/AuthPagesTest.php:24`
-- `resources/views/livewire/auth/login.blade.php` (probable location of text)
-
-**Next Steps**:
-
-1. Verify text "Iniciar sesion" exists in login view
-2. Increase PAGE_LOAD_TIMEOUT if needed
-3. Review browser testing configuration
-4. Run test individually for more details: `php vendor/bin/pest tests/Browser/AuthPagesTest.php --filter="Login Page"`
-
-#### 2. Git Status - Uncommitted Files
-
-**Modified**:
-
-- `.env.example` (Boost configuration)
-- `README.md` (security warnings)
-- `app/Http/Middleware/ApplyUserPreferences.php` (theme logic)
-- `database/seeders/DevelopmentSeeder.php`
-- `docs/themes/daisyui-themes.md`
-- `resources/views/components/layouts/app.blade.php` (themes)
-- `resources/views/components/layouts/guest.blade.php` (themes)
-- `resources/views/welcome.blade.php`
-
-**Added**:
-
-- `docs/logo/favicon_io.zip`
-
-**Deleted**:
-
-- `storage/framework/cache/data/.gitignore`
-
-**Untracked**:
-
-- `database/seeders/RealisticServicesSeeder.php`
-
-**Next Steps**:
-
-1. Review changes with `git diff`
-2. Prepare coherent commit with:
-   - Fix: Theme and preferences system for guest/authenticated users
-   - Fix: Laravel Boost configuration (performance + security)
-   - Fix: Config file error (app() helper)
-   - Docs: README update with security warnings
-3. Run linters before commit: `composer pint`
-4. Run complete tests: `composer test` (resolve browser test first)
+**None** - All systems operational ✅
 
 ### Current Development Phase
 
@@ -302,8 +250,8 @@ BOOST_BROWSER_LOGS_WATCHER=false
 - [x] **ADR-003**: Phase 2 - Remove customers table, unify in users ✅ 2025-12-16
 - [x] **Tests**: Complete suite passing (13/13) ✅ 2025-12-16
 - [x] **ADR-001**: Implement automatic fiscal snapshot in Invoice ✅ 2025-12-16
-- [ ] **Browser Test**: Fix failing AuthPagesTest (Iniciar sesion timeout) 🆕
-- [ ] **Commit**: Theme system + Boost fixes 🆕
+- [x] **Browser Tests**: Fixed Pest 4 syntax + Playwright installed ✅ 2026-01-06
+- [x] **Commit**: Theme system + Boost fixes + Browser tests ✅ 2026-01-06 (f38ed17)
 
 ### 🟡 High - Next 2 Weeks
 
@@ -453,7 +401,7 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
 
 ## 🧪 Testing
 
-### ✅ Passing Tests (243/244)
+### ✅ Passing Tests (263/263)
 
 - [x] AdminAccessTest (8/8)
 - [x] SpanishB2CInvoiceTest (5/5) - Updated for ADR-001 + ADR-003
@@ -462,8 +410,9 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
   - [x] Validates Spanish DNI format
   - [x] **Generates encrypted fiscal snapshots on creation (ADR-001)** ✅ 2025-12-16
   - [x] **Creates fiscal snapshots with temporal validity (ADR-001)** ✅ 2025-12-16
-- [ ] AuthPagesTest (0/1) - **FAILING** 🆕 2026-01-06
-  - [ ] Login page timeout waiting for "Iniciar sesion" text
+- [x] AuthPagesTest (11/11) - **FIXED** ✅ 2026-01-06
+  - [x] All browser tests passing with Pest 4 syntax
+- [x] WelcomePageTest (9/9) - **FIXED** ✅ 2026-01-06
 
 ### 🚧 Pending Tests
 
@@ -485,7 +434,7 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
 ### Current Status
 
 - **Version**: dev-main
-- **Tests**: Passing in larafactu (243/244) - 1 browser test failing 🆕
+- **Tests**: Passing in larafactu (263/263) ✅
 - **ADR-003**: Phase 1 + Phase 2 completed
 - **ADR-001**: Automatic fiscal snapshot implemented
 
@@ -578,7 +527,7 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
 2. ~~**Fiscal snapshot**~~: ✅ Implemented - immutable and encrypted (AES-256-CBC)
 3. **Tests**: Temporal edge case coverage critical
 4. **Performance**: Validate with 100k+ invoices
-5. **Browser Tests**: Current timeout issue with Playwright/Dusk 🆕
+5. ~~**Browser Tests**~~: ✅ Fixed - Pest 4 syntax + Playwright working
 
 ### References
 
