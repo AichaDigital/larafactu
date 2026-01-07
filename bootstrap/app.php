@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\ApplyUserPreferences;
 use App\Http\Middleware\BlockAdminDuringImpersonation;
+use App\Http\Middleware\EnsureInstallerRemoved;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            EnsureInstallerRemoved::class,
             ApplyUserPreferences::class,
         ]);
 

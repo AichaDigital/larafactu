@@ -1,0 +1,193 @@
+/* 
+ * Larafactu Installer Styles
+ * 
+ * Minimal custom styles - most styling done with Tailwind via CDN
+ * This file provides fallbacks and custom animations
+ */
+
+/* Custom font import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Base styles */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(147, 51, 234, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(147, 51, 234, 0.7);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Step transition */
+.step-enter {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.step-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.step-leave {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.step-leave-active {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Form elements */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: rgb(147, 51, 234);
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+}
+
+/* Checkbox custom style */
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+    background: rgb(147, 51, 234);
+    border-color: rgb(147, 51, 234);
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+input[type="checkbox"]:focus {
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+}
+
+/* Radio button custom style */
+input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+input[type="radio"]:checked {
+    border-color: rgb(147, 51, 234);
+    background: rgb(147, 51, 234);
+    box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Button hover effects */
+button {
+    transition: all 0.2s ease;
+}
+
+button:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+    transform: translateY(0);
+}
+
+/* Loading spinner */
+.spinner {
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: rgb(147, 51, 234);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Status indicators */
+.status-ok {
+    color: rgb(34, 197, 94);
+}
+
+.status-error {
+    color: rgb(239, 68, 68);
+}
+
+.status-warning {
+    color: rgb(234, 179, 8);
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+    .hide-mobile {
+        display: none;
+    }
+}
+

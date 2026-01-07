@@ -193,10 +193,49 @@ We are in post-refactor phase after:
 
 1. ~~**URGENT**: Resolve failing browser test~~ ✅ 2026-01-06
 2. ~~**HIGH**: Commit completed changes (theme system + boost fixes)~~ ✅ 2026-01-06
-3. **MEDIUM**: Review and update ADR-004 (authorization should be in app, not packages)
-4. **MEDIUM**: Continue UI migration from Filament to DaisyUI
-5. **HIGH**: Remove Filament dependencies from composer.json
-6. **LOW**: Create tag `v0.6.0-alpha` for larabill
+3. ~~**HIGH**: Web installation wizard~~ ✅ 2026-01-07 (AID-39)
+4. **MEDIUM**: Review and update ADR-004 (authorization should be in app, not packages)
+5. **MEDIUM**: Continue UI migration from Filament to DaisyUI
+6. **HIGH**: Remove Filament dependencies from composer.json
+7. **LOW**: Create tag `v0.6.0-alpha` for larabill
+8. **LOW**: Deprecate CLI installer (AID-41) - Due: 2026-01-15
+
+#### 7. Web Installation Wizard (COMPLETED - 2026-01-07)
+
+**Problem**: CLI installer (`php artisan larafactu:install`) requires SSH access, not suitable for shared hosting
+
+**Solution Implemented** (AID-39):
+
+- Framework-less web wizard (PHP puro + Alpine.js)
+- Runs BEFORE Laravel is fully installed
+- Multi-language support (ES/EN)
+- Security: token-based access, IP locking, rate limiting, session timeout
+- Complete installation flow: Requirements → APP_KEY → Database → Migrations → Company → Verifactu → Admin → Finalize
+
+**Structure**:
+
+```
+installer/
+├── public/           # Entry points (index.php, api.php)
+├── src/              # PHP classes (Actions, Security, Steps, Validators, I18n)
+├── templates/        # PHP views
+├── storage/          # Temporary state
+└── docker/           # Isolated testing environment
+```
+
+**Post-Installation Security**:
+
+- `EnsureInstallerRemoved` middleware
+- 24-hour grace period to delete installer/
+- Auto-blocking after grace period
+
+**Files Created**: 60+ files in `installer/` directory
+
+**Linear Issues**:
+- AID-39: Web wizard (completed)
+- AID-41: CLI deprecation (created)
+
+**Documentation**: `docs/wizard/TODO_WIZARD.md`, `docs/wizard/ADR-WZ-001_ARCHITECTURE.md`
 
 ### Important Technical Notes
 
@@ -337,6 +376,8 @@ BOOST_BROWSER_LOGS_WATCHER=false
 - [ ] **Seeding**: Create production seeders
 - [x] **Tests ADR-004**: Tests de autorización completos ✅ 2026-01-07 (56 tests)
 - [ ] **Admin Panel**: CRUD usuarios con user_type
+- [ ] **AID-39**: Web Installation Wizard (ver [docs/wizard/](./wizard/))
+- [ ] **AID-40**: Deprecate CLI installer (deadline: 15/01/2026)
 
 ---
 
@@ -604,6 +645,9 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
 - DaisyUI Themes: `docs/themes/daisyui-themes.md` 🆕
 - Nexus Template: `docs/themes/nexus/` 🆕
 - BookStack Wiki: <https://wiki.castris.com> 🆕
+- **Installation Wizard**: `docs/wizard/` 🆕
+  - [TODO_WIZARD.md](./wizard/TODO_WIZARD.md)
+  - [ADR-WZ-001](./wizard/ADR-WZ-001_ARCHITECTURE.md)
 
 ---
 

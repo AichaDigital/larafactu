@@ -383,8 +383,17 @@ herd restart  # o tu servidor web
 
 ## 📚 Documentación
 
+### Instalación
+- [docs/PRODUCTION_WEB_INSTALL.md](docs/PRODUCTION_WEB_INSTALL.md) - **Guía de instalación web (producción)** ⭐
+- [docs/DEVELOPMENT_WIZARD_TESTING.md](docs/DEVELOPMENT_WIZARD_TESTING.md) - Testing del wizard de instalación (desarrollo)
+
+### Configuración
 - [STAGING_SETUP.md](STAGING_SETUP.md) - Configuración completa de staging/pre-producción
 - [docs/DEVELOPMENT_COMMANDS.md](docs/DEVELOPMENT_COMMANDS.md) - Comandos útiles de desarrollo
+
+### Wizard de Instalación
+- [docs/wizard/TODO_WIZARD.md](docs/wizard/TODO_WIZARD.md) - Roadmap del wizard
+- [docs/wizard/ADR-WZ-001_ARCHITECTURE.md](docs/wizard/ADR-WZ-001_ARCHITECTURE.md) - Arquitectura del wizard (sin framework)
 
 ## 🧪 Testing
 
@@ -589,8 +598,17 @@ herd restart  # or your web server
 
 ## 📚 Documentation
 
+### Installation
+- [docs/PRODUCTION_WEB_INSTALL.md](docs/PRODUCTION_WEB_INSTALL.md) - **Web installation guide (production)** ⭐
+- [docs/DEVELOPMENT_WIZARD_TESTING.md](docs/DEVELOPMENT_WIZARD_TESTING.md) - Installation wizard testing (development)
+
+### Configuration
 - [STAGING_SETUP.md](STAGING_SETUP.md) - Complete staging/pre-production setup
 - [docs/DEVELOPMENT_COMMANDS.md](docs/DEVELOPMENT_COMMANDS.md) - Useful development commands
+
+### Installation Wizard
+- [docs/wizard/TODO_WIZARD.md](docs/wizard/TODO_WIZARD.md) - Wizard roadmap
+- [docs/wizard/ADR-WZ-001_ARCHITECTURE.md](docs/wizard/ADR-WZ-001_ARCHITECTURE.md) - Wizard architecture (framework-less)
 
 ## 🧪 Testing
 

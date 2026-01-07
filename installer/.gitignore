@@ -1,0 +1,25 @@
+# Installation state (generated during installation)
+storage/install_state.json
+storage/install_session.json
+storage/failed_attempts.log
+
+# Security token (auto-generated)
+.token
+
+# Installation marker
+.done
+
+# Vendor (if using composer for tests)
+vendor/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+docker/mysql-data/
+
