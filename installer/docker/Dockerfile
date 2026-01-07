@@ -16,7 +16,9 @@ RUN apk add --no-cache \
     mysql-client \
     oniguruma-dev \
     libxml2-dev \
-    icu-dev
+    icu-dev \
+    linux-headers \
+    $PHPIZE_DEPS
 
 # Install PHP extensions required by Laravel/Larafactu
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -31,7 +33,17 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         zip \
         xml \
         intl \
-        opcache
+        opcache \
+        ctype \
+        fileinfo \
+        tokenizer
+
+# Install Redis extension (optional but recommended)
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Enable opcache
+RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+    && echo "opcache.enable_cli=1" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
