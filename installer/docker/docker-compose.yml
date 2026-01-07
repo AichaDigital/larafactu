@@ -10,8 +10,6 @@
 #   docker-compose exec php-fpm php vendor/bin/phpunit
 #   docker-compose down -v
 
-version: '3.8'
-
 services:
   # PHP-FPM for installer
   php-fpm:
