@@ -19,9 +19,8 @@ uses(RefreshDatabase::class);
 */
 
 beforeEach(function () {
-    // Create admin user
-    $this->admin = User::factory()->create(['email' => 'admin@testdomain.com']);
-    config(['app.admin_domains' => 'testdomain.com']);
+    // ADR-004: Create admin user using staff() factory state
+    $this->admin = User::factory()->staff()->create();
 
     // Create regular user
     $this->regularUser = User::factory()->create(['email' => 'user@example.com']);

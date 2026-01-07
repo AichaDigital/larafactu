@@ -84,11 +84,7 @@
                             <tr wire:key="customer-{{ $customer->id }}">
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <div class="avatar placeholder">
-                                            <div class="bg-neutral text-neutral-content w-10 rounded-full">
-                                                <span class="text-sm">{{ strtoupper(substr($customer->name, 0, 2)) }}</span>
-                                            </div>
-                                        </div>
+                                        <x-avatar :user="$customer" size="md" />
                                         <div>
                                             <div class="font-medium">{{ $customer->name }}</div>
                                             <div class="text-sm text-base-content/60">{{ $customer->email }}</div>

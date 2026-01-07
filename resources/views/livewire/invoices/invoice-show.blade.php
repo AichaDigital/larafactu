@@ -34,11 +34,7 @@
                 <h2 class="font-semibold text-lg mb-4">Datos del Cliente</h2>
                 @if($invoice->billableUser)
                     <div class="flex items-start gap-4">
-                        <div class="avatar placeholder">
-                            <div class="bg-neutral text-neutral-content w-12 rounded-full">
-                                <span>{{ strtoupper(substr($invoice->billableUser->name, 0, 2)) }}</span>
-                            </div>
-                        </div>
+                        <x-avatar :user="$invoice->billableUser" size="lg" />
                         <div class="flex-1">
                             <p class="font-medium">{{ $customerProfile?->fiscal_name ?? $invoice->billableUser->name }}</p>
                             <p class="text-sm text-base-content/60">{{ $invoice->billableUser->email }}</p>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Profile;
 
 use App\Models\UserPreference;
+use App\Services\AvatarService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -12,15 +13,21 @@ use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('components.layouts.app')]
 #[Title('Mi Perfil')]
 class ProfileEdit extends Component
 {
+    use WithFileUploads;
+
     // Personal info
     public string $name = '';
 
     public string $email = '';
+
+    // Avatar
+    public $avatarFile = null;
 
     // Password change
     public string $currentPassword = '';
@@ -96,6 +103,32 @@ class ProfileEdit extends Component
         $this->reset(['currentPassword', 'newPassword', 'newPasswordConfirmation']);
 
         session()->flash('password-success', 'Contrasena actualizada correctamente.');
+    }
+
+    public function uploadAvatar(): void
+    {
+        $this->validate([
+            'avatarFile' => 'required|image|max:2048', // 2MB max
+        ], [
+            'avatarFile.required' => 'Selecciona una imagen.',
+            'avatarFile.image' => 'El archivo debe ser una imagen.',
+            'avatarFile.max' => 'La imagen no puede superar 2MB.',
+        ]);
+
+        $avatarService = app(AvatarService::class);
+        $avatarService->uploadAvatar(Auth::user(), $this->avatarFile);
+
+        $this->reset('avatarFile');
+
+        session()->flash('avatar-success', 'Avatar actualizado correctamente.');
+    }
+
+    public function deleteAvatar(): void
+    {
+        $avatarService = app(AvatarService::class);
+        $avatarService->deleteAvatar(Auth::user());
+
+        session()->flash('avatar-success', 'Avatar eliminado. Se usara el avatar por defecto.');
     }
 
     public function updatePreferences(): void

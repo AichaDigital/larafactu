@@ -1,3 +1,8 @@
+@php
+use AichaDigital\Larabill\Enums\InvoiceSerieType;
+use AichaDigital\Larabill\Enums\InvoiceStatus;
+@endphp
+
 <div>
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -115,11 +120,7 @@
                                 <td>
                                     @if($invoice->billableUser)
                                         <div class="flex items-center gap-2">
-                                            <div class="avatar placeholder">
-                                                <div class="bg-neutral text-neutral-content w-8 rounded-full">
-                                                    <span class="text-xs">{{ strtoupper(substr($invoice->billableUser->name, 0, 2)) }}</span>
-                                                </div>
-                                            </div>
+                                            <x-avatar :user="$invoice->billableUser" size="sm" />
                                             <div>
                                                 <div class="font-medium text-sm">{{ $invoice->billableUser->name }}</div>
                                             </div>
@@ -131,37 +132,44 @@
                                 <td>
                                     @php
                                         $serieLabel = match($invoice->serie) {
-                                            0 => 'Proforma',
-                                            1 => 'Factura',
-                                            2 => 'Simplificada',
-                                            3 => 'Rectificativa',
+                                            InvoiceSerieType::PROFORMA      => 'Proforma',
+                                            InvoiceSerieType::INVOICE       => 'Factura',
+                                            InvoiceSerieType::SIMPLIFIED    => 'Simplificada',
+                                            InvoiceSerieType::RECTIFICATIVE => 'Rectificativa',
                                             default => 'Desconocido',
                                         };
+                                        $serieColor = match($invoice->serie) {
+                                            InvoiceSerieType::PROFORMA      => 'text-base-content/60',
+                                            InvoiceSerieType::INVOICE       => 'text-primary font-medium',
+                                            InvoiceSerieType::SIMPLIFIED    => 'text-secondary',
+                                            InvoiceSerieType::RECTIFICATIVE => 'text-warning',
+                                            default => 'text-base-content/40',
+                                        };
                                     @endphp
-                                    <span class="badge badge-outline badge-sm">
+                                    <span class="text-sm {{ $serieColor }}">
                                         {{ $serieLabel }}
                                     </span>
                                 </td>
                                 <td>
                                     @php
                                         $statusLabel = match($invoice->status) {
-                                            0 => 'Borrador',
-                                            1 => 'Enviada',
-                                            2 => 'Pagada',
-                                            3 => 'Vencida',
-                                            4 => 'Anulada',
-                                            5 => 'Pendiente',
-                                            6 => 'Convertida',
+                                            InvoiceStatus::DRAFT     => 'Borrador',
+                                            InvoiceStatus::SENT      => 'Enviada',
+                                            InvoiceStatus::PAID      => 'Pagada',
+                                            InvoiceStatus::OVERDUE   => 'Vencida',
+                                            InvoiceStatus::CANCELLED => 'Anulada',
+                                            InvoiceStatus::PENDING   => 'Pendiente',
+                                            InvoiceStatus::CONVERTED => 'Convertida',
                                             default => 'Desconocido',
                                         };
                                         $statusColor = match($invoice->status) {
-                                            0 => 'badge-ghost',      // DRAFT
-                                            1 => 'badge-info',       // SENT
-                                            2 => 'badge-success',    // PAID
-                                            3 => 'badge-error',      // OVERDUE
-                                            4 => 'badge-neutral',    // CANCELLED
-                                            5 => 'badge-warning',    // PENDING
-                                            6 => 'badge-secondary',  // CONVERTED
+                                            InvoiceStatus::DRAFT     => 'badge-ghost',
+                                            InvoiceStatus::SENT      => 'badge-info',
+                                            InvoiceStatus::PAID      => 'badge-success',
+                                            InvoiceStatus::OVERDUE   => 'badge-error',
+                                            InvoiceStatus::CANCELLED => 'badge-neutral',
+                                            InvoiceStatus::PENDING   => 'badge-warning',
+                                            InvoiceStatus::CONVERTED => 'badge-secondary',
                                             default => 'badge-ghost',
                                         };
                                     @endphp
@@ -186,7 +194,7 @@
                                                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
                                             </svg>
                                         </a>
-                                        @if($invoice->status === 0)
+                                        @if($invoice->status === InvoiceStatus::DRAFT)
                                             <a
                                                 href="{{ route('invoices.edit', $invoice) }}"
                                                 class="btn btn-ghost btn-sm btn-square"

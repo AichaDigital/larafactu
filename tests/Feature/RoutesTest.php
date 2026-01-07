@@ -139,8 +139,8 @@ describe('Admin Routes', function () {
     });
 
     it('allows admin access to admin dashboard', function () {
-        config(['app.admin_emails' => 'admin@test.com']);
-        $admin = User::factory()->create(['email' => 'admin@test.com']);
+        // ADR-004: Use staff() factory state
+        $admin = User::factory()->staff()->create();
         $this->actingAs($admin);
 
         $response = $this->get('/admin');
@@ -150,8 +150,8 @@ describe('Admin Routes', function () {
     });
 
     it('loads admin users page for admin', function () {
-        config(['app.admin_emails' => 'admin@test.com']);
-        $admin = User::factory()->create(['email' => 'admin@test.com']);
+        // ADR-004: Use staff() factory state
+        $admin = User::factory()->staff()->create();
         $this->actingAs($admin);
 
         $response = $this->get('/admin/users');

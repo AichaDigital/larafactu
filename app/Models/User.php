@@ -6,6 +6,7 @@ use AichaDigital\Larabill\Concerns\HasUuid;
 use AichaDigital\Larabill\Enums\UserRelationshipType;
 use AichaDigital\Larabill\Models\LegalEntityType;
 use AichaDigital\Larabill\Models\UserTaxProfile;
+use App\Enums\UserType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,11 +28,17 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar_path',
         'parent_user_id',
-        'relationship_type',
+        'relationship_type', // DEPRECATED by ADR-004, use user_type
         'display_name',
         'legal_entity_type_code',
         'current_tax_profile_id',
+        // ADR-004: Authorization fields
+        'user_type',
+        'is_active',
+        'suspended_at',
+        'is_superadmin',
     ];
 
     /**
@@ -54,7 +61,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'relationship_type' => UserRelationshipType::class,
+            'relationship_type' => UserRelationshipType::class, // DEPRECATED by ADR-004
+            // ADR-004: Authorization casts
+            'user_type' => UserType::class,
+            'is_active' => 'boolean',
+            'suspended_at' => 'datetime',
+            'is_superadmin' => 'boolean',
         ];
     }
 
@@ -394,15 +406,110 @@ class User extends Authenticatable
     }
 
     // ========================================
-    // ADMIN ACCESS CONTROL
+    // ADR-004: USER TYPE HELPERS
     // ========================================
 
     /**
+     * Check if user is staff type.
+     */
+    public function isStaff(): bool
+    {
+        return $this->user_type === UserType::STAFF;
+    }
+
+    /**
+     * Check if user is customer type.
+     */
+    public function isCustomer(): bool
+    {
+        return $this->user_type === UserType::CUSTOMER;
+    }
+
+    /**
+     * Check if user is delegate type.
+     */
+    public function isDelegate(): bool
+    {
+        return $this->user_type === UserType::DELEGATE;
+    }
+
+    /**
+     * Check if user is superadmin.
+     */
+    public function isSuperadmin(): bool
+    {
+        return $this->is_superadmin === true;
+    }
+
+    /**
+     * Check if user account is active and not suspended.
+     */
+    public function isAccountActive(): bool
+    {
+        return $this->is_active && $this->suspended_at === null;
+    }
+
+    /**
+     * Suspend user account.
+     */
+    public function suspend(): void
+    {
+        $this->update([
+            'is_active' => false,
+            'suspended_at' => now(),
+        ]);
+    }
+
+    /**
+     * Reactivate suspended user account.
+     */
+    public function reactivate(): void
+    {
+        $this->update([
+            'is_active' => true,
+            'suspended_at' => null,
+        ]);
+    }
+
+    // ========================================
+    // ADMIN ACCESS CONTROL (ADR-004 Refactored)
+    // ========================================
+
+    /**
+     * Check if user can access admin panel.
+     *
+     * ADR-004: Based on user_type (STAFF) or is_superadmin flag.
+     * Legacy email/domain check kept as fallback for transition period.
+     */
+    public function canAccessAdmin(): bool
+    {
+        // Superadmin always has access
+        if ($this->isSuperadmin()) {
+            return true;
+        }
+
+        // Staff users can access admin
+        if ($this->isStaff()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Check if user is allowed to access admin area.
+     *
+     * @deprecated Use canAccessAdmin() instead. Will be removed in v2.0.
      */
     public function isAdmin(): bool
     {
-        // Get allowed emails (comma-separated)
+        // ADR-004: Delegate to new method
+        if ($this->canAccessAdmin()) {
+            return true;
+        }
+
+        // Legacy fallback: email/domain check during transition
+        // TODO: Remove after full ADR-004 implementation
         $allowedEmails = config('app.admin_emails', '');
         if (! empty($allowedEmails)) {
             $emailList = array_map('trim', explode(',', $allowedEmails));
@@ -411,10 +518,8 @@ class User extends Authenticatable
             }
         }
 
-        // Get allowed domains (comma-separated)
         $allowedDomains = config('app.admin_domains', '');
         if (! empty($allowedDomains)) {
-            // Normalize domains: remove @ prefix if present
             $domainList = array_map(function ($domain) {
                 $domain = trim($domain);
 

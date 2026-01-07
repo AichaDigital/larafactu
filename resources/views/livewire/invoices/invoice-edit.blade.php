@@ -32,11 +32,7 @@
                     @if($selectedCustomer)
                         <div class="flex items-center justify-between p-4 bg-base-200 rounded-lg">
                             <div class="flex items-center gap-3">
-                                <div class="avatar placeholder">
-                                    <div class="bg-neutral text-neutral-content w-10 rounded-full">
-                                        <span class="text-sm">{{ strtoupper(substr($selectedCustomer->name, 0, 2)) }}</span>
-                                    </div>
-                                </div>
+                                <x-avatar :user="$selectedCustomer" size="md" />
                                 <div>
                                     <p class="font-medium">{{ $selectedCustomer->name }}</p>
                                     <p class="text-sm text-base-content/60">{{ $selectedCustomer->email }}</p>
@@ -75,11 +71,7 @@
                                                 wire:click="selectCustomer('{{ $customer['id'] }}')"
                                                 class="flex items-center gap-3"
                                             >
-                                                <div class="avatar placeholder">
-                                                    <div class="bg-neutral text-neutral-content w-8 rounded-full">
-                                                        <span class="text-xs">{{ strtoupper(substr($customer['name'], 0, 2)) }}</span>
-                                                    </div>
-                                                </div>
+                                                <x-avatar :email="$customer['email']" size="sm" />
                                                 <div class="text-left">
                                                     <p class="font-medium">{{ $customer['name'] }}</p>
                                                     <p class="text-xs text-base-content/60">{{ $customer['email'] }}</p>

@@ -1,10 +1,29 @@
 # ADR-003: Unificación Users/Customers
 
-> **Estado**: ✅ COMPLETADO (Fase 1 ✅ | Fase 2 ✅)
+> **Estado**: ✅ COMPLETADO (Fase 1 ✅ | Fase 2 ✅) - PARCIALMENTE SUPERSEDED por ADR-004
 > **Fecha**: 2025-12-08
-> **Actualizado**: 2025-12-19
+> **Actualizado**: 2026-01-07
 > **Deadline**: ~15 febrero 2026
 > **Ubicación canónica**: `packages/aichadigital/larabill/docs/ADR-003-user-customer-unification.md`
+
+---
+
+## ⚠️ DEPRECATION NOTICE (ADR-004)
+
+**Los siguientes elementos de este ADR quedan DEPRECATED por ADR-004:**
+
+| Elemento | Estado | Reemplazo (ADR-004) |
+|----------|--------|---------------------|
+| `relationship_type` enum | ⚠️ DEPRECATED | `user_type` (STAFF/CUSTOMER/DELEGATE) |
+| `UserRelationshipType` (DIRECT/DELEGATED) | ⚠️ DEPRECATED | `UserType` enum en app |
+| Lógica DIRECT/DELEGATED | ⚠️ DEPRECATED | user_type + parent_user_id |
+
+**Elementos que PERMANECEN VIGENTES:**
+
+- ✅ `parent_user_id` (self-reference para delegados)
+- ✅ `user_tax_profiles` con `owner_user_id`
+- ✅ `billable_user_id` en invoices
+- ✅ Arquitectura de perfiles fiscales compartidos
 
 ---
 
@@ -104,13 +123,25 @@ Este documento referencia el ADR-003 ubicado en el paquete larabill, que define 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### PHP Enum: UserRelationshipType
+### PHP Enum: UserRelationshipType (⚠️ DEPRECATED)
+
+> **DEPRECATED**: Este enum queda deprecado por ADR-004. Usar `App\Enums\UserType` en su lugar.
+> El enum permanece en larabill por compatibilidad pero NO debe usarse en código nuevo.
 
 ```php
+// ⚠️ DEPRECATED - NO USAR
 enum UserRelationshipType: int implements HasLabel, HasColor, HasIcon
 {
     case DIRECT = 0;      // Cliente directo de la Empresa
     case DELEGATED = 1;   // Cliente de un User (facturación delegada)
+}
+
+// ✅ USAR ESTO (ADR-004)
+enum UserType: int  // En App\Enums
+{
+    case STAFF = 0;      // Empleado de la empresa
+    case CUSTOMER = 1;   // Cliente directo
+    case DELEGATE = 2;   // Delegado de un cliente
 }
 ```
 

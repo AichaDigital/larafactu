@@ -19,9 +19,8 @@ uses(RefreshDatabase::class);
 */
 
 beforeEach(function () {
-    // Create user with admin domain for full access
-    $this->user = User::factory()->create(['email' => 'user@testdomain.com']);
-    config(['app.admin_domains' => 'testdomain.com']);
+    // ADR-004: Create user with staff type for full access
+    $this->user = User::factory()->staff()->create();
 
     // Create a customer user
     $this->customer = User::factory()->create(['name' => 'Test Customer']);

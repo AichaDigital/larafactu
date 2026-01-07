@@ -31,9 +31,8 @@ beforeEach(function () {
     $this->delegate = User::factory()->create(['name' => 'Delegate']);
     $this->otherUser = User::factory()->create(['name' => 'Other User']);
 
-    // Admin user (via config)
-    $this->admin = User::factory()->create(['email' => 'admin@testdomain.com']);
-    config(['app.admin_domains' => 'testdomain.com']);
+    // ADR-004: Admin user using staff() factory state
+    $this->admin = User::factory()->staff()->create();
 });
 
 describe('UserCustomerAccessPolicy viewAny', function () {

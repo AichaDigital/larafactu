@@ -1,13 +1,13 @@
 # TODO - Larafactu Project Status
 
-**Last Update**: 2026-01-06 (evening session)
+**Last Update**: 2026-01-07
 **Current Phase**: Post-refactor Filament → DaisyUI, system adjustments
 **Deadline**: ~15 February 2026
 **Context**: Larafactu v1.0 - Staging Pre-Production
 
 ---
 
-## 🔥 OPERATIONAL STATUS - IMMEDIATE (2026-01-06)
+## 🔥 OPERATIONAL STATUS - IMMEDIATE (2026-01-07)
 
 ### Recently Completed Work
 
@@ -112,6 +112,68 @@
 
 **Commit**: `f38ed17` - Pushed to main
 
+#### 5. Avatar System Refactored (COMPLETED - 2026-01-07)
+
+**Problem**: Previous avatar system (`murtaza1904/avatar-generator`) generated letters/initials
+
+**Requirements** (Linear AID-38):
+
+- NO letras, usar iconos/formas geométricas
+- Soporte Gravatar (si existe)
+- Avatar personalizado (upload)
+- Storage local
+
+**Solution Implemented**:
+
+- Removed `murtaza1904/avatar-generator`
+- Installed `intervention/image:^3.11`
+- Created `AvatarService` with priority: Custom > Gravatar > Generated SVG
+- SVG generation with geometric patterns (circles, squares, triangles, lines)
+- Created `<x-avatar>` Blade component with sizes (xs, sm, md, lg, xl, 2xl, 3xl)
+- Added avatar upload/delete in profile page
+- Migration: `avatar_path` column in users table
+
+**Files Created/Modified**:
+
+- `app/Services/AvatarService.php` (new)
+- `app/Http/Controllers/AvatarController.php` (new)
+- `resources/views/components/avatar.blade.php` (new)
+- `database/migrations/..._add_avatar_path_to_users_table.php` (new)
+- `app/Livewire/Profile/ProfileEdit.php` (upload)
+- 10+ views updated to use new component
+
+**Linear**: AID-38 ✅ Done
+
+#### 6. ADR-004 Authorization System (COMPLETED - 2026-01-07)
+
+**Problem**: No user type differentiation, no granular permissions, isAdmin() based on email/domain
+
+**Solution Implemented**:
+
+- Migration: `user_type`, `is_active`, `suspended_at`, `is_superadmin` columns in users
+- User model: UserType cast, helper methods (isStaff, isCustomer, isDelegate, isSuperadmin)
+- Account status: isAccountActive(), suspend(), reactivate()
+- canAccessAdmin() replaces email-based isAdmin() (legacy kept as fallback)
+- UserPolicy: 11 authorization methods (viewAny, view, create, update, suspend, delete, impersonate...)
+- Gates: access-admin, impersonate-users, manage-delegates, view-invoices
+- UserFactory states: staff(), customer(), delegate(), superadmin(), inactive(), suspended()
+- Middleware EnsureUserIsAdmin updated to use canAccessAdmin()
+- 56 new tests (UserTypeAuthorizationTest + UserPolicyTest)
+
+**Files Created/Modified**:
+
+- `database/migrations/..._add_authorization_fields_to_users_table.php` (new)
+- `app/Models/User.php` (+60 lines)
+- `app/Policies/UserPolicy.php` (new - 254 lines)
+- `app/Providers/AppServiceProvider.php` (+40 lines Gates)
+- `app/Http/Middleware/EnsureUserIsAdmin.php` (updated)
+- `database/factories/UserFactory.php` (+50 lines states)
+- `tests/Feature/UserTypeAuthorizationTest.php` (new - 22 tests)
+- `tests/Feature/UserPolicyTest.php` (new - 34 tests)
+- 8+ test files updated to use staff() factory
+
+**Test Status**: 319 tests passing ✅
+
 ### Current Issues
 
 **None** - All systems operational ✅
@@ -129,11 +191,12 @@ We are in post-refactor phase after:
 
 **Next Priority Tasks**:
 
-1. **URGENT**: Resolve failing browser test
-2. **HIGH**: Commit completed changes (theme system + boost fixes)
+1. ~~**URGENT**: Resolve failing browser test~~ ✅ 2026-01-06
+2. ~~**HIGH**: Commit completed changes (theme system + boost fixes)~~ ✅ 2026-01-06
 3. **MEDIUM**: Review and update ADR-004 (authorization should be in app, not packages)
 4. **MEDIUM**: Continue UI migration from Filament to DaisyUI
-5. **LOW**: Remove Filament dependencies from composer.json
+5. **HIGH**: Remove Filament dependencies from composer.json
+6. **LOW**: Create tag `v0.6.0-alpha` for larabill
 
 ### Important Technical Notes
 
@@ -259,20 +322,21 @@ BOOST_BROWSER_LOGS_WATCHER=false
 - [x] **Tests**: Create tests for fiscal temporality ✅ 2025-12-16
 - [x] **ADR-001**: FiscalIntegrityChecker to detect duplicate configs ✅ 2025-12-18
 - [x] **Docs**: Update ADR-003 with Phase 2 completed ✅ 2025-12-19
-- [ ] **ADR-005**: Continue Filament → DaisyUI migration 🆕
-- [ ] **ADR-004**: Review authorization (should be in app, not packages) 🆕
+- [x] **Avatar System**: Refactored to geometric icons (AID-38) ✅ 2026-01-07
+- [x] **Cleanup**: Remove Filament dependencies ✅ 2026-01-07 (ya no estaban)
+- [x] **ADR-004**: Análisis y aprobación ✅ 2026-01-07
+- [x] **ADR-004 Fase 3**: Migración user_type + columnas users ✅ 2026-01-07
+- [x] **ADR-004 Fase 4**: UserPolicy + Gates completos ✅ 2026-01-07
+- [ ] **ADR-004 Fase 5**: api_credentials para integraciones (APLAZADA)
 
 ### 🟢 Medium - Next Month
 
 - [x] **ADR-001**: Implement proforma management with fiscal change ✅ 2025-12-18
-- [x] **Filament**: UserResource with delegate management ✅ 2025-12-18
-  - [x] Form with relationship_type, parent_user_id
-  - [x] DelegatedUsersRelationManager
-  - [x] TaxProfilesRelationManager
-  - [x] Complete ES/EN translations
+- [x] **Filament**: UserResource with delegate management ✅ 2025-12-18 (DEPRECATED - ahora Livewire)
 - [ ] **Docs**: Update API documentation
 - [ ] **Seeding**: Create production seeders
-- [ ] **Cleanup**: Remove Filament dependencies from composer.json 🆕
+- [x] **Tests ADR-004**: Tests de autorización completos ✅ 2026-01-07 (56 tests)
+- [ ] **Admin Panel**: CRUD usuarios con user_type
 
 ---
 
@@ -544,5 +608,5 @@ packages/aichadigital/larabill-filament/src/Resources/CustomerResource/
 ---
 
 **Maintained by**: @abkrim
-**Last Review**: 2026-01-06
-**Next Review**: 2026-01-13
+**Last Review**: 2026-01-07
+**Next Review**: 2026-01-14

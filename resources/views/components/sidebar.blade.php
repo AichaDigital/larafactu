@@ -198,11 +198,7 @@
                 <div class="dropdown dropdown-top w-full">
                     <div tabindex="0" role="button" class="flex w-full items-center gap-3 rounded-lg p-2 hover:bg-base-200 transition-colors cursor-pointer">
                         {{-- Avatar --}}
-                        <div class="avatar placeholder">
-                            <div class="bg-primary/10 text-primary w-10 rounded-full">
-                                <span class="text-sm font-medium">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</span>
-                            </div>
-                        </div>
+                        <x-avatar :user="auth()->user()" size="md" />
                         {{-- Name and handle --}}
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium truncate">{{ auth()->user()->name }}</p>

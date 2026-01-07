@@ -1,11 +1,57 @@
 # ADR-004: Sistema de Autorizacion y Permisos
 
-**Estado**: PROPUESTO
+**Estado**: ✅ APROBADO - EN IMPLEMENTACIÓN
 **Fecha**: 2026-01-01
+**Actualizado**: 2026-01-07
 **Contexto**: Larafactu + Ecosistema AichaDigital
 **Deadline**: ~15 febrero 2026
 **Impacto**: CRITICO - Cambio arquitectonico en modelo de usuarios
-**Aprobado por**: Pendiente
+**Aprobado por**: @abkrim (2026-01-07)
+
+---
+
+## 📊 Estado de Implementación (2026-01-07)
+
+| Componente | Estado | Notas |
+|------------|--------|-------|
+| **Enums** | | |
+| `AccessLevel` enum | ✅ Completado | `app/Enums/AccessLevel.php` |
+| `UserType` enum | ✅ Completado | `app/Enums/UserType.php` |
+| **Tablas** | | |
+| `user_department_access` | ✅ Completado | Migración + Modelo |
+| `user_customer_access` | ✅ Completado | Migración + Modelo |
+| `api_credentials` | ⏸️ Aplazado | Para integraciones externas (Fase 5) |
+| **Columnas users** | | |
+| `current_tax_profile_id` | ✅ Completado | FK a user_tax_profiles |
+| `user_type` | ✅ Completado | STAFF/CUSTOMER/DELEGATE |
+| `is_active` | ✅ Completado | Estado de cuenta |
+| `suspended_at` | ✅ Completado | Fecha suspensión |
+| `is_superadmin` | ✅ Completado | Flag superadmin |
+| `avatar_path` | ✅ Completado | Avatar personalizado |
+| **Modelos** | | |
+| `UserDepartmentAccess` | ✅ Completado | `app/Models/` |
+| `UserCustomerAccess` | ✅ Completado | `app/Models/` |
+| Relaciones en `User` | ✅ Completado | +métodos isStaff/isCustomer/isDelegate |
+| **Policies** | | |
+| `InvoicePolicy` | ✅ Completado | |
+| `UserTaxProfilePolicy` | ✅ Completado | |
+| `UserCustomerAccessPolicy` | ✅ Completado | |
+| `ArticlePolicy` | ✅ Completado | |
+| `UserPolicy` | ✅ Completado | Nuevo - 11 métodos |
+| **Gates** | | |
+| `access-admin` | ✅ Completado | AppServiceProvider |
+| `impersonate-users` | ✅ Completado | AppServiceProvider |
+| `manage-delegates` | ✅ Completado | AppServiceProvider |
+| `view-invoices` | ✅ Completado | AppServiceProvider |
+| **Middleware** | | |
+| `EnsureUserIsAdmin` | ✅ Completado | Usa canAccessAdmin() |
+| **Tests** | | |
+| `UserTypeAuthorizationTest` | ✅ Completado | 22 tests |
+| `UserPolicyTest` | ✅ Completado | 34 tests |
+| **Deprecations** | | |
+| `relationship_type` | ⚠️ Deprecated | Reemplazado por user_type |
+| `UserRelationshipType` (larabill) | ⚠️ Deprecated | Usar UserType de app |
+| `isAdmin()` método | ⚠️ Deprecated | Usar canAccessAdmin() |
 
 ---
 
@@ -454,45 +500,52 @@ Juan cambia direccion fiscal
 
 ## Plan de Implementacion
 
-### Fase 1: Enums y Migraciones Base (Semana 1)
+### Fase 1: Enums y Migraciones Base ✅ COMPLETADA
 
-- [ ] Crear UserType enum
-- [ ] Crear AccessLevel enum
-- [ ] Migracion: Añadir campos a users (user_type, current_tax_profile_id, is_active, suspended_at, is_superadmin)
-- [ ] Migracion: Renombrar user_tax_profiles.user_id a owner_user_id
-- [ ] Tests unitarios de enums
+- [x] Crear UserType enum → `app/Enums/UserType.php`
+- [x] Crear AccessLevel enum → `app/Enums/AccessLevel.php`
+- [x] Migracion: current_tax_profile_id en users ✅
+- [x] Migracion: Renombrar user_tax_profiles.user_id a owner_user_id ✅
 
-### Fase 2: Tablas de Permisos (Semana 1-2)
+### Fase 2: Tablas de Permisos ✅ COMPLETADA
 
-- [ ] Migracion: Crear tabla departments
-- [ ] Migracion: Crear tabla user_department_access
-- [ ] Migracion: Crear tabla user_customer_access
-- [ ] Migracion: Crear tabla api_credentials
-- [ ] Seeders para departments por defecto
-- [ ] Modelos para nuevas tablas
+- [x] Tabla departments (via laratickets)
+- [x] Tabla user_department_access ✅
+- [x] Tabla user_customer_access ✅
+- [x] Modelos UserDepartmentAccess, UserCustomerAccess ✅
 
-### Fase 3: Actualizacion de Modelos (Semana 2)
+### Fase 3: Columnas users y Modelos ✅ COMPLETADA (2026-01-07)
 
-- [ ] Actualizar User model con nuevas relaciones
-- [ ] Actualizar UserTaxProfile model
-- [ ] Actualizar HasUserRelationships trait
-- [ ] Tests de relaciones
+- [x] Migración: user_type, is_active, suspended_at, is_superadmin ✅
+- [x] Actualizar User model con user_type cast y métodos ✅
+- [x] Métodos: isStaff(), isCustomer(), isDelegate(), isSuperadmin() ✅
+- [x] Métodos: isAccountActive(), suspend(), reactivate() ✅
+- [x] canAccessAdmin() como reemplazo de isAdmin() ✅
+- [x] UserFactory states: staff(), customer(), delegate(), superadmin() ✅
+- [x] Tests de user_type (22 tests) ✅
 
-### Fase 4: Gates y Policies (Semana 3)
+### Fase 4: Gates y Policies ✅ COMPLETADA (2026-01-07)
 
-- [ ] Crear UserPolicy
-- [ ] Crear InvoicePolicy
-- [ ] Crear TicketPolicy (en laratickets)
-- [ ] Crear DepartmentPolicy
-- [ ] Implementar Gate para impersonation
-- [ ] Tests de autorizacion
+- [x] InvoicePolicy ✅
+- [x] UserTaxProfilePolicy ✅
+- [x] UserCustomerAccessPolicy ✅
+- [x] ArticlePolicy ✅
+- [x] UserPolicy (11 métodos) ✅ NUEVO
+- [x] Gate access-admin ✅
+- [x] Gate impersonate-users ✅
+- [x] Gate manage-delegates ✅
+- [x] Gate view-invoices ✅
+- [x] Middleware EnsureUserIsAdmin actualizado ✅
+- [x] Tests de autorización (34 tests) ✅
 
-### Fase 5: Integracion y Validacion (Semana 3-4)
+### Fase 5: API Credentials e Integraciones ⏸️ APLAZADA
 
-- [ ] Actualizar Filament Resources
-- [ ] Tests end-to-end
-- [ ] Documentacion de API
-- [ ] Code review
+- [ ] Tabla api_credentials
+- [ ] Modelo ApiCredential
+- [ ] Middleware de autenticación API
+- [ ] Tests
+
+> **Nota**: Fase 5 aplazada para implementar cuando se necesiten integraciones externas.
 
 ---
 

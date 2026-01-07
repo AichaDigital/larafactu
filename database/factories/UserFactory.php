@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use AichaDigital\Larabill\Enums\UserRelationshipType;
+use App\Enums\UserType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -32,9 +33,14 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'parent_user_id' => null,
-            'relationship_type' => UserRelationshipType::DIRECT,
+            'relationship_type' => UserRelationshipType::DIRECT, // DEPRECATED by ADR-004
             'display_name' => null,
             'legal_entity_type_code' => null,
+            // ADR-004: Authorization defaults
+            'user_type' => UserType::CUSTOMER, // Default to customer
+            'is_active' => true,
+            'suspended_at' => null,
+            'is_superadmin' => false,
         ];
     }
 
@@ -135,6 +141,72 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    // ========================================
+    // ADR-004 USER TYPE STATES
+    // ========================================
+
+    /**
+     * Create a staff user (can access admin panel).
+     */
+    public function staff(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_type' => UserType::STAFF,
+        ]);
+    }
+
+    /**
+     * Create a customer user (default, explicit state).
+     */
+    public function customer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_type' => UserType::CUSTOMER,
+        ]);
+    }
+
+    /**
+     * Create a delegate user.
+     */
+    public function delegate(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_type' => UserType::DELEGATE,
+        ]);
+    }
+
+    /**
+     * Create a superadmin user (bypasses all authorization).
+     */
+    public function superadmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_type' => UserType::STAFF,
+            'is_superadmin' => true,
+        ]);
+    }
+
+    /**
+     * Create an inactive/disabled user.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+
+    /**
+     * Create a suspended user.
+     */
+    public function suspended(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+            'suspended_at' => now(),
         ]);
     }
 }

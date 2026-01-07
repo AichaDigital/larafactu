@@ -109,11 +109,7 @@
                             <tr class="hover:bg-base-200/50 border-base-300" wire:key="user-{{ $user->id }}">
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <div class="avatar placeholder">
-                                            <div class="bg-primary text-primary-content rounded-full w-10">
-                                                <span class="text-sm">{{ strtoupper(substr($user->name, 0, 2)) }}</span>
-                                            </div>
-                                        </div>
+                                        <x-avatar :user="$user" size="md" />
                                         <div>
                                             <div class="font-medium">{{ $user->name }}</div>
                                             @if ($user->display_name)

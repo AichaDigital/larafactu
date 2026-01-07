@@ -22,13 +22,12 @@ uses(RefreshDatabase::class);
 */
 
 beforeEach(function () {
-    // Admin user
-    $this->admin = User::factory()->create(['email' => 'admin@testdomain.com']);
-    config(['app.admin_domains' => 'testdomain.com']);
+    // ADR-004: Admin user using staff() factory state
+    $this->admin = User::factory()->staff()->create();
 
-    // Regular users
-    $this->customer = User::factory()->create(['name' => 'Customer']);
-    $this->otherAdmin = User::factory()->create(['email' => 'other@testdomain.com']);
+    // Regular users (customers by default)
+    $this->customer = User::factory()->customer()->create(['name' => 'Customer']);
+    $this->otherAdmin = User::factory()->staff()->create();
 });
 
 describe('Impersonation Gate', function () {

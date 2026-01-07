@@ -65,11 +65,7 @@
         @auth
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                    <div class="avatar placeholder">
-                        <div class="bg-primary/10 text-primary w-9 rounded-full">
-                            <span class="text-sm">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</span>
-                        </div>
-                    </div>
+                    <x-avatar :user="auth()->user()" size="sm" />
                 </div>
                 <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow border border-base-300">
                     {{-- User info header --}}

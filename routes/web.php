@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AvatarController;
 use App\Livewire\Articles\ArticleCreate;
 use App\Livewire\Articles\ArticleEdit;
 use App\Livewire\Articles\ArticleList;
@@ -26,6 +27,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Avatar generation (public, cached)
+Route::get('/avatar', [AvatarController::class, 'generate'])->name('avatar.generate');
 
 /*
 |--------------------------------------------------------------------------

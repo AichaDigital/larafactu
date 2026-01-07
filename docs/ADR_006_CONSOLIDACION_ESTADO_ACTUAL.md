@@ -2,6 +2,7 @@
 
 **Estado**: VIGENTE
 **Fecha**: 2026-01-02
+**Actualizado**: 2026-01-07
 **Contexto**: Larafactu - Consolidacion post-refactor
 **Objetivo**: Documento unico de referencia para el estado real del proyecto
 
@@ -17,11 +18,11 @@ Este ADR consolida el estado real del proyecto tras los refactors de ADR-001 a A
 
 | ADR | Titulo | Estado | Notas |
 |-----|--------|--------|-------|
-| ADR-001 | CompanyFiscalConfig | COMPLETADO | Modelo funcionando |
-| ADR-002 | UUID v7 | COMPLETADO | Implementado en todo el sistema |
-| ADR-003 | Users/Customers Unification | COMPLETADO | Diagrama desactualizado (user_id -> owner_user_id) |
-| ADR-004 | Authorization | PARCIAL | Enums, Policies y tablas base creadas. Faltan funcionalidades |
-| ADR-005 | Filament Deprecation | COMPLETADO | Stack DaisyUI funcionando |
+| ADR-001 | CompanyFiscalConfig | ✅ COMPLETADO | Modelo funcionando |
+| ADR-002 | UUID v7 | ✅ COMPLETADO | Implementado en todo el sistema |
+| ADR-003 | Users/Customers Unification | ⚠️ PARCIALMENTE SUPERSEDED | `relationship_type` deprecated por ADR-004 |
+| ADR-004 | Authorization | ✅ COMPLETADO (Fases 1-4) | Fase 5 (api_credentials) aplazada |
+| ADR-005 | Filament Deprecation | ✅ COMPLETADO | Stack DaisyUI funcionando |
 
 ---
 
@@ -33,10 +34,14 @@ Este ADR consolida el estado real del proyecto tras los refactors de ADR-001 a A
 users
   - id (UUID v7 string)
   - parent_user_id (self-reference, nullable)
-  - relationship_type (unsignedTinyInteger)
+  - relationship_type (unsignedTinyInteger) ⚠️ DEPRECATED por user_type
+  - user_type (unsignedTinyInteger) 🆕 STAFF(0)/CUSTOMER(1)/DELEGATE(2)
   - current_tax_profile_id (FK -> user_tax_profiles.id, nullable)
   - display_name, legal_entity_type_code
-  - is_admin (boolean) - control basico de acceso admin
+  - is_active (boolean) 🆕 Estado de cuenta
+  - suspended_at (timestamp) 🆕 Fecha suspensión
+  - is_superadmin (boolean) 🆕 Flag superadmin
+  - avatar_path (varchar) 🆕 Avatar personalizado
 
 user_tax_profiles
   - id (bigint)
@@ -155,13 +160,16 @@ company_fiscal_configs
 
 ## Funcionalidades Pendientes
 
-### Autorizacion Completa (ADR-004 incompleto)
+### Autorizacion Completa (ADR-004 en implementación)
 
-- [ ] Tabla user_customer_access (permisos delegados)
+- [x] Tabla user_customer_access (permisos delegados) ✅
+- [x] Tabla user_department_access (permisos staff) ✅
+- [ ] Columnas user_type, is_active, suspended_at, is_superadmin en users
 - [ ] Tabla api_credentials (API keys externas)
-- [ ] Sistema de impersonation (staff ve como cliente)
+- [x] Sistema de impersonation (staff ve como cliente) ✅ ImpersonationService
 - [ ] Gates completos en AuthServiceProvider
 - [ ] Tests de autorizacion
+- [ ] UserPolicy completa
 
 ### Panel Admin Completo
 

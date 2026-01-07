@@ -189,19 +189,63 @@
             <!-- Avatar / User Info -->
             <x-ui.card>
                 <div class="flex flex-col items-center text-center">
-                    <div class="avatar placeholder mb-4">
-                        <div class="bg-primary text-primary-content rounded-full w-24">
-                            <span class="text-3xl">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</span>
-                        </div>
-                    </div>
+                    @if (session('avatar-success'))
+                        <x-ui.alert type="success" class="mb-4 text-left w-full">
+                            {{ session('avatar-success') }}
+                        </x-ui.alert>
+                    @endif
+
+                    <x-avatar :user="auth()->user()" size="3xl" class="mb-4" />
+
                     <h3 class="font-semibold text-lg">{{ auth()->user()->name }}</h3>
                     <p class="text-base-content/60 text-sm">{{ auth()->user()->email }}</p>
                     <div class="mt-2">
-                        @if(auth()->user()->is_admin)
+                        @if(auth()->user()->isAdmin())
                             <span class="badge badge-primary">Administrador</span>
                         @else
                             <span class="badge badge-ghost">Usuario</span>
                         @endif
+                    </div>
+
+                    {{-- Avatar upload --}}
+                    <div class="mt-4 w-full">
+                        <form wire:submit="uploadAvatar" class="space-y-3">
+                            <input
+                                type="file"
+                                wire:model="avatarFile"
+                                accept="image/*"
+                                class="file-input file-input-bordered file-input-sm w-full"
+                            />
+                            @error('avatarFile')
+                                <p class="text-error text-xs">{{ $message }}</p>
+                            @enderror
+
+                            <div class="flex gap-2">
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary btn-sm flex-1"
+                                    wire:loading.attr="disabled"
+                                    wire:target="avatarFile"
+                                >
+                                    <span wire:loading.remove wire:target="avatarFile">Subir</span>
+                                    <span wire:loading wire:target="avatarFile" class="loading loading-spinner loading-xs"></span>
+                                </button>
+
+                                @if(auth()->user()->avatar_path)
+                                    <button
+                                        type="button"
+                                        wire:click="deleteAvatar"
+                                        wire:confirm="¿Seguro que quieres eliminar tu avatar personalizado?"
+                                        class="btn btn-ghost btn-sm text-error"
+                                    >
+                                        Eliminar
+                                    </button>
+                                @endif
+                            </div>
+                        </form>
+                        <p class="text-xs text-base-content/50 mt-2">
+                            Max. 2MB. JPG, PNG o WebP.
+                        </p>
                     </div>
                 </div>
             </x-ui.card>
