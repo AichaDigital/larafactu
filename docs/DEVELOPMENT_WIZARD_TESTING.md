@@ -85,7 +85,7 @@ docker-compose build --no-cache
 docker-compose up -d
 ```
 
-#### Puertos Utilizados
+#### Puertos y Credenciales
 
 | Servicio | Puerto Host | Puerto Container |
 |----------|-------------|------------------|
@@ -93,6 +93,19 @@ docker-compose up -d
 | MySQL    | 3307        | 3306             |
 
 Estos puertos están elegidos para no conflictuar con servicios locales (Herd, Elasticsearch).
+
+**Credenciales MySQL para el wizard:**
+
+| Campo | Valor |
+|-------|-------|
+| Host | `mysql` (nombre del servicio Docker) |
+| Puerto | `3306` (interno, no 3307) |
+| Base de datos | `larafactu_test` |
+| Usuario | `larafactu` |
+| Contraseña | `larafactu` |
+
+> **Nota**: Desde el contenedor PHP, el host es `mysql` (nombre del servicio), NO `127.0.0.1`.
+> El puerto 3307 es solo para acceso externo desde tu máquina host.
 
 ### Método 2: Instalación Limpia con PHP Built-in
 

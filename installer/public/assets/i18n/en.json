@@ -18,6 +18,32 @@
         "fix_issues": "Please fix the issues before continuing",
         "all_passed": "All requirements passed!"
     },
+    "dependencies": {
+        "title": "Dependencies Installation",
+        "description": "Laravel and all project dependencies will be installed",
+        "status": "Current status",
+        "available": "Available",
+        "not_available": "Not available",
+        "vendor_dir": "vendor/ directory",
+        "exists": "Exists",
+        "not_exists": "Does not exist",
+        "working": "Working",
+        "not_working": "Pending",
+        "composer_required": "Composer is required",
+        "composer_install_hint": "Install Composer from getcomposer.org before continuing.",
+        "composer_not_found": "Composer is not installed or not in PATH",
+        "already_installed": "Dependencies are already installed",
+        "skip_info": "Dependencies are already installed. You can continue to the next step.",
+        "force_reinstall": "Force reinstall dependencies",
+        "will_install": "Dependencies will be installed",
+        "install_info": "Composer install will be executed to install Laravel and all dependencies. This process may take a few minutes.",
+        "install_dev": "Install development dependencies",
+        "install_dev_hint": "Only needed if you will develop or run tests",
+        "time_warning": "This step may take several minutes",
+        "time_info": "Depending on your internet connection and server, installation may take between 1 and 5 minutes. Do not close this window.",
+        "install_success": "Dependencies installed successfully",
+        "install_failed": "Error installing dependencies"
+    },
     "appkey": {
         "title": "Application Key",
         "description": "The application key is used to encrypt all sensitive data",
@@ -38,7 +64,14 @@
         "password": "Password",
         "create_if_not_exists": "Create database if it doesn't exist",
         "connection_success": "Database connection successful",
-        "connection_failed": "Connection error: :error"
+        "connection_failed": "Connection error: :error",
+        "id_type": "ID type for users and entities",
+        "recommended": "Recommended",
+        "legacy": "Classic",
+        "uuid_description": "Universal unique identifiers. More secure, scalable and recommended for new installations.",
+        "integer_description": "Auto-incremental numeric IDs. Compatible with migrations from legacy systems.",
+        "warning": "Important",
+        "id_type_warning": "This setting CANNOT be changed after installation."
     },
     "migrations": {
         "title": "Database Migration",

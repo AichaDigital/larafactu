@@ -74,6 +74,12 @@ class DatabaseStep extends AbstractStep
             );
         }
 
+        // Determine ID type (uuid or integer)
+        $idType = $data['id_type'] ?? 'uuid';
+        if (! in_array($idType, ['uuid', 'integer'], true)) {
+            $idType = 'uuid'; // Default to UUID if invalid value
+        }
+
         // Write to .env
         $envWriter = new EnvFileWriter;
         $envWriter->setMany([
@@ -83,6 +89,7 @@ class DatabaseStep extends AbstractStep
             'DB_DATABASE' => $data['database'],
             'DB_USERNAME' => $data['username'],
             'DB_PASSWORD' => $data['password'] ?? '',
+            'LARABILL_USER_ID_TYPE' => $idType,
         ]);
 
         $writeResult = $envWriter->write();
@@ -100,11 +107,13 @@ class DatabaseStep extends AbstractStep
             'port' => $data['port'],
             'database' => $data['database'],
             'username' => $data['username'],
+            'id_type' => $idType,
             // Don't store password in state
         ]);
 
         return $this->success(__('database.connection_success'), [
             'mysql_version' => $result->getDetails()['mysql_version'] ?? 'unknown',
+            'id_type' => $idType,
         ]);
     }
 

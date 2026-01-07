@@ -43,13 +43,14 @@
 
 - [x] Step 1: `WelcomeStep` - Bienvenida + idioma
 - [x] Step 2: `RequirementsStep` - Verificación de requisitos
-- [x] Step 3: `AppKeyStep` - Generación APP_KEY (CRÍTICO - antes de encriptación)
-- [x] Step 4: `DatabaseStep` - Configuración BD
-- [x] Step 5: `MigrationsStep` - Migraciones
-- [x] Step 6: `CompanyStep` - Datos fiscales completos
-- [x] Step 7: `VerifactuStep` - Configuración Verifactu + certificados
-- [x] Step 8: `AdminStep` - Superadmin
-- [x] Step 9: `FinalizeStep` - Marker en settings + resumen
+- [x] Step 3: `DependenciesStep` - Instalación de dependencias (composer install)
+- [x] Step 4: `AppKeyStep` - Generación APP_KEY (CRÍTICO - antes de encriptación)
+- [x] Step 5: `DatabaseStep` - Configuración BD + selección tipo ID (UUID/Integer)
+- [x] Step 6: `MigrationsStep` - Migraciones
+- [x] Step 7: `CompanyStep` - Datos fiscales completos
+- [x] Step 8: `VerifactuStep` - Configuración Verifactu + certificados
+- [x] Step 9: `AdminStep` - Superadmin
+- [x] Step 10: `FinalizeStep` - Marker en settings + resumen
 
 ## Fase 5: Templates y Frontend ✅ COMPLETADA
 
@@ -107,10 +108,11 @@
 
 ### Orden de Ejecución Crítico
 
-1. **APP_KEY** debe generarse ANTES de cualquier operación de encriptación
-2. Base de datos debe estar configurada ANTES de migraciones
-3. Migraciones ANTES de crear empresa/admin
-4. Verifactu es OPCIONAL (se puede saltar)
+1. **Dependencias** (composer install) - Sin esto, artisan no funciona
+2. **APP_KEY** debe generarse ANTES de cualquier operación de encriptación
+3. **Base de datos** debe estar configurada ANTES de migraciones (incluye tipo ID: UUID/Integer)
+4. **Migraciones** ANTES de crear empresa/admin
+5. **Verifactu** es OPCIONAL (se puede saltar)
 
 ### Seguridad del Installer
 

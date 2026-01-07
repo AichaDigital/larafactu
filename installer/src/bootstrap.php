@@ -16,7 +16,20 @@ ini_set('log_errors', '1');
 // Define paths
 define('INSTALLER_ROOT', dirname(__DIR__));
 define('INSTALLER_VERSION', '1.0.0');
-define('LARAFACTU_ROOT', dirname(dirname(__DIR__)));
+
+// LARAFACTU_ROOT: Support both local development and Docker
+// Detection priority:
+// 1. Environment variable (most reliable for Docker)
+// 2. Docker path detection
+// 3. Relative path calculation (local development)
+if (getenv('LARAFACTU_ROOT') !== false) {
+    define('LARAFACTU_ROOT', getenv('LARAFACTU_ROOT'));
+} elseif (file_exists('/var/www/larafactu/artisan')) {
+    define('LARAFACTU_ROOT', '/var/www/larafactu');
+} else {
+    define('LARAFACTU_ROOT', dirname(dirname(__DIR__)));
+}
+
 define('STORAGE_PATH', INSTALLER_ROOT.'/storage');
 define('LANG_COOKIE_NAME', 'installer_lang');
 

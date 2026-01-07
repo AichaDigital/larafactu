@@ -18,6 +18,32 @@
         "fix_issues": "Por favor, corrija los problemas antes de continuar",
         "all_passed": "¡Todos los requisitos cumplidos!"
     },
+    "dependencies": {
+        "title": "Instalación de dependencias",
+        "description": "Se instalarán Laravel y todas las dependencias del proyecto",
+        "status": "Estado actual",
+        "available": "Disponible",
+        "not_available": "No disponible",
+        "vendor_dir": "Directorio vendor/",
+        "exists": "Existe",
+        "not_exists": "No existe",
+        "working": "Funcionando",
+        "not_working": "Pendiente",
+        "composer_required": "Composer es necesario",
+        "composer_install_hint": "Instale Composer desde getcomposer.org antes de continuar.",
+        "composer_not_found": "Composer no está instalado o no está en el PATH",
+        "already_installed": "Las dependencias ya están instaladas",
+        "skip_info": "Las dependencias ya están instaladas. Puede continuar al siguiente paso.",
+        "force_reinstall": "Forzar reinstalación de dependencias",
+        "will_install": "Se instalarán las dependencias",
+        "install_info": "Se ejecutará composer install para instalar Laravel y todas las dependencias. Este proceso puede tardar unos minutos.",
+        "install_dev": "Instalar dependencias de desarrollo",
+        "install_dev_hint": "Solo necesario si va a desarrollar o ejecutar tests",
+        "time_warning": "Este paso puede tardar varios minutos",
+        "time_info": "Dependiendo de su conexión a internet y servidor, la instalación puede tardar entre 1 y 5 minutos. No cierre esta ventana.",
+        "install_success": "Dependencias instaladas correctamente",
+        "install_failed": "Error al instalar dependencias"
+    },
     "appkey": {
         "title": "Clave de aplicación",
         "description": "La clave de aplicación se usa para encriptar todos los datos sensibles",
@@ -38,7 +64,14 @@
         "password": "Contraseña",
         "create_if_not_exists": "Crear base de datos si no existe",
         "connection_success": "Conexión exitosa a la base de datos",
-        "connection_failed": "Error de conexión: :error"
+        "connection_failed": "Error de conexión: :error",
+        "id_type": "Tipo de ID para usuarios y entidades",
+        "recommended": "Recomendado",
+        "legacy": "Clásico",
+        "uuid_description": "Identificadores únicos universales. Más seguros, escalables y recomendados para nuevas instalaciones.",
+        "integer_description": "IDs numéricos auto-incrementales. Compatible con migraciones desde sistemas legacy.",
+        "warning": "Importante",
+        "id_type_warning": "Esta configuración NO se puede cambiar después de la instalación."
     },
     "migrations": {
         "title": "Migración de base de datos",

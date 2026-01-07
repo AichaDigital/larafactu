@@ -36,6 +36,7 @@ class StepRegistry
         $this->order = [
             'welcome',
             'requirements',
+            'dependencies',  // NEW: Install composer dependencies (Laravel)
             'appkey',
             'database',
             'migrations',
@@ -49,6 +50,7 @@ class StepRegistry
         $this->steps = [
             'welcome' => fn () => new WelcomeStep($this->state, $this->translator),
             'requirements' => fn () => new RequirementsStep($this->state, $this->translator),
+            'dependencies' => fn () => new DependenciesStep($this->state, $this->translator),
             'appkey' => fn () => new AppKeyStep($this->state, $this->translator),
             'database' => fn () => new DatabaseStep($this->state, $this->translator),
             'migrations' => fn () => new MigrationsStep($this->state, $this->translator),
