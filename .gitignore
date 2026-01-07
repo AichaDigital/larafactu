@@ -65,6 +65,7 @@ bun.lock.json
 
 ## Docker/Sail (responsabilidad del usuario)
 docker/
+!installer/docker/
 sail
 sail/
 docker-compose.override.yml
