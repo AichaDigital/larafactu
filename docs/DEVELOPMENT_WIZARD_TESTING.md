@@ -29,31 +29,60 @@ El wizard incluye una configuración Docker para testing aislado.
 ```
 installer/docker/
 ├── docker-compose.yml    # Servicios: nginx, php-fpm, mysql
-├── Dockerfile            # PHP 8.4 + extensiones
+├── Dockerfile            # PHP 8.4 + todas las extensiones
 └── nginx.conf            # Configuración Nginx
+```
+
+#### Directorio de Trabajo Recomendado
+
+Usa un directorio dedicado para pruebas Docker (NO `/tmp` que se limpia al reiniciar):
+
+```bash
+# Crear estructura (una vez)
+mkdir -p ~/SitesDocker
+
+# Clonar para pruebas
+cd ~/SitesDocker
+git clone https://github.com/AichaDigital/larafactu.git larafactu-wizard-test
 ```
 
 #### Ejecutar Tests
 
 ```bash
-# Desde la raíz del proyecto
-cd /Users/abkrim/SitesLR12/larafactu
+# Ir al directorio de prueba
+cd ~/SitesDocker/larafactu-wizard-test/installer/docker
 
-# Levantar entorno Docker
-cd installer/docker
+# Primera vez: construir imagen
+docker-compose build
+
+# Levantar servicios
 docker-compose up -d
 
-# Ver logs
+# Ver logs (opcional)
 docker-compose logs -f
+
+# Obtener token de acceso
+docker-compose exec php-fpm cat /var/www/installer/storage/.token
 
 # Acceder al wizard
 open http://localhost:8888/
 
-# El token se genera en el contenedor
-docker-compose exec installer-test cat /var/www/html/installer/storage/.token
+# Parar servicios (mantiene datos)
+docker-compose stop
 
-# Parar y limpiar
+# Parar y limpiar todo (reset completo)
 docker-compose down -v
+```
+
+#### Actualizar después de cambios
+
+```bash
+cd ~/SitesDocker/larafactu-wizard-test
+git pull origin main
+
+# Reconstruir si cambió Dockerfile
+docker-compose build --no-cache
+docker-compose up -d
 ```
 
 #### Puertos Utilizados
@@ -65,20 +94,17 @@ docker-compose down -v
 
 Estos puertos están elegidos para no conflictuar con servicios locales (Herd, Elasticsearch).
 
-### Método 2: Instalación Limpia Temporal
+### Método 2: Instalación Limpia con PHP Built-in
 
-Si prefieres probar sin Docker:
+Si prefieres probar sin Docker (más rápido para cambios pequeños):
 
 ```bash
-# Crear directorio temporal
-mkdir /tmp/larafactu-wizard-test
-cd /tmp/larafactu-wizard-test
+# Crear directorio de prueba
+mkdir -p ~/SitesDocker/larafactu-php-test
+cd ~/SitesDocker/larafactu-php-test
 
 # Clonar el proyecto
 git clone https://github.com/aichadigital/larafactu.git .
-
-# O copiar solo el installer
-cp -r /Users/abkrim/SitesLR12/larafactu/installer ./
 
 # Configurar servidor PHP built-in
 cd installer/public
@@ -87,6 +113,8 @@ php -S localhost:9000
 # Acceder
 open http://localhost:9000/
 ```
+
+**Nota**: Este método usa TU instalación local de PHP, no la del Dockerfile.
 
 ### Método 3: Subdirectorio en Herd
 
