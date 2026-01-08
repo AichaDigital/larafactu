@@ -48,6 +48,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['access_token'])) {
         header('Location: '.$_SERVER['REQUEST_URI']);
         exit;
     }
+
+    // Token invalid - show form with error
+    $errorMessages = [
+        'invalid' => __('errors.invalid_token') ?? 'Token inválido',
+        'ip_mismatch' => __('errors.ip_mismatch') ?? 'Token bloqueado a otra IP. Regenere el token.',
+        'blocked' => __('errors.blocked') ?? 'Demasiados intentos fallidos. Espere 15 minutos.',
+    ];
+    
+    $accessControl->ensureTokenExists();
+    echo view('token-form', [
+        'locale' => getLocale(),
+        'error' => $errorMessages[$access->getReason()] ?? 'Error de acceso',
+    ]);
+    exit;
 }
 
 // Check access
