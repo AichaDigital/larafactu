@@ -8,36 +8,6 @@
         "framework"
     ],
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "path",
-            "url": "./packages/aichadigital/larabill",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "./packages/aichadigital/lara-verifactu",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "./packages/aichadigital/laratickets",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "./packages/aichadigital/lararoi",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
     "require": {
         "php": "^8.3",
         "aichadigital/lara-verifactu": "dev-main",
@@ -76,12 +46,9 @@
     },
     "scripts": {
         "setup": [
-            "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-            "@php artisan key:generate",
-            "@php artisan migrate --force",
-            "npm install",
-            "npm run build"
+            "@php artisan key:generate --ansi",
+            "@dev-repos"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
@@ -135,6 +102,18 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "dev-repos": [
+            "@php -r \"if(is_dir('packages/aichadigital/larabill')) { passthru('composer config repositories.larabill path ./packages/aichadigital/larabill'); }\"",
+            "@php -r \"if(is_dir('packages/aichadigital/lara-verifactu')) { passthru('composer config repositories.lara-verifactu path ./packages/aichadigital/lara-verifactu'); }\"",
+            "@php -r \"if(is_dir('packages/aichadigital/laratickets')) { passthru('composer config repositories.laratickets path ./packages/aichadigital/laratickets'); }\"",
+            "@php -r \"if(is_dir('packages/aichadigital/lararoi')) { passthru('composer config repositories.lararoi path ./packages/aichadigital/lararoi'); }\""
+        ],
+        "clean-repos": [
+            "composer config --unset repositories.larabill",
+            "composer config --unset repositories.lara-verifactu",
+            "composer config --unset repositories.laratickets",
+            "composer config --unset repositories.lararoi"
         ]
     },
     "extra": {
