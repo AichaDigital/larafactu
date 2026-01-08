@@ -61,7 +61,7 @@ class ExtensionsValidator implements ValidatorInterface
 
         // Check optional extensions
         foreach (self::OPTIONAL_EXTENSIONS as $ext => $description) {
-            if (extension_loaded($ext)) {
+            if ($this->isExtensionLoaded($ext)) {
                 $loaded[$ext] = [
                     'name' => $ext,
                     'description' => $description,
@@ -135,5 +135,18 @@ class ExtensionsValidator implements ValidatorInterface
     public static function getOptionalExtensions(): array
     {
         return self::OPTIONAL_EXTENSIONS;
+    }
+
+    /**
+     * Check if extension is loaded (handles special cases like OPcache)
+     */
+    private function isExtensionLoaded(string $extension): bool
+    {
+        // OPcache is a Zend extension, extension_loaded('opcache') returns false
+        if ($extension === 'opcache') {
+            return function_exists('opcache_get_status');
+        }
+
+        return extension_loaded($extension);
     }
 }

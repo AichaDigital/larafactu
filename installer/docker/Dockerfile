@@ -21,9 +21,9 @@ RUN apk add --no-cache \
     $PHPIZE_DEPS
 
 # Install PHP extensions required by Laravel/Larafactu
+# Already compiled in PHP 8.4: ctype, fileinfo, tokenizer, pdo, xml (dom/simplexml)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-        pdo \
         pdo_mysql \
         mbstring \
         exif \
@@ -31,15 +31,12 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         bcmath \
         gd \
         zip \
-        xml \
         intl \
-        opcache \
-        ctype \
-        fileinfo \
-        tokenizer
+        opcache
 
 # Install Redis extension (optional but recommended)
-RUN pecl install redis && docker-php-ext-enable redis
+# Using printf to auto-answer PECL prompts (no to igbinary, no to lzf, etc.)
+RUN printf '\n\n\n\n\n\n' | pecl install redis && docker-php-ext-enable redis
 
 # Enable opcache
 RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
@@ -68,4 +65,3 @@ USER larafactu
 EXPOSE 9000
 
 CMD ["php-fpm"]
-

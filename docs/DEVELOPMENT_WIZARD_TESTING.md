@@ -29,9 +29,12 @@ El wizard incluye una configuración Docker para testing aislado.
 ```
 installer/docker/
 ├── docker-compose.yml    # Servicios: nginx, php-fpm, mysql
-├── Dockerfile            # PHP 8.4 + todas las extensiones
+├── Dockerfile            # PHP 8.4 (referencia local, no se usa)
 └── nginx.conf            # Configuración Nginx
 ```
+
+**Imagen Docker**: Se usa la imagen pre-built `abkrim/laravel-dock:8.4` de Docker Hub.
+No es necesario compilar nada localmente.
 
 #### Directorio de Trabajo Recomendado
 
@@ -46,32 +49,70 @@ cd ~/SitesDocker
 git clone https://github.com/AichaDigital/larafactu.git larafactu-wizard-test
 ```
 
-#### Ejecutar Tests
+#### Flujo Completo de Testing
+
+##### Paso 1: Levantar servicios
 
 ```bash
-# Ir al directorio de prueba
 cd ~/SitesDocker/larafactu-wizard-test/installer/docker
 
-# Primera vez: construir imagen
-docker-compose build
-
-# Levantar servicios
+# Levantar servicios (descarga imagen automaticamente)
 docker-compose up -d
 
-# Ver logs (opcional)
+# Verificar que los 3 servicios estan running
+docker-compose ps
+```
+
+Deberias ver 3 servicios: `nginx`, `php-fpm`, `mysql`.
+
+La imagen `abkrim/laravel-dock:8.4` se descarga automaticamente de Docker Hub la primera vez.
+
+##### Paso 2: Verificar estado
+
+```bash
+# Ver logs en tiempo real (Ctrl+C para salir)
 docker-compose logs -f
 
-# Obtener token de acceso
+# O solo los ultimos logs
+docker-compose logs --tail=50
+```
+
+Espera hasta ver que MySQL esta ready (`ready for connections`).
+
+##### Paso 3: Obtener token de acceso
+
+El wizard genera un token de seguridad automaticamente en el primer acceso. Para obtenerlo:
+
+```bash
 docker-compose exec php-fpm cat /var/www/installer/storage/.token
+```
 
-# Acceder al wizard
+Si el archivo no existe aun, accede primero a `http://localhost:8888/` y el token se generara.
+
+##### Paso 4: Acceder al wizard
+
+```bash
 open http://localhost:8888/
+```
 
-# Parar servicios (mantiene datos)
+El wizard pedira el token. Copia el valor obtenido en el paso anterior.
+
+##### Comandos de gestion
+
+```bash
+# Parar servicios (mantiene datos en volumen)
 docker-compose stop
 
-# Parar y limpiar todo (reset completo)
+# Reanudar servicios
+docker-compose start
+
+# Parar y limpiar TODO (reset completo - elimina BD)
 docker-compose down -v
+
+# Ver logs de un servicio especifico
+docker-compose logs -f php-fpm
+docker-compose logs -f nginx
+docker-compose logs -f mysql
 ```
 
 #### Actualizar después de cambios
@@ -80,9 +121,8 @@ docker-compose down -v
 cd ~/SitesDocker/larafactu-wizard-test
 git pull origin main
 
-# Reconstruir si cambió Dockerfile
-docker-compose build --no-cache
-docker-compose up -d
+# Reiniciar servicios para aplicar cambios
+docker-compose restart
 ```
 
 #### Puertos y Credenciales
@@ -106,6 +146,99 @@ Estos puertos están elegidos para no conflictuar con servicios locales (Herd, E
 
 > **Nota**: Desde el contenedor PHP, el host es `mysql` (nombre del servicio), NO `127.0.0.1`.
 > El puerto 3307 es solo para acceso externo desde tu máquina host.
+
+#### Acceso a MySQL desde Host (TablePlus, DataGrip, etc.)
+
+Para conectarte a la BD de prueba desde tu maquina:
+
+| Campo | Valor |
+|-------|-------|
+| Host | `127.0.0.1` |
+| Puerto | `3307` |
+| Usuario | `larafactu` |
+| Password | `larafactu` |
+| Base de datos | `larafactu_test` |
+
+Tambien puedes conectar como root:
+
+| Campo | Valor |
+|-------|-------|
+| Host | `127.0.0.1` |
+| Puerto | `3307` |
+| Usuario | `root` |
+| Password | `root` |
+
+#### Variables de Entorno del Contenedor
+
+El contenedor PHP-FPM tiene estas variables configuradas:
+
+| Variable | Valor | Descripcion |
+|----------|-------|-------------|
+| `PHP_VERSION` | `8.4` | Version de PHP |
+| `INSTALLER_ENV` | `testing` | Entorno del installer |
+| `LARAFACTU_ROOT` | `/var/www/larafactu` | Ruta al proyecto principal |
+
+El wizard detecta `INSTALLER_ENV=testing` y puede ajustar comportamientos (ej: skip de validaciones estrictas).
+
+#### Troubleshooting Docker
+
+##### Error: "port is already allocated"
+
+```bash
+# Ver que usa el puerto 8888
+lsof -i :8888
+
+# Ver que usa el puerto 3307
+lsof -i :3307
+
+# Cambiar puertos en docker-compose.yml si es necesario
+```
+
+##### Error: "mysql connection refused"
+
+El contenedor MySQL tarda unos segundos en estar ready. Espera y reintenta:
+
+```bash
+# Ver estado del healthcheck
+docker-compose ps
+
+# El servicio mysql debe mostrar "(healthy)"
+# Si muestra "(health: starting)", espera unos segundos
+```
+
+##### Error: Imagen no encontrada
+
+Si hay problemas con la imagen, puedes forzar la descarga:
+
+```bash
+docker pull abkrim/laravel-dock:8.4
+docker-compose up -d
+```
+
+##### Reset completo para re-testing
+
+```bash
+# Eliminar todo y empezar de cero
+docker-compose down -v
+rm -f ../storage/install_session.json
+rm -f ../storage/.token
+rm -f ../storage/failed_attempts.log
+rm -f ../.done
+docker-compose up -d
+```
+
+##### Ver logs de PHP/errores
+
+```bash
+# Logs de PHP-FPM
+docker-compose logs php-fpm
+
+# Logs de Nginx (errores HTTP)
+docker-compose logs nginx
+
+# Entrar al contenedor para debug
+docker-compose exec php-fpm sh
+```
 
 ### Método 2: Instalación Limpia con PHP Built-in
 
@@ -272,6 +405,6 @@ Antes de considerar el wizard listo para producción:
 
 ---
 
-**Documento**: DEVELOPMENT_WIZARD_TESTING.md  
-**Última actualización**: 2026-01-07
+**Documento**: DEVELOPMENT_WIZARD_TESTING.md
+**Ultima actualizacion**: 2026-01-08
 

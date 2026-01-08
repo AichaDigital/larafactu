@@ -13,9 +13,8 @@
 services:
   # PHP-FPM for installer
   php-fpm:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: abkrim/laravel-dock:8.4
+    working_dir: /var/www/installer
     volumes:
       - ../:/var/www/installer:cached
       - ../../:/var/www/larafactu:cached
