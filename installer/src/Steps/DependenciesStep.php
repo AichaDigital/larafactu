@@ -1,5 +1,6 @@
 <?php
 
+
 declare(strict_types=1);
 
 namespace Installer\Steps;
@@ -95,6 +96,9 @@ class DependenciesStep extends AbstractStep
         $process = proc_open($command, $descriptors, $pipes, $larafactuRoot, [
             'COMPOSER_NO_INTERACTION' => '1',
             'COMPOSER_ALLOW_SUPERUSER' => '1',
+            'HOME' => getenv('HOME') ?: '/tmp',
+            'COMPOSER_HOME' => getenv('COMPOSER_HOME') ?: '/tmp/.composer',
+            'PATH' => getenv('PATH') ?: '/usr/local/bin:/usr/bin:/bin',
         ]);
 
         if (is_resource($process)) {
