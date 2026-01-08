@@ -22,65 +22,65 @@
             <!-- Composer Available -->
             <div class="flex items-center justify-between">
                 <span class="text-slate-300">Composer</span>
-                <?php if ($composer_available): ?>
+                <?php if ($composer_available) { ?>
                     <span class="flex items-center gap-2 text-green-400">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                         <?= __('dependencies.available') ?? 'Disponible' ?>
                     </span>
-                <?php else: ?>
+                <?php } else { ?>
                     <span class="flex items-center gap-2 text-red-400">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                         <?= __('dependencies.not_available') ?? 'No disponible' ?>
                     </span>
-                <?php endif; ?>
+                <?php } ?>
             </div>
             
             <!-- Vendor Directory -->
             <div class="flex items-center justify-between">
                 <span class="text-slate-300"><?= __('dependencies.vendor_dir') ?? 'Directorio vendor/' ?></span>
-                <?php if ($vendor_exists): ?>
+                <?php if ($vendor_exists) { ?>
                     <span class="flex items-center gap-2 text-green-400">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                         <?= __('dependencies.exists') ?? 'Existe' ?>
                     </span>
-                <?php else: ?>
+                <?php } else { ?>
                     <span class="flex items-center gap-2 text-amber-400">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <?= __('dependencies.not_exists') ?? 'No existe' ?>
                     </span>
-                <?php endif; ?>
+                <?php } ?>
             </div>
             
             <!-- Artisan Works -->
             <div class="flex items-center justify-between">
                 <span class="text-slate-300">Laravel (artisan)</span>
-                <?php if ($artisan_works): ?>
+                <?php if ($artisan_works) { ?>
                     <span class="flex items-center gap-2 text-green-400">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                         <?= __('dependencies.working') ?? 'Funcionando' ?>
                     </span>
-                <?php else: ?>
+                <?php } else { ?>
                     <span class="flex items-center gap-2 text-amber-400">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <?= __('dependencies.not_working') ?? 'Pendiente' ?>
                     </span>
-                <?php endif; ?>
+                <?php } ?>
             </div>
         </div>
         
-        <?php if (! $composer_available): ?>
+        <?php if (! $composer_available) { ?>
             <!-- Composer Not Available Warning -->
             <div class="bg-red-900/30 border border-red-500/50 rounded-lg p-4">
                 <div class="flex items-start gap-3">
@@ -95,7 +95,7 @@
                     </div>
                 </div>
             </div>
-        <?php elseif ($vendor_exists && $artisan_works): ?>
+        <?php } elseif ($vendor_exists && $artisan_works) { ?>
             <!-- Already Installed -->
             <div class="bg-green-900/30 border border-green-500/50 rounded-lg p-4">
                 <div class="flex items-start gap-3">
@@ -121,7 +121,7 @@
                 >
                 <span class="text-slate-300"><?= __('dependencies.force_reinstall') ?? 'Forzar reinstalación de dependencias' ?></span>
             </label>
-        <?php else: ?>
+        <?php } else { ?>
             <!-- Will Install -->
             <div class="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4">
                 <div class="flex items-start gap-3">
@@ -136,10 +136,10 @@
                     </div>
                 </div>
             </div>
-        <?php endif; ?>
+        <?php } ?>
         
         <!-- Dev Dependencies Option -->
-        <?php if ($composer_available && (! $vendor_exists || ! $artisan_works)): ?>
+        <?php if ($composer_available && (! $vendor_exists || ! $artisan_works)) { ?>
             <label class="flex items-center gap-3 cursor-pointer">
                 <input 
                     type="checkbox" 
@@ -152,10 +152,10 @@
                     <p class="text-xs text-slate-500"><?= __('dependencies.install_dev_hint') ?? 'Solo necesario si va a desarrollar o ejecutar tests' ?></p>
                 </div>
             </label>
-        <?php endif; ?>
+        <?php } ?>
         
         <!-- Time Warning -->
-        <?php if ($composer_available && ! $artisan_works): ?>
+        <?php if ($composer_available && ! $artisan_works) { ?>
             <div class="bg-amber-900/30 border border-amber-500/50 rounded-lg p-4">
                 <div class="flex items-start gap-3">
                     <svg class="w-6 h-6 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -169,7 +169,7 @@
                     </div>
                 </div>
             </div>
-        <?php endif; ?>
+        <?php } ?>
         
     </form>
 </div>

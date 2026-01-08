@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Installer\Steps;
 
-use Installer\Actions\ActionResult;
-use Installer\Actions\CommandRunner;
-
 /**
  * Step 2.5: Install Dependencies
  *
@@ -217,4 +214,3 @@ class DependenciesStep extends AbstractStep
         return null;
     }
 }
-
