@@ -1,4 +1,4 @@
-
+<?php
 
 declare(strict_types=1);
 
@@ -13,20 +13,12 @@ use Illuminate\Support\Facades\Schema;
  * This table links users (staff) to departments with specific access levels.
  * It references laratickets' departments table.
  *
- * NOTE: This migration is conditional - it only runs if the departments
- * table exists (requires laratickets migrations to be published first).
- *
  * @see ADR-004 for authorization architecture
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        // Only create if departments table exists (laratickets dependency)
-        if (! Schema::hasTable('departments')) {
-            return;
-        }
-
         Schema::create('user_department_access', function (Blueprint $table) {
             $table->id();
 
