@@ -77,7 +77,7 @@ class DependenciesStep extends AbstractStep
             $command .= ' --no-dev';
         }
 
-        $command .= ' --no-interaction --optimize-autoloader';
+        $command .= ' --no-interaction --optimize-autoloader --ignore-platform-reqs';
 
         // Execute composer install
         $cwd = getcwd();
