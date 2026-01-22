@@ -79,23 +79,24 @@ docker-compose logs --tail=50
 
 Espera hasta ver que MySQL esta ready (`ready for connections`).
 
-##### Paso 3: Obtener token de acceso
-
-El wizard genera un token de seguridad automaticamente en el primer acceso. Para obtenerlo:
-
-```bash
-docker-compose exec php-fpm cat /var/www/installer/storage/.token
-```
-
-Si el archivo no existe aun, accede primero a `http://localhost:8888/` y el token se generara.
-
-##### Paso 4: Acceder al wizard
+##### Paso 3: Acceder al wizard (genera el token)
 
 ```bash
 open http://localhost:8888/
 ```
 
-El wizard pedira el token. Copia el valor obtenido en el paso anterior.
+El wizard mostrara un formulario pidiendo el token de acceso. **El token se genera automaticamente en este primer acceso.**
+
+##### Paso 4: Obtener el token generado
+
+Abre otra terminal y ejecuta:
+
+```bash
+cd ~/SitesDocker/larafactu-wizard-test/installer/docker
+docker-compose exec php-fpm cat /var/www/installer/storage/.token
+```
+
+Copia el token y pegalo en el formulario del navegador.
 
 ##### Comandos de gestion
 
