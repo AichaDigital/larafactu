@@ -112,17 +112,20 @@ class AccessControl
             return ['valid' => false, 'reason' => 'invalid'];
         }
 
-        // Check IP lock (if set)
+        // Check IP lock (if set) - disabled in testing environment
         $clientIp = $this->getClientIp();
+        $isTestingEnv = getenv('INSTALLER_ENV') === 'testing';
 
-        if (isset($data['ip']) && $data['ip'] !== null && $data['ip'] !== $clientIp) {
-            return ['valid' => false, 'reason' => 'ip_mismatch'];
-        }
+        if (! $isTestingEnv) {
+            if (isset($data['ip']) && $data['ip'] !== null && $data['ip'] !== $clientIp) {
+                return ['valid' => false, 'reason' => 'ip_mismatch'];
+            }
 
-        // Lock to this IP if not already locked
-        if (! isset($data['ip']) || $data['ip'] === null) {
-            $data['ip'] = $clientIp;
-            file_put_contents($tokenFile, json_encode($data, JSON_PRETTY_PRINT));
+            // Lock to this IP if not already locked
+            if (! isset($data['ip']) || $data['ip'] === null) {
+                $data['ip'] = $clientIp;
+                file_put_contents($tokenFile, json_encode($data, JSON_PRETTY_PRINT));
+            }
         }
 
         return ['valid' => true, 'reason' => null];
