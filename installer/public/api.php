@@ -75,7 +75,7 @@ function handleGetStep(array $input, StepRegistry $registry, InstallState $state
     jsonResponse([
         'success' => true,
         'content' => $content,
-        'defaults' => $viewData['defaults'] ?? [],
+        'defaults' => ! empty($viewData['defaults']) ? $viewData['defaults'] : new \stdClass,
         'step' => [
             'id' => $step->getId(),
             'title' => $step->getTitle(),

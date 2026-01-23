@@ -35,8 +35,11 @@ class MigrationsStep extends AbstractStep
     {
         $runner = new MigrationRunner;
 
-        // Determine migration type
+        // Determine migration type - handle both boolean and string "1"
         $fresh = $data['fresh'] ?? false;
+        if (is_string($fresh)) {
+            $fresh = $fresh === '1' || strtolower($fresh) === 'true';
+        }
 
         // Clear config cache first
         $commandRunner = new CommandRunner;

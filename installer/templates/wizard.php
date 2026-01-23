@@ -299,7 +299,7 @@ $currentStepId = $currentStep['id'] ?? 'welcome';
                     this.loadingMessage = '<?= __('common.validating') ?>';
                     this.error = null;
                     this.success = null;
-                    
+
                     // Get form data from current step
                     const form = document.querySelector('#step-form');
                     if (form) {
@@ -308,7 +308,7 @@ $currentStepId = $currentStep['id'] ?? 'welcome';
                             this.formData[key] = value;
                         });
                     }
-                    
+
                     try {
                         const response = await fetch('api.php', {
                             method: 'POST',

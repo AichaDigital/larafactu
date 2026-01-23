@@ -6,10 +6,10 @@
  * @var array $currencies
  */
 ?>
-<div id="step-company">
+<div id="step-company" x-data="{ isRoi: false }">
     <h2 class="text-2xl font-bold text-white mb-2"><?= __('company.title') ?></h2>
     <p class="text-slate-400 mb-6"><?= __('company.description') ?></p>
-    
+
     <form id="step-form" class="space-y-6">
         
         <!-- Business Info -->
@@ -237,11 +237,4 @@
     </form>
 </div>
 
-<script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('companyForm', () => ({
-        isRoi: false
-    }))
-})
-</script>
 
