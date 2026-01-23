@@ -103,16 +103,28 @@ La fase final debe enfocarse en integracion real entre paquetes y Larafactu, con
 - SCHEMA_REQUIREMENTS.md creado en larabill (version 2.1)
 - UI DaisyUI parcialmente migrada (~60%)
 - MigrationHelper soporta int/uuid/ulid en larabill
+- Wizard soporta seleccion UUID/Integer en DatabaseStep
+- AdminStep genera ID segun tipo seleccionado (2026-01-23)
+- LegalEntityTypesSeeder incluye campo is_company (2026-01-23)
+- Tests EU B2B con ROI/reverse charge (EuB2BInvoiceTest)
 
-### Pendiente critico
+### Pendiente
 
-| Item | Estado | Bloqueo |
-|------|--------|---------|
-| Wizard AdminStep solo UUID v7 | PENDIENTE | Necesita opcion Integer |
-| Tests integracion inter-paquetes | LIMITADOS | Solo SpanishB2CInvoiceTest |
-| Soporte Integer en wizard | NO IMPLEMENTADO | Requiere refactor AdminStep |
+| Item | Estado | Nota |
+|------|--------|------|
+| Tests integracion inter-paquetes | PARCIAL | SpanishB2CInvoiceTest + EuB2BInvoiceTest |
+| Validacion wizard con Integer | PENDIENTE | Requiere test manual en staging |
 
-### Detalle tecnico: Soporte de IDs
+### Detalle tecnico: Soporte de IDs (IMPLEMENTADO)
+
+**Flujo completo**:
+
+1. DatabaseStep presenta selector UUID/Integer en UI
+2. Usuario selecciona tipo de ID
+3. DatabaseStep escribe `LARABILL_USER_ID_TYPE` en .env
+4. DatabaseStep guarda `id_type` en state
+5. AdminStep lee `id_type` del state
+6. AdminStep genera UUID o usa auto-increment segun tipo
 
 **larabill config/larabill.php**:
 
@@ -120,17 +132,13 @@ La fase final debe enfocarse en integracion real entre paquetes y Larafactu, con
 'user_id_type' => env('LARABILL_USER_ID_TYPE', 'uuid'), // int, uuid, ulid, auto
 ```
 
-**installer/src/Steps/AdminStep.php (linea 79)**:
+**installer/src/Steps/AdminStep.php**:
 
 ```php
-$userId = $this->generateUuidV7(); // HARDCODED - no soporta Integer
+$dbConfig = $this->state->get('database');
+$idType = $dbConfig['id_type'] ?? 'uuid';
+$userId = $this->generateUserId($idType); // UUID o null para auto-increment
 ```
-
-**Solucion propuesta**:
-
-1. Añadir paso de seleccion de tipo ID en wizard
-2. Modificar AdminStep para usar `MigrationHelper::getUserIdType()`
-3. Ajustar migracion de users segun tipo seleccionado
 
 ## Conclusion
 
@@ -138,4 +146,4 @@ Larafactu debe seguir siendo un instalador opinado con dos variantes de ID, mien
 
 ---
 
-Ultima actualizacion: 2026-01-22
+Ultima actualizacion: 2026-01-23

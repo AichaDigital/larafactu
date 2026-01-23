@@ -6,7 +6,6 @@ namespace Installer\Steps;
 
 use Installer\Security\Encryption;
 use PDO;
-use Ramsey\Uuid\Uuid;
 
 /**
  * Step 8: Administrator Creation
@@ -75,17 +74,20 @@ class AdminStep extends AbstractStep
                 );
             }
 
-            // Generate UUID v7 for user ID
-            $userId = $this->generateUuidV7();
+            // Get ID type from database step configuration
+            $dbConfig = $this->state->get('database');
+            $idType = $dbConfig['id_type'] ?? 'uuid';
+
+            // Generate user ID based on configured type
+            $userId = $this->generateUserId($idType);
 
             // Hash password
             $hashedPassword = Encryption::hashPassword($data['password']);
 
             $now = date('Y-m-d H:i:s');
 
-            // Insert user
+            // Build user data - exclude 'id' for integer type (auto-increment)
             $userData = [
-                'id' => $userId,
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => $hashedPassword,
@@ -97,17 +99,28 @@ class AdminStep extends AbstractStep
                 'updated_at' => $now,
             ];
 
+            // Only include 'id' for UUID type
+            if ($idType === 'uuid' && $userId !== null) {
+                $userData = ['id' => $userId] + $userData;
+            }
+
             $columns = implode(', ', array_keys($userData));
             $placeholders = implode(', ', array_fill(0, count($userData), '?'));
 
             $stmt = $pdo->prepare("INSERT INTO users ({$columns}) VALUES ({$placeholders})");
             $stmt->execute(array_values($userData));
 
+            // For integer type, get the auto-generated ID
+            if ($idType === 'integer') {
+                $userId = $pdo->lastInsertId();
+            }
+
             // Save to state
             $this->state->set('admin', [
                 'id' => $userId,
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'id_type' => $idType,
             ]);
 
             return $this->success(
@@ -115,6 +128,7 @@ class AdminStep extends AbstractStep
                 [
                     'user_id' => $userId,
                     'email' => $data['email'],
+                    'id_type' => $idType,
                 ]
             );
 
@@ -190,6 +204,21 @@ class AdminStep extends AbstractStep
         }
 
         return true;
+    }
+
+    /**
+     * Generate user ID based on configured type
+     *
+     * @param  string  $idType  'uuid' or 'integer'
+     * @return string|null UUID string for uuid type, null for integer (auto-increment)
+     */
+    private function generateUserId(string $idType): ?string
+    {
+        if ($idType === 'integer') {
+            return null; // Auto-increment handled by database
+        }
+
+        return $this->generateUuidV7();
     }
 
     /**
