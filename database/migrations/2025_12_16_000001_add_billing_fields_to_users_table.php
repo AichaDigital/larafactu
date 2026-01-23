@@ -15,10 +15,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        $idType = $this->getUserIdType();
+
+        Schema::table('users', function (Blueprint $table) use ($idType) {
             // Self-reference for delegation hierarchy
-            // NULL = direct client of company, UUID = delegated client of another user
-            $table->uuid('parent_user_id')->nullable()->after('id');
+            // NULL = direct client of company, ID = delegated client of another user
+            if ($idType === 'integer') {
+                $table->unsignedBigInteger('parent_user_id')->nullable()->after('id');
+            } else {
+                $table->uuid('parent_user_id')->nullable()->after('id');
+            }
 
             // Relationship type: 0 = DIRECT, 1 = DELEGATED (UserRelationshipType enum)
             $table->unsignedTinyInteger('relationship_type')->default(0)->after('parent_user_id');
@@ -68,5 +74,29 @@ return new class extends Migration
                 'current_tax_profile_id',
             ]);
         });
+    }
+
+    /**
+     * Get user ID type directly from .env file to avoid config cache issues.
+     */
+    private function getUserIdType(): string
+    {
+        $fromConfig = config('larabill.user_id_type');
+        if ($fromConfig && in_array($fromConfig, ['uuid', 'integer', 'int', 'ulid'])) {
+            return $fromConfig === 'int' ? 'integer' : $fromConfig;
+        }
+
+        $envPath = base_path('.env');
+        if (file_exists($envPath)) {
+            $content = file_get_contents($envPath);
+            if (preg_match('/^LARABILL_USER_ID_TYPE=(.+)$/m', $content, $matches)) {
+                $value = trim($matches[1], '"\'');
+                if (in_array($value, ['integer', 'int'])) {
+                    return 'integer';
+                }
+            }
+        }
+
+        return 'uuid';
     }
 };

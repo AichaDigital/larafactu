@@ -22,16 +22,15 @@ class CompanyStep extends AbstractStep
     {
         $errors = [];
 
-        // Required fields
+        // Required fields (matching actual schema)
         $required = [
             'business_name',
             'tax_id',
-            'address_line1',
-            'postal_code',
+            'legal_entity_type',
+            'address',
+            'zip_code',
             'city',
-            'province',
             'country_code',
-            'email',
         ];
 
         foreach ($required as $field) {
@@ -43,16 +42,6 @@ class CompanyStep extends AbstractStep
         // Validate tax_id format (Spanish CIF/NIF)
         if (! empty($data['tax_id']) && ! $this->validateSpanishTaxId($data['tax_id'])) {
             $errors['tax_id'] = __('company.tax_id_invalid');
-        }
-
-        // Validate email
-        if (! empty($data['email']) && ! $this->validateEmail($data['email'])) {
-            $errors['email'] = __('errors.invalid_email');
-        }
-
-        // If ROI operator, require EU VAT number
-        if (! empty($data['is_roi']) && empty($data['eu_vat'])) {
-            $errors['eu_vat'] = 'Requerido para operadores ROI/OSS';
         }
 
         return empty($errors)
@@ -82,28 +71,26 @@ class CompanyStep extends AbstractStep
                 );
             }
 
-            // Prepare data
+            // Prepare data (matching actual larabill schema)
             $now = date('Y-m-d H:i:s');
             $today = date('Y-m-d');
 
             $configData = [
                 'business_name' => $data['business_name'],
-                'trade_name' => $data['trade_name'] ?? null,
                 'tax_id' => strtoupper($data['tax_id']),
-                'tax_id_type' => $this->detectTaxIdType($data['tax_id']),
-                'address_line1' => $data['address_line1'],
-                'address_line2' => $data['address_line2'] ?? null,
-                'postal_code' => $data['postal_code'],
+                'legal_entity_type' => $data['legal_entity_type'],
+                'address' => $data['address'],
                 'city' => $data['city'],
-                'province' => $data['province'],
+                'state' => $data['state'] ?? null,
+                'zip_code' => $data['zip_code'],
                 'country_code' => strtoupper($data['country_code']),
-                'phone' => $data['phone'] ?? null,
-                'email' => $data['email'],
-                'is_eu_vat_registered' => ! empty($data['is_roi']) ? 1 : 0,
-                'eu_vat_number' => $data['eu_vat'] ?? null,
-                'currency_code' => $data['currency'] ?? 'EUR',
+                'is_oss' => ! empty($data['is_oss']) ? 1 : 0,
+                'is_roi' => ! empty($data['is_roi']) ? 1 : 0,
+                'currency' => $data['currency'] ?? 'EUR',
+                'fiscal_year_start' => '01-01',
                 'valid_from' => $today,
                 'valid_until' => null,
+                'is_active' => 1,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
@@ -143,7 +130,42 @@ class CompanyStep extends AbstractStep
         return [
             'countries' => $this->getCountries(),
             'currencies' => ['EUR' => 'Euro (EUR)', 'USD' => 'US Dollar (USD)', 'GBP' => 'British Pound (GBP)'],
+            'legalEntityTypes' => $this->getLegalEntityTypes(),
         ];
+    }
+
+    /**
+     * Get legal entity types from database
+     */
+    private function getLegalEntityTypes(): array
+    {
+        $pdo = $this->getDatabase();
+
+        if ($pdo === null) {
+            // Fallback if no DB connection
+            return [
+                'LIMITED_COMPANY' => 'Sociedad de Responsabilidad Limitada (S.L.)',
+                'PUBLIC_LIMITED_COMPANY' => 'Sociedad Anónima (S.A.)',
+                'SELF_EMPLOYED' => 'Trabajador Autónomo',
+                'INDIVIDUAL' => 'Persona Física',
+            ];
+        }
+
+        try {
+            $stmt = $pdo->query("SELECT code, name FROM legal_entity_types WHERE is_active = 1 ORDER BY sort_order");
+            $types = [];
+
+            while ($row = $stmt->fetch()) {
+                $nameData = json_decode($row['name'], true);
+                $types[$row['code']] = $nameData['es'] ?? $nameData['en'] ?? $row['code'];
+            }
+
+            return $types;
+        } catch (\PDOException $e) {
+            return [
+                'LIMITED_COMPANY' => 'Sociedad de Responsabilidad Limitada (S.L.)',
+            ];
+        }
     }
 
     /**
