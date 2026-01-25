@@ -6,6 +6,8 @@ namespace Installer\Steps;
 
 use Installer\Actions\EnvFileWriter;
 use Installer\Environment\EnvironmentDetector;
+use Installer\I18n\Translator;
+use Installer\Session\InstallState;
 use Installer\Validators\DatabaseValidator;
 use Installer\Validators\SqliteValidator;
 
@@ -21,8 +23,9 @@ class DatabaseStep extends AbstractStep
 {
     private EnvironmentDetector $environmentDetector;
 
-    public function __construct()
+    public function __construct(?InstallState $state = null, ?Translator $translator = null)
     {
+        parent::__construct($state, $translator);
         $this->environmentDetector = new EnvironmentDetector;
     }
 
