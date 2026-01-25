@@ -346,8 +346,68 @@ Aumenta el timeout de sesion o completa la instalacion mas rapido. El asistente 
 
 ---
 
+## Testing
+
+### E2E Tests (Docker)
+
+Run the automated E2E test script:
+
+```bash
+cd installer
+./tests/e2e-test.sh
+```
+
+Options:
+
+- `--uuid-only`: Test only UUID ID type scenario
+- `--integer-only`: Test only Integer ID type scenario
+
+The script will:
+
+1. Start Docker environment
+2. Run full installation flow for each ID type
+3. Verify essential data was seeded
+4. Verify user ID format matches selected type
+5. Report test results
+
+### Unit Tests
+
+Unit tests are included in `tests/Unit/` and can be run with PHPUnit from the main Larafactu project.
+
+---
+
+## Pruebas
+
+### Tests E2E (Docker)
+
+Ejecuta el script de pruebas E2E automatizado:
+
+```bash
+cd installer
+./tests/e2e-test.sh
+```
+
+Opciones:
+
+- `--uuid-only`: Probar solo el escenario UUID
+- `--integer-only`: Probar solo el escenario Integer
+
+El script:
+
+1. Inicia el entorno Docker
+2. Ejecuta el flujo de instalacion completo para cada tipo de ID
+3. Verifica que los datos esenciales fueron sembrados
+4. Verifica que el formato del ID de usuario coincide con el tipo seleccionado
+5. Reporta los resultados de las pruebas
+
+### Tests Unitarios
+
+Los tests unitarios estan incluidos en `tests/Unit/` y pueden ejecutarse con PHPUnit desde el proyecto principal de Larafactu.
+
+---
+
 ## Version
 
-Installer Version: 1.0.0
+Installer Version: 1.1.0
 
 Compatible with: Larafactu (Laravel 12)
