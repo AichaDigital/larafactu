@@ -1,12 +1,12 @@
 # Larafactu Installer - Docker Testing Environment
 #
 # Ports configured to avoid conflicts with common services:
-# - 8888: Installer web (avoiding 80, 8080)
+# - 8889: Installer web (avoiding 80, 8080, 8888 used by Laravel Herd)
 # - 3307: MySQL (avoiding 3306 local)
 #
 # Usage:
 #   docker-compose up -d
-#   Open http://localhost:8888
+#   Open http://localhost:8889
 #   docker-compose down -v
 
 services:

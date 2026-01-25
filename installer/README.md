@@ -29,7 +29,7 @@ cd installer
 ./test.sh
 ```
 
-Then open http://localhost:8888 in your browser.
+Then open http://localhost:8889 in your browser.
 
 **Docker credentials (predefined):**
 
@@ -66,7 +66,7 @@ cd installer
 ./test.sh
 ```
 
-Luego abre http://localhost:8888 en tu navegador.
+Luego abre http://localhost:8889 en tu navegador.
 
 **Credenciales Docker (predefinidas):**
 
@@ -219,6 +219,32 @@ Durante la configuracion de base de datos, debes elegir un tipo de ID para usuar
 - **Integer** (Clasico): IDs numericos auto-incrementales. Para compatibilidad con sistemas legacy.
 
 **Esta seleccion NO se puede cambiar despues de la instalacion.**
+
+---
+
+## Essential Data Seeding
+
+After running migrations, the installer automatically seeds essential lookup data:
+
+- **LegalEntityTypesSeeder**: Spanish legal entity types (S.L., S.A., etc.)
+- **TaxRatesSeeder**: Spanish VAT rates (21%, 10%, 4%, 0%)
+- **TaxGroupsSeeder**: Tax groupings for invoicing
+- **UnitMeasuresSeeder**: Standard unit measures (units, hours, kg, etc.)
+
+This data is required for the application to function properly. Additional demo data can be optionally installed by checking "Run seeders" during migration step.
+
+---
+
+## Datos Esenciales Sembrados
+
+Despues de ejecutar las migraciones, el instalador siembra automaticamente datos esenciales:
+
+- **LegalEntityTypesSeeder**: Tipos de entidad legal espanolas (S.L., S.A., etc.)
+- **TaxRatesSeeder**: Tipos de IVA espanoles (21%, 10%, 4%, 0%)
+- **TaxGroupsSeeder**: Agrupaciones de impuestos para facturacion
+- **UnitMeasuresSeeder**: Unidades de medida estandar (unidades, horas, kg, etc.)
+
+Estos datos son necesarios para que la aplicacion funcione correctamente. Datos de demostracion adicionales pueden instalarse opcionalmente marcando "Ejecutar seeders" durante el paso de migraciones.
 
 ---
 

@@ -121,13 +121,21 @@ class MigrationRunner
     /**
      * Run essential seeders that are always required for the application to work.
      *
-     * These seeders populate lookup tables like legal_entity_types that are
-     * required for forms to function properly.
+     * These seeders populate lookup tables required for the application:
+     * - LegalEntityTypesSeeder: Company form legal entity dropdown
+     * - TaxRatesSeeder: Spanish VAT rates for invoicing
+     * - TaxGroupsSeeder: Tax groupings (depends on TaxRates)
+     * - UnitMeasuresSeeder: Unit measures for invoice lines
+     *
+     * Order matters: TaxGroupsSeeder depends on TaxRatesSeeder.
      */
     public function seedEssentials(): ActionResult
     {
         $essentialSeeders = [
             'Database\\Seeders\\LegalEntityTypesSeeder',
+            'Database\\Seeders\\TaxRatesSeeder',
+            'Database\\Seeders\\TaxGroupsSeeder',
+            'Database\\Seeders\\UnitMeasuresSeeder',
         ];
 
         $outputs = [];
