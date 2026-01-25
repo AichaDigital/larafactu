@@ -62,7 +62,14 @@ class MigrationsStep extends AbstractStep
             );
         }
 
-        // Run seeders if requested
+        // Always run essential seeders (lookup tables like legal_entity_types)
+        $essentialResult = $runner->seedEssentials();
+        if (! $essentialResult->isSuccess()) {
+            // Warning but don't fail - store for potential debugging
+            $this->state->set('essential_seeder_warning', $essentialResult->getError());
+        }
+
+        // Run additional seeders if requested (demo data)
         if ($data['run_seeders'] ?? false) {
             $seedResult = $runner->seed();
 

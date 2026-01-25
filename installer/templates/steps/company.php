@@ -45,7 +45,7 @@
                         >
                             <option value="">-- Seleccione --</option>
                             <?php foreach ($legalEntityTypes as $code => $name) { ?>
-                            <option value="<?= htmlspecialchars($code) ?>" <?= $code === 'LIMITED_COMPANY' ? 'selected' : '' ?>><?= htmlspecialchars($name) ?></option>
+                            <option value="<?= htmlspecialchars($code, ENT_QUOTES, 'UTF-8') ?>" <?= $code === 'LIMITED_COMPANY' ? 'selected' : '' ?>><?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?></option>
                             <?php } ?>
                         </select>
                     </div>

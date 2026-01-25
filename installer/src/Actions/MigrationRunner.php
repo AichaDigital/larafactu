@@ -119,6 +119,45 @@ class MigrationRunner
     }
 
     /**
+     * Run essential seeders that are always required for the application to work.
+     *
+     * These seeders populate lookup tables like legal_entity_types that are
+     * required for forms to function properly.
+     */
+    public function seedEssentials(): ActionResult
+    {
+        $essentialSeeders = [
+            'Database\\Seeders\\LegalEntityTypesSeeder',
+        ];
+
+        $outputs = [];
+        $errors = [];
+
+        foreach ($essentialSeeders as $seeder) {
+            $result = $this->commandRunner->artisan('db:seed', '--force', '--class='.$seeder);
+
+            if ($result->isSuccess()) {
+                $outputs[] = "Seeded: {$seeder}";
+            } else {
+                $errors[] = "Failed: {$seeder} - ".$result->getError();
+            }
+        }
+
+        if (! empty($errors)) {
+            return ActionResult::failure(
+                'Algunos seeders esenciales fallaron',
+                implode('; ', $errors),
+                ['output' => array_merge($outputs, $errors)]
+            );
+        }
+
+        return ActionResult::success(
+            'Seeders esenciales ejecutados correctamente',
+            ['output' => $outputs]
+        );
+    }
+
+    /**
      * Get migration log
      */
     public function getMigrationLog(): array
