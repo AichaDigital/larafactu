@@ -14,6 +14,7 @@
         "aichadigital/larabill": "dev-main",
         "aichadigital/lararoi": "dev-main",
         "aichadigital/laratickets": "dev-main",
+        "aichadigital/lara-content": "dev-main",
         "intervention/image": "^3.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
@@ -107,13 +108,15 @@
             "@php -r \"if(is_dir('packages/aichadigital/larabill')) { passthru('composer config repositories.larabill path ./packages/aichadigital/larabill'); }\"",
             "@php -r \"if(is_dir('packages/aichadigital/lara-verifactu')) { passthru('composer config repositories.lara-verifactu path ./packages/aichadigital/lara-verifactu'); }\"",
             "@php -r \"if(is_dir('packages/aichadigital/laratickets')) { passthru('composer config repositories.laratickets path ./packages/aichadigital/laratickets'); }\"",
-            "@php -r \"if(is_dir('packages/aichadigital/lararoi')) { passthru('composer config repositories.lararoi path ./packages/aichadigital/lararoi'); }\""
+            "@php -r \"if(is_dir('packages/aichadigital/lararoi')) { passthru('composer config repositories.lararoi path ./packages/aichadigital/lararoi'); }\"",
+            "@php -r \"if(is_dir('packages/aichadigital/lara-content')) { passthru('composer config repositories.lara-content path ./packages/aichadigital/lara-content'); }\""
         ],
         "clean-repos": [
             "composer config --unset repositories.larabill",
             "composer config --unset repositories.lara-verifactu",
             "composer config --unset repositories.laratickets",
-            "composer config --unset repositories.lararoi"
+            "composer config --unset repositories.lararoi",
+            "composer config --unset repositories.lara-content"
         ]
     },
     "extra": {
