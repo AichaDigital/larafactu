@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(rsync:*)",
+      "Bash(rm:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(git:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(php:*)",
+      "Bash(composer:*)",
+      "Bash(npm:*)",
+      "Bash(./vendor/bin/pest:*)",
+      "Read",
+      "Write",
+      "Edit",
+      "mcp__plugin_playwright_playwright__*"
+    ],
+    "additionalDirectories": [
+      "/Users/abkrim/SitesDocker/larafactu-wizard-test"
+    ]
+  }
+}
