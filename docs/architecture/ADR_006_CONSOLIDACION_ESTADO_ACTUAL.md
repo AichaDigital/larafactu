@@ -1,6 +1,10 @@
-# ADR-006: Consolidacion y Estado Actual del Proyecto
+---
+status: VIGENTE
+date: 2026-01-02
+---
 
-**Estado**: VIGENTE
+# ADR-006: Consolidación y Estado Actual del Proyecto
+
 **Fecha**: 2026-01-02
 **Actualizado**: 2026-01-07
 **Contexto**: Larafactu - Consolidacion post-refactor

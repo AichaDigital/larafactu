@@ -1,6 +1,10 @@
+---
+status: VIGENTE
+date: 2025-12-07
+---
+
 # ADR-002: Migración a UUID v7 String y Consolidación de Entidades
 
-> **Estado**: ⚠️ PARCIALMENTE SUPERSEDED
 > **Fecha**: 2025-12-07
 > **Actualizado**: 2025-12-15
 > **Contexto**: Larafactu + Ecosistema AichaDigital

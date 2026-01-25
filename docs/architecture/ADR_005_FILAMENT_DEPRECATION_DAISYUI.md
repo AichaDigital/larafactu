@@ -1,6 +1,10 @@
-# ADR-005: Deprecacion de Filament y Adopcion de Blade+Livewire+DaisyUI
+---
+status: VIGENTE
+date: 2026-01-01
+---
 
-**Estado**: APROBADO
+# ADR-005: Deprecación de Filament y Adopción de Blade+Livewire+DaisyUI
+
 **Fecha**: 2026-01-01
 **Contexto**: Larafactu + Ecosistema AichaDigital
 **Impacto**: CRITICO - Cambio arquitectonico completo del frontend

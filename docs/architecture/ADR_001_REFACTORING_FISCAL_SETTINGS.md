@@ -1,6 +1,10 @@
+---
+status: VIGENTE
+date: 2025-11-28
+---
+
 # ADR 001: Refactorización de FiscalSettings - Separación Empresa vs Usuario
 
-**Estado**: ⚠️ **PARCIALMENTE SUPERSEDED**
 **Fecha**: 2025-11-28
 **Actualizado**: 2025-12-15
 **Contexto**: Staging Pre-Producción

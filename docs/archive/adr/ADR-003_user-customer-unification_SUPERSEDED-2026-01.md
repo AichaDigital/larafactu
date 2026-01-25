@@ -1,9 +1,13 @@
+---
+status: SUPERSEDED
+date: 2025-12-08
+superseded_by: ADR-004
+---
+
 # ADR-003: Unificación Users/Customers
 
-> **Estado**: ✅ COMPLETADO (Fase 1 ✅ | Fase 2 ✅) - PARCIALMENTE SUPERSEDED por ADR-004
-> **Fecha**: 2025-12-08
-> **Actualizado**: 2026-01-07
-> **Deadline**: ~15 febrero 2026
+> **Fecha original**: 2025-12-08
+> **Archivado**: 2026-01-25
 > **Ubicación canónica**: `packages/aichadigital/larabill/docs/ADR-003-user-customer-unification.md`
 
 ---

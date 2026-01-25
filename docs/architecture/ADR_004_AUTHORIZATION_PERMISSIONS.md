@@ -1,6 +1,10 @@
-# ADR-004: Sistema de Autorizacion y Permisos
+---
+status: VIGENTE
+date: 2026-01-01
+---
 
-**Estado**: ✅ APROBADO - EN IMPLEMENTACIÓN
+# ADR-004: Sistema de Autorización y Permisos
+
 **Fecha**: 2026-01-01
 **Actualizado**: 2026-01-07
 **Contexto**: Larafactu + Ecosistema AichaDigital
