@@ -66,6 +66,9 @@ require_once INSTALLER_ROOT.'/src/helpers.php';
 // Initialize translator
 $translator = new \Installer\I18n\Translator;
 
+// Initialize environment detector
+$environmentDetector = new \Installer\Environment\EnvironmentDetector;
+
 // Start session if not started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

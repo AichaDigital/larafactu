@@ -152,7 +152,7 @@ class CompanyStep extends AbstractStep
         }
 
         try {
-            $stmt = $pdo->query("SELECT code, name FROM legal_entity_types WHERE is_active = 1 ORDER BY sort_order");
+            $stmt = $pdo->query('SELECT code, name FROM legal_entity_types WHERE is_active = 1 ORDER BY sort_order');
             $types = [];
 
             while ($row = $stmt->fetch()) {

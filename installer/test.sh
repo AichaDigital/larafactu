@@ -1,14 +1,13 @@
 #!/bin/bash
 #
-# Larafactu Installer - Test Runner
+# Larafactu Installer - Docker Testing Environment
 #
-# This script runs the installer tests in a clean Docker environment.
-# It's designed to be run OUTSIDE of the main CI pipeline.
+# This script starts the Docker environment for testing the web installer.
+# It does NOT run automated tests - it sets up the environment for manual testing.
 #
 # Usage:
-#   ./test.sh              # Run all tests
-#   ./test.sh --unit       # Run only unit tests
-#   ./test.sh --integration # Run only integration tests
+#   ./test.sh         # Start Docker and open installer
+#   ./test.sh --down  # Stop and clean up Docker containers
 #
 
 set -e
@@ -16,29 +15,29 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-echo "🧪 Larafactu Installer - Test Suite"
-echo "===================================="
+echo "Larafactu Installer - Docker Testing Environment"
+echo "================================================="
 echo ""
 
-# Parse arguments
-TEST_TYPE="all"
-if [ "$1" == "--unit" ]; then
-    TEST_TYPE="unit"
-elif [ "$1" == "--integration" ]; then
-    TEST_TYPE="integration"
+# Check for --down flag
+if [ "$1" == "--down" ]; then
+    echo "Stopping Docker containers..."
+    docker-compose -f docker/docker-compose.yml down -v 2>/dev/null || true
+    echo "Done. Containers stopped and volumes removed."
+    exit 0
 fi
 
 # Clean up previous containers
-echo "🧹 Cleaning up previous containers..."
+echo "Cleaning up previous containers..."
 docker-compose -f docker/docker-compose.yml down -v 2>/dev/null || true
 
 # Start fresh containers
-echo "🚀 Starting Docker containers..."
+echo "Starting Docker containers..."
 docker-compose -f docker/docker-compose.yml up -d
 
 # Wait for MySQL to be ready
-echo "⏳ Waiting for MySQL to be ready..."
-sleep 10
+echo "Waiting for MySQL to be ready..."
+sleep 5
 
 # Check MySQL is healthy
 MAX_TRIES=30
@@ -46,48 +45,33 @@ TRIES=0
 until docker-compose -f docker/docker-compose.yml exec -T mysql mysqladmin ping -h localhost -u root -proot --silent 2>/dev/null; do
     TRIES=$((TRIES + 1))
     if [ $TRIES -gt $MAX_TRIES ]; then
-        echo "❌ MySQL failed to start"
+        echo "ERROR: MySQL failed to start"
         docker-compose -f docker/docker-compose.yml logs mysql
         exit 1
     fi
     echo "   Waiting for MySQL... ($TRIES/$MAX_TRIES)"
     sleep 2
 done
-echo "✅ MySQL is ready"
+echo "MySQL is ready"
 
-# Run tests based on type
 echo ""
-echo "🧪 Running tests..."
+echo "================================================="
+echo "Docker environment is ready!"
 echo ""
-
-case $TEST_TYPE in
-    "unit")
-        docker-compose -f docker/docker-compose.yml exec -T php-fpm \
-            php vendor/bin/phpunit --testsuite=Unit
-        ;;
-    "integration")
-        docker-compose -f docker/docker-compose.yml exec -T php-fpm \
-            php vendor/bin/phpunit --testsuite=Integration
-        ;;
-    *)
-        docker-compose -f docker/docker-compose.yml exec -T php-fpm \
-            php vendor/bin/phpunit
-        ;;
-esac
-
-TEST_RESULT=$?
-
-# Cleanup
+echo "Open the installer at:"
 echo ""
-echo "🧹 Cleaning up..."
-docker-compose -f docker/docker-compose.yml down -v
-
-# Report result
+echo "    http://localhost:8888"
 echo ""
-if [ $TEST_RESULT -eq 0 ]; then
-    echo "✅ All tests passed!"
-else
-    echo "❌ Some tests failed"
-    exit $TEST_RESULT
-fi
-
+echo "Database credentials (predefined for Docker):"
+echo "    Host:     mysql"
+echo "    Port:     3306"
+echo "    Database: larafactu_test"
+echo "    Username: larafactu"
+echo "    Password: larafactu"
+echo ""
+echo "To stop the environment:"
+echo "    ./test.sh --down"
+echo ""
+echo "Or manually:"
+echo "    docker-compose -f docker/docker-compose.yml down -v"
+echo "================================================="
