@@ -125,7 +125,7 @@
                                             <label class="label text-xs">Cantidad</label>
                                             <input
                                                 type="number"
-                                                wire:model.blur="items.{{ $index }}.quantity"
+                                                wire:model.live.blur="items.{{ $index }}.quantity"
                                                 class="input input-sm w-full text-right"
                                                 min="0.01"
                                                 step="0.01"
@@ -137,7 +137,7 @@
                                             <label class="label text-xs">Precio (&euro;)</label>
                                             <input
                                                 type="number"
-                                                wire:model.blur="items.{{ $index }}.unit_price"
+                                                wire:model.live.blur="items.{{ $index }}.unit_price"
                                                 class="input input-sm w-full text-right"
                                                 min="0"
                                                 step="1"
@@ -149,7 +149,7 @@
                                         <!-- Tax Rate -->
                                         <div class="md:col-span-2">
                                             <label class="label text-xs">IVA %</label>
-                                            <select wire:model.blur="items.{{ $index }}.tax_rate" class="select select-sm w-full">
+                                            <select wire:model.live.blur="items.{{ $index }}.tax_rate" class="select select-sm w-full">
                                                 <option value="0">0%</option>
                                                 <option value="4">4%</option>
                                                 <option value="10">10%</option>

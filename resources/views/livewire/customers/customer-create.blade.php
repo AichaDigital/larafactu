@@ -23,7 +23,7 @@
                     <legend class="fieldset-legend">Nombre *</legend>
                     <input
                         type="text"
-                        wire:model.blur="name"
+                        wire:model.live.blur="name"
                         class="input w-full @error('name') input-error @enderror"
                         placeholder="Nombre del cliente"
                         required
