@@ -7,6 +7,7 @@ namespace App\Livewire\Invoices;
 use AichaDigital\Larabill\Enums\InvoiceSerieType;
 use AichaDigital\Larabill\Enums\InvoiceStatus;
 use AichaDigital\Larabill\Models\Invoice;
+use AichaDigital\Larabill\Services\InvoiceNumberingService;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
@@ -154,13 +155,18 @@ class InvoiceCreate extends Component
 
         DB::transaction(function () {
             $serieType = InvoiceSerieType::from($this->serie);
-            $fiscalYear = (int) date('Y', strtotime($this->invoiceDate));
 
-            // Get next series number
-            $seriesNumber = $this->getNextSeriesNumber($serieType, $fiscalYear);
+            // Atomic numbering via InvoiceNumberingService (lockForUpdate + savepoint)
+            $numberingService = app(InvoiceNumberingService::class);
+            $invoiceNumber = $numberingService->generateNumber(
+                prefix: $serieType->defaultPrefix(),
+                serie: $serieType->value,
+                userId: auth()->id(),
+            );
 
-            // Generate fiscal number
-            $fiscalNumber = $this->generateFiscalNumber($serieType, $fiscalYear, $seriesNumber);
+            $fiscalNumber = $invoiceNumber->formatted;
+            $seriesNumber = $invoiceNumber->seriesNumber;
+            $fiscalYear = $invoiceNumber->fiscalYear;
 
             // Create invoice
             $invoice = Invoice::create([
@@ -207,23 +213,6 @@ class InvoiceCreate extends Component
         session()->flash('success', 'Factura creada correctamente.');
 
         $this->redirect(route('invoices.index'), navigate: true);
-    }
-
-    protected function getNextSeriesNumber(InvoiceSerieType $serie, int $fiscalYear): int
-    {
-        $lastNumber = DB::table('invoices')
-            ->where('serie', $serie->value)
-            ->where('fiscal_year', $fiscalYear)
-            ->max('series_number');
-
-        return ($lastNumber ?? 0) + 1;
-    }
-
-    protected function generateFiscalNumber(InvoiceSerieType $serie, int $fiscalYear, int $seriesNumber): string
-    {
-        $prefix = $serie->defaultPrefix();
-
-        return sprintf('%s-%d-%06d', $prefix, $fiscalYear, $seriesNumber);
     }
 
     public function getCustomers(): array
