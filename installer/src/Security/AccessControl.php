@@ -240,23 +240,39 @@ class AccessControl
 
     /**
      * Get client IP address
+     *
+     * Only reads proxy headers (X-Forwarded-For, X-Real-IP, etc.) when
+     * REMOTE_ADDR is in the INSTALLER_TRUSTED_PROXIES list.
+     * Secure by default: no trusted proxies = REMOTE_ADDR only.
+     *
+     * @see docs/plans/2026-02-15-larafactu-security-fixes-design.md
      */
     private function getClientIp(): string
     {
-        // Check for proxied IP
-        $headers = [
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+
+        if (! filter_var($remoteAddr, FILTER_VALIDATE_IP)) {
+            return '0.0.0.0';
+        }
+
+        // Check if REMOTE_ADDR is a trusted proxy
+        if (! $this->isTrustedProxy($remoteAddr)) {
+            return $remoteAddr;
+        }
+
+        // REMOTE_ADDR is trusted — read proxy headers in priority order
+        $proxyHeaders = [
             'HTTP_CF_CONNECTING_IP',     // Cloudflare
             'HTTP_X_FORWARDED_FOR',      // Standard proxy
             'HTTP_X_REAL_IP',            // Nginx
             'HTTP_CLIENT_IP',            // Some proxies
-            'REMOTE_ADDR',               // Direct connection
         ];
 
-        foreach ($headers as $header) {
+        foreach ($proxyHeaders as $header) {
             if (! empty($_SERVER[$header])) {
                 $ip = $_SERVER[$header];
 
-                // X-Forwarded-For can contain multiple IPs
+                // X-Forwarded-For can contain multiple IPs — take the first (client)
                 if (strpos($ip, ',') !== false) {
                     $ip = trim(explode(',', $ip)[0]);
                 }
@@ -267,7 +283,27 @@ class AccessControl
             }
         }
 
-        return '0.0.0.0';
+        // No valid proxy header found — fall back to REMOTE_ADDR
+        return $remoteAddr;
+    }
+
+    /**
+     * Check if an IP is in the trusted proxies list
+     *
+     * Reads from INSTALLER_TRUSTED_PROXIES env var (comma-separated IPs).
+     * Empty/unset = no trusted proxies (secure by default).
+     */
+    private function isTrustedProxy(string $ip): bool
+    {
+        $trustedProxies = getenv('INSTALLER_TRUSTED_PROXIES');
+
+        if ($trustedProxies === false || $trustedProxies === '') {
+            return false;
+        }
+
+        $trusted = array_map('trim', explode(',', $trustedProxies));
+
+        return in_array($ip, $trusted, true);
     }
 
     /**
