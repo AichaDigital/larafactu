@@ -85,6 +85,10 @@ describe('Authenticated Routes', function () {
     });
 
     it('loads invoice create page', function () {
+        // Invoice create requires admin (InvoicePolicy::create)
+        $admin = User::factory()->staff()->create();
+        $this->actingAs($admin);
+
         $response = $this->get('/invoices/create');
 
         $response->assertStatus(200);
