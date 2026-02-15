@@ -150,6 +150,8 @@ class InvoiceCreate extends Component
 
     public function save(): void
     {
+        $this->authorize('create', \AichaDigital\Larabill\Models\Invoice::class);
+
         $this->calculateTotals();
         $this->validate();
 

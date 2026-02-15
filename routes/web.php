@@ -68,7 +68,7 @@ Route::middleware(['auth'])->group(function () {
     // Invoices
     Route::prefix('invoices')->name('invoices.')->group(function () {
         Route::get('/', InvoiceList::class)->name('index');
-        Route::get('/create', InvoiceCreate::class)->name('create');
+        Route::get('/create', InvoiceCreate::class)->name('create')->can('create', \AichaDigital\Larabill\Models\Invoice::class);
         Route::get('/{invoice}', InvoiceShow::class)->name('show');
         Route::get('/{invoice}/edit', InvoiceEdit::class)->name('edit');
         Route::get('/{invoice}/pdf', function (\AichaDigital\Larabill\Models\Invoice $invoice) {
