@@ -21,7 +21,7 @@ class AccessControlTest extends TestCase
     {
         parent::setUp();
 
-        $this->storagePath = sys_get_temp_dir() . '/installer_test_' . uniqid();
+        $this->storagePath = sys_get_temp_dir().'/installer_test_'.uniqid();
         mkdir($this->storagePath, 0755, true);
 
         // Clean server vars
@@ -40,7 +40,7 @@ class AccessControlTest extends TestCase
     protected function tearDown(): void
     {
         // Clean up storage
-        $files = glob($this->storagePath . '/*');
+        $files = glob($this->storagePath.'/*');
         foreach ($files as $file) {
             if (is_file($file)) {
                 unlink($file);
