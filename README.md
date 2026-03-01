@@ -81,6 +81,9 @@ npm install && npm run build
 # 4. Generar clave y migrar
 php artisan key:generate
 php artisan migrate --seed
+
+# 5. Activar git hooks (pre-commit con Pint)
+git config core.hooksPath bin/hooks
 ```
 
 ### 🎉 ¡Listo!

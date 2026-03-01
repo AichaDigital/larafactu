@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Pre-commit hook: Protege composer.json de subir con path repositories
+
+COMPOSER_FILE="composer.json"
+
+# Verificar si composer.json está en el commit
+if git diff --cached --name-only | grep -q "^${COMPOSER_FILE}$"; then
+    # Verificar si tiene path repositories
+    if git show :${COMPOSER_FILE} | grep -q '"type":\s*"path"'; then
+        echo "ERROR: composer.json contiene path repositories."
+        echo ""
+        echo "El composer.json no debe subirse con repositorios locales."
+        echo "Los paquetes deben venir de Packagist."
+        echo ""
+        echo "Para desarrollo local, usa:"
+        echo "  composer config repositories.larabill path ./packages/aichadigital/larabill"
+        echo ""
+        echo "Para arreglar este commit:"
+        echo "  git checkout HEAD -- composer.json"
+        echo "  git add composer.json"
+        echo ""
+        exit 1
+    fi
+fi
+
+# Ejecutar Pint sobre los archivos PHP staged
+STAGED_PHP=$(git diff --cached --name-only --diff-filter=ACM | grep '\.php$')
+
+if [ -n "$STAGED_PHP" ]; then
+    echo "Running Pint on staged PHP files..."
+    echo "$STAGED_PHP" | xargs vendor/bin/pint --test 2>/dev/null
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "ERROR: Pint found style issues. Run:"
+        echo "  vendor/bin/pint"
+        echo ""
+        echo "Then stage the fixed files and commit again."
+        exit 1
+    fi
+fi
+
+exit 0
