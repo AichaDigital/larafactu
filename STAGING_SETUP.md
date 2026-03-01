@@ -111,53 +111,14 @@ cd larafactu
 cp .env.example .env
 php artisan key:generate
 
-# 3. Ejecutar instalador interactivo
-php artisan larafactu:install
+# 3. Instalar dependencias y migrar
+composer install
+npm install && npm run build
+php artisan migrate --seed
 ```
 
-El instalador preguntará:
-- **¿Local o Producción?** → Seleccionar "Local"
-- **¿Ejecutar migraciones?** → Seleccionar "FRESH" para empezar limpio
-- **¿Ejecutar seeders?** → Sí (crea usuarios de prueba)
-
-#### Opciones del Instalador
-
-```bash
-# Instalación local completa (no interactivo)
-php artisan larafactu:install --local --fresh
-
-# Especificar ruta de paquetes
-php artisan larafactu:install --local --packages-path=/custom/path
-
-# Solo migraciones (sin fresh)
-php artisan larafactu:install --local --skip-seeders
-
-# Producción
-php artisan larafactu:install --production
-```
-
-#### Qué hace el instalador en modo local
-
-1. ✅ Crea directorio `packages/aichadigital/`
-2. ✅ Crea symlinks a paquetes en `/Users/abkrim/development/packages/aichadigital/`
-3. ✅ Modifica `composer.json` añadiendo path repositories
-4. ✅ Ejecuta `composer update` para usar paquetes locales
-5. ✅ Ejecuta migraciones (`migrate` o `migrate:fresh`)
-6. ✅ Ejecuta seeders de desarrollo
-
-### Reset Completo (Fresh Install)
-
-Para resetear el proyecto preservando configuración de IDE:
-
-```bash
-# Ejecutar script de reset
-bin/fresh-install.sh
-
-# Luego ejecutar instalador
-php artisan larafactu:install --local --fresh
-```
-
-**Preserva**: `.cursor/`, `.claude/`, `.vscode/`, `.env`, `.mcp.json`
+> **Nota**: El antiguo CLI installer (`php artisan larafactu:install`) fue eliminado.
+> Para instalacion en produccion, usar el wizard web. Ver `docs/PRODUCTION_WEB_INSTALL.md`.
 
 ### Configurar Base de Datos
 
@@ -491,9 +452,10 @@ ls -la packages/aichadigital/
 # Deben mostrar -> /Users/abkrim/development/packages/aichadigital/...
 ```
 
-**Si no existen**, ejecutar instalador:
+**Si no existen**, crear symlinks manualmente:
 ```bash
-php artisan larafactu:install --local
+mkdir -p packages/aichadigital
+ln -s /Users/abkrim/development/packages/aichadigital/larabill packages/aichadigital/larabill
 ```
 
 ### El instalador falla

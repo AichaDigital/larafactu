@@ -198,11 +198,11 @@ We are in post-refactor phase after:
 5. **MEDIUM**: Continue UI migration from Filament to DaisyUI
 6. **HIGH**: Remove Filament dependencies from composer.json
 7. **LOW**: Create tag `v0.6.0-alpha` for larabill
-8. **LOW**: Deprecate CLI installer (AID-41) - Due: 2026-01-15
+8. ~~**LOW**: Deprecate CLI installer (AID-40)~~ ✅ 2026-03-01
 
 #### 7. Web Installation Wizard (COMPLETED - 2026-01-07)
 
-**Problem**: CLI installer (`php artisan larafactu:install`) requires SSH access, not suitable for shared hosting
+**Problem**: CLI installer (removed, see AID-40) required SSH access, not suitable for shared hosting
 
 **Solution Implemented** (AID-39):
 
@@ -376,8 +376,8 @@ BOOST_BROWSER_LOGS_WATCHER=false
 - [ ] **Seeding**: Create production seeders
 - [x] **Tests ADR-004**: Tests de autorización completos ✅ 2026-01-07 (56 tests)
 - [ ] **Admin Panel**: CRUD usuarios con user_type
-- [ ] **AID-39**: Web Installation Wizard (ver [docs/wizard/](./wizard/))
-- [ ] **AID-40**: Deprecate CLI installer (deadline: 15/01/2026)
+- [x] **AID-39**: Web Installation Wizard (ver [docs/wizard/](./wizard/))
+- [x] **AID-40**: Deprecate CLI installer ✅ 2026-03-01
 
 ---
 

@@ -66,84 +66,21 @@ aichadigital/lara100         → Valores monetarios base 100
 
 ### 🏠 Desarrollo Local
 
-El proyecto incluye un **instalador bash** que configura todo automáticamente desde cero:
-
 ```bash
 # 1. Clonar repositorio
 git clone https://github.com/AichaDigital/larafactu.git
 cd larafactu
 
-# 2. Configurar base de datos en .env.example (o crear .env)
-# DB_DATABASE=larafactu
-# DB_USERNAME=root
-# DB_PASSWORD=
+# 2. Copiar .env y configurar base de datos
+cp .env.example .env
 
-# 3. Ejecutar instalador local (hace TODO automáticamente)
-./bin/local-install.sh
-```
+# 3. Instalar dependencias
+composer install
+npm install && npm run build
 
-El script `local-install.sh` realiza automáticamente:
-
-- ✅ Detecta paquetes de desarrollo en rutas comunes
-- ✅ Pregunta qué BD usar (SQLite o MySQL)
-- ✅ Configura `.env` con los datos de conexión
-- ✅ Crea symlinks a paquetes locales
-- ✅ Configura path repositories en composer.json
-- ✅ Ejecuta `composer install`
-- ✅ Genera APP_KEY
-- ✅ Ejecuta migraciones y seeders
-- ✅ Compila assets (npm install && build)
-
-#### Opciones del Instalador
-
-```bash
-# Instalación rápida con SQLite (sin preguntas de BD)
-./bin/local-install.sh --sqlite
-
-# Instalación con MySQL (interactivo)
-./bin/local-install.sh --mysql
-
-# MySQL no interactivo (CI/scripts)
-./bin/local-install.sh --mysql --db-database=larafactu --db-username=root --db-password=secret
-
-# Especificar ruta a paquetes
-./bin/local-install.sh --packages-path=/ruta/a/paquetes
-
-# Sin compilar assets
-./bin/local-install.sh --skip-npm
-
-# Reset completo preservando IDE config (para reinstalar)
-bin/fresh-install.sh && ./bin/local-install.sh
-```
-
-#### Comandos Post-Instalación
-
-```bash
-# Reinstalar limpio (si ya tienes el proyecto funcionando)
-php artisan larafactu:install --local --fresh
-```
-
-#### Nota sobre `composer.json` en desarrollo
-
-El `composer.json` del repositorio usa **paths locales** para los paquetes de desarrollo. El instalador aplica `git skip-worktree` para evitar commits accidentales.
-
-**Si necesitas modificar `composer.json` legítimamente** (añadir dependencias, etc.):
-
-```bash
-# 1. Quitar protección
-git update-index --no-skip-worktree composer.json
-
-# 2. Restaurar versión original del repo
-git checkout composer.json
-
-# 3. Hacer tus cambios (añadir dependencias, etc.)
-composer require nuevo/paquete
-
-# 4. Commitear
-git add composer.json && git commit -m "feat: Add nuevo/paquete"
-
-# 5. Volver a aplicar paths locales y protección
-php artisan larafactu:install --local --skip-migrations
+# 4. Generar clave y migrar
+php artisan key:generate
+php artisan migrate --seed
 ```
 
 ### 🎉 ¡Listo!

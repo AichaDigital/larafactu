@@ -75,15 +75,6 @@ Este directorio contiene scripts para facilitar el desarrollo y mantenimiento de
 
 ---
 
-### 🚀 `test-install.sh` - Test de Instalación Completa
-
-**Propósito**: Test automático de instalación de paquetes.
-
-**Uso**:
-```bash
-./bin/test-install.sh
-```
-
 ---
 
 ## 🔧 Workflow Recomendado
@@ -164,7 +155,7 @@ git push origin main
 |-----------|------|---------|
 | Desarrollando localmente | PATH | (Cambios automáticos) |
 | Después de push a GitHub | VCS | `./bin/composer-update-vcs.sh` |
-| Testing de instalación limpia | VCS | `./bin/test-install.sh` |
+| Testing de instalación limpia | Web Wizard | Ver `docs/PRODUCTION_WEB_INSTALL.md` |
 | CI/CD en GitHub Actions | VCS | (Automático en workflow) |
 
 ---

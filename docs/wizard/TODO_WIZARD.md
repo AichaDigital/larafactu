@@ -95,12 +95,12 @@
 - [ ] Documentar proceso de instalación
 - [ ] Actualizar README principal
 
-## Fase 10: Deprecación CLI Installer ⏳ PLANIFICADO
+## Fase 10: Deprecación CLI Installer ✅ COMPLETADO
 
-- [ ] Marcar `php artisan larafactu:install` como deprecated
-- [ ] Añadir warning en consola
-- [ ] Crear issue Linear AID-40 para eliminación
-- [ ] Fecha límite eliminación: 2026-01-15
+- [x] Marcar `php artisan larafactu:install` como deprecated
+- [x] Eliminar CLI installer (AID-40)
+- [x] Eliminar scripts bin/ relacionados (fresh-install.sh, local-install.sh, test-install.sh)
+- [x] Actualizar documentacion para apuntar al wizard web
 
 ---
 
